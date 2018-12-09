@@ -1,0 +1,245 @@
+[
+ {
+  "name": "g_d1_f12",
+  "rowTexts": [
+   "LP-WAVENET: LINEAR PREDICTION-BASED WAVENET SPEECH SYNTHESIS"
+  ]
+ },
+ {
+  "name": "g_d1_f13",
+  "rowTexts": [
+   "Min-Jae Hwang"
+  ]
+ },
+ {
+  "name": "g_d1_f14",
+  "rowTexts": [
+   "‹:"
+  ]
+ },
+ {
+  "name": "g_d1_f13",
+  "rowTexts": [
+   ", Frank Soong"
+  ]
+ },
+ {
+  "name": "g_d1_f14",
+  "rowTexts": [
+   ":"
+  ]
+ },
+ {
+  "name": "g_d1_f13",
+  "rowTexts": [
+   ", Fenglong Xie"
+  ]
+ },
+ {
+  "name": "g_d1_f14",
+  "rowTexts": [
+   ":"
+  ]
+ },
+ {
+  "name": "g_d1_f13",
+  "rowTexts": [
+   ", Xi Wang"
+  ]
+ },
+ {
+  "name": "g_d1_f14",
+  "rowTexts": [
+   ":"
+  ]
+ },
+ {
+  "name": "g_d1_f13",
+  "rowTexts": [
+   "and Hong-Goo Kang"
+  ]
+ },
+ {
+  "name": "g_d1_f14",
+  "rowTexts": [
+   "‹",
+   "‹"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   "Department of Electrical and Electronic Engineering, Yonsei University, Seoul, South Korea"
+  ]
+ },
+ {
+  "name": "g_d1_f14",
+  "rowTexts": [
+   ":"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   "Microsoft Research Asia, Beijing, China"
+  ]
+ },
+ {
+  "name": "g_d1_f12",
+  "rowTexts": [
+   "ABSTRACT"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   "We propose a linear prediction (LP)-based waveform gener-",
+   "ation method via WaveNet speech synthesis.  The WaveNet",
+   "vocoder, which uses speech parameters as a conditional input",
+   "of WaveNet, has significantly improved the quality of statis-",
+   "tical parametric speech synthesis system.  However, it is still",
+   "challenging to effectively train the neural vocoder when the",
+   "target  database  becomes  larger  and  more  expressive.   As  a",
+   "solution, the approaches that only generate the vocal source",
+   "signal  by  the  neural  vocoder  have  been  proposed.    How-",
+   "ever, they tend to generate synthetic noise because the vocal",
+   "source is independently handled without considering the en-",
+   "tire speech synthesis process; where it is inevitable to come",
+   "up with a mismatch between vocal source and vocal tract fil-",
+   "ter. To address this problem, we propose an LP-WaveNet that",
+   "structurally  models  the  vocal  source  in  the  speech  training",
+   "and inference processes. The experimental results verify that",
+   "the proposed system outperforms the conventional WaveNet",
+   "vocoders both objectively and subjectively."
+  ]
+ },
+ {
+  "name": "g_d1_f16",
+  "rowTexts": [
+   "Index Terms"
+  ]
+ },
+ {
+  "name": "g_d1_f12",
+  "rowTexts": [
+   "—"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   "Text-to-speech, speech synthesis, statisti-",
+   "cal parametric speech synthesis, WaveNet, WaveNet vocoder"
+  ]
+ },
+ {
+  "name": "g_d1_f12",
+  "rowTexts": [
+   "1. INTRODUCTION"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   "The  WaveNet  vocoder  [1, 2],  which  uses  the  acoustic  fea-",
+   "tures as a conditional input of WaveNet [3], significantly im-",
+   "proves  the  synthesis  quality  of  conventional  deep  learning-",
+   "based statistical parametric speech synthesis (SPSS) systems.",
+   "Because the WaveNet vocoder can generate speech samples in",
+   "a single unified neural network, it does not require any hand-",
+   "engineered signal processing pipeline. Thus, it presents much",
+   "higher  quality  of  synthetic  speech  than  that  of  the  conven-",
+   "tional  band-aperiodicity  (BAP)-based  deterministic  vocoder",
+   "[4].   Inspired  by  this  success,  many  WaveNet-style  neural",
+   "vocoders have been proposed and actively studied [1, 5–8].",
+   "However, training neural vocoder is not an easy task, es-",
+   "pecially when the training database is large and has an expres-",
+   "sive characteristic. One effective solution is to model the vo-",
+   "cal source signal only, instead of the entire speech waveform",
+   "[7–9]. In these approaches, the vocal source signal is first es-",
+   "timated by a linear prediction (LP)-based analysis [10–12],",
+   "This work was done when the first author was an intern at MSRA.",
+   "then modeled by a neural vocoder.  Because the vocal source",
+   "signal shows physically simpler behavior than the speech sig-",
+   "nal, its training is relatively easier, too. However, the synthe-",
+   "sized speech is likely to be noisy due to the mismatch between",
+   "vocal source and vocal tract filter. In detail, the synthesis out-",
+   "put is vulnerable to the variation of vocal tract filter because",
+   "the vocal tract filtering effect is not considered in the neural",
+   "vocoder training.",
+   "In this paper, we propose an"
+  ]
+ },
+ {
+  "name": "g_d1_f16",
+  "rowTexts": [
+   "LP-WaveNet"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   ", where both vo-",
+   "cal source signal and vocal tract filter are jointly considered",
+   "during the waveform training and inference processes. Based",
+   "on the basic assumption that the past speech samples and the",
+   "LP coefficients are given as conditional information, we fig-",
+   "ure out that the difference between the random variables of",
+   "speech and excitation only lies on a constant factor.  Further-",
+   "more, if we model the speech distribution by a mixture den-",
+   "sity network (MDN) [13], then the distribution of excitation",
+   "signal can be converted to the distribution of speech by simply",
+   "“shifting” the mean components of excitation mixture param-",
+   "eters.   In detail,  the mixture parameters of excitation signal",
+   "are predicted first by the WaveNet.  Then, the mean parame-",
+   "ters of target speech distribution is estimated by summing up",
+   "the predicted mixture parameters and the"
+  ]
+ },
+ {
+  "name": "g_d1_f13",
+  "rowTexts": [
+   "LP approximation"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   ",",
+   "which  presents  the  linear  combination  of  past  speech  sam-",
+   "ples weighted by LP coefficients.  Note that the LP-WaveNet",
+   "is easy to train because the WaveNet only needs to model the",
+   "excitation signal, and complicated spectrum modeling portion",
+   "is embedded into the LP approximation.",
+   "In this study, we only focus on the WaveNet vocoder with",
+   "the discretized mixture of logistic (MoL) distribution [14, 15].",
+   "However, the proposed LP-WaveNet can be extended to any",
+   "of neural vocoders that utilize an MDN-based auto-regressive",
+   "generative  model  using  LP  coefficients.   For  example,  the",
+   "sample-RNN vocoder [5] or the FFTNet vocoder [6] can be",
+   "used  instead  of  the  WaveNet  vocoder,  and  the  mixture  of",
+   "Gaussian (MoG) [13] can be used instead of MoL."
+  ]
+ },
+ {
+  "name": "g_d1_f12",
+  "rowTexts": [
+   "2. WAVENET-BASED SPEECH SYNTHESIS",
+   "SYSTEMS",
+   "2.1. Mixture Density Network-based WaveNet vocoder"
+  ]
+ },
+ {
+  "name": "g_d1_f15",
+  "rowTexts": [
+   "WaveNet is an autoregressive generative model that directly",
+   "models  the  joint  probability  distribution  of  speech  samples"
+  ]
+ },
+ {
+  "name": "Times",
+  "rowTexts": [
+   "arXiv:1811.11913v1  [eess.AS]  29 Nov 2018"
+  ]
+ }
+]

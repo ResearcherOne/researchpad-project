@@ -1,0 +1,302 @@
+[
+ {
+  "name": "Times",
+  "rowTexts": [
+   "arXiv:1806.09514v1  [cs.CL]  25 Jun 2018"
+  ]
+ },
+ {
+  "name": "g_d0_f1",
+  "rowTexts": [
+   "The Emotional Voices Database: Towards",
+   "Controlling the Emotion Dimension in Voice",
+   "Generation Systems"
+  ]
+ },
+ {
+  "name": "g_d0_f2",
+  "rowTexts": [
+   "Adaeze Adigwe"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "2"
+  ]
+ },
+ {
+  "name": "g_d0_f4",
+  "rowTexts": [
+   "⋆"
+  ]
+ },
+ {
+  "name": "g_d0_f2",
+  "rowTexts": [
+   ", No ́e Tits"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d0_f4",
+  "rowTexts": [
+   "⋆"
+  ]
+ },
+ {
+  "name": "g_d0_f2",
+  "rowTexts": [
+   ", Kevin El Haddad"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "1[0000"
+  ]
+ },
+ {
+  "name": "g_d0_f5",
+  "rowTexts": [
+   "−"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "0003"
+  ]
+ },
+ {
+  "name": "g_d0_f5",
+  "rowTexts": [
+   "−"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "1465"
+  ]
+ },
+ {
+  "name": "g_d0_f5",
+  "rowTexts": [
+   "−"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "6273]"
+  ]
+ },
+ {
+  "name": "g_d0_f2",
+  "rowTexts": [
+   ", Sarah",
+   "Ostadabbas"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "2"
+  ]
+ },
+ {
+  "name": "g_d0_f2",
+  "rowTexts": [
+   ", and Thierry Dutoit"
+  ]
+ },
+ {
+  "name": "g_d0_f3",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d0_f6",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "num ́ediart Institute, University of Mons, 7000, Belgium"
+  ]
+ },
+ {
+  "name": "g_d0_f6",
+  "rowTexts": [
+   "2"
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "Augmented Cognition Laboratory, Northeastern University",
+   ", Boston, USA"
+  ]
+ },
+ {
+  "name": "g_d0_f8",
+  "rowTexts": [
+   "{"
+  ]
+ },
+ {
+  "name": "g_d0_f9",
+  "rowTexts": [
+   "noe.tits, kevin.elhaddad, thierry.dutoit"
+  ]
+ },
+ {
+  "name": "g_d0_f8",
+  "rowTexts": [
+   "}"
+  ]
+ },
+ {
+  "name": "g_d0_f9",
+  "rowTexts": [
+   "@umons.ac.be",
+   "ostadabbas@ece.neu.edu"
+  ]
+ },
+ {
+  "name": "g_d0_f10",
+  "rowTexts": [
+   "Abstract."
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "In this paper, we present a database of emotional speech",
+   "intended to be open-sourced and used for synthesis and gener",
+   "ation pur-",
+   "pose. It contains data for male and female actors in English a",
+   "nd a male",
+   "actor in French. The database covers 5 emotion classes so it c",
+   "ould be",
+   "suitable to build synthesis and voice transformation syste",
+   "ms with the",
+   "potential to control the emotional dimension in a continuou",
+   "s way. We",
+   "show the data’s efficiency by building a simple MLP system conv",
+   "erting",
+   "neutral to angry speech style and evaluate it via a CMOS perce",
+   "ption",
+   "test. Even though the system is a very simple one, the test sho",
+   "w the",
+   "efficiency of the data which is promising for future work."
+  ]
+ },
+ {
+  "name": "g_d0_f10",
+  "rowTexts": [
+   "Keywords:"
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "Emotional speech"
+  ]
+ },
+ {
+  "name": "g_d0_f8",
+  "rowTexts": [
+   "·"
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "Speech Synthesis"
+  ]
+ },
+ {
+  "name": "g_d0_f8",
+  "rowTexts": [
+   "·"
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "Voice Conversion"
+  ]
+ },
+ {
+  "name": "g_d0_f8",
+  "rowTexts": [
+   "·"
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "Deep learning."
+  ]
+ },
+ {
+  "name": "g_d0_f1",
+  "rowTexts": [
+   "1  Introduction"
+  ]
+ },
+ {
+  "name": "g_d0_f2",
+  "rowTexts": [
+   "One of the major components of human-agent interaction system",
+   "s is the speech",
+   "synthesis module. The state-of-the-art speech synthesis syst",
+   "ems such as wavenet",
+   "and tacotron[19,23,21] are giving impressive results. They can prod",
+   "uce, intelligi-",
+   "ble, expressive, even human-like speech. But, they cannot yet be",
+   "used to control",
+   "the emotional dimensionality in speech which is a crucial parameter in o",
+   "rder to",
+   "obtain human-like controllable speech synthesis system.",
+   "Although still being relatively neglected by the affective computing co",
+   "mmu-",
+   "nity, the interest for emotional speech synthesis systems has be",
+   "en growing for",
+   "the past two decades. After the improvement parametric system",
+   "s brought to this",
+   "field [14,10], deep learning-based systems were also employed for suc",
+   "h a task.",
+   "One of the problems in the emotional speech synthesis research co",
+   "mmunity",
+   "is the lack of open-source data available and the difficulty to collect th",
+   "em. In",
+   "fact, to the best of our knowledge, no open-source emotional sp",
+   "eech database",
+   "for synthesis purpose and suitable for deep learning systems is ava",
+   "ilable. In"
+  ]
+ },
+ {
+  "name": "g_d0_f11",
+  "rowTexts": [
+   "⋆"
+  ]
+ },
+ {
+  "name": "g_d0_f7",
+  "rowTexts": [
+   "These authors contributed equally to this work"
+  ]
+ }
+]

@@ -1,8 +1,8 @@
 const fs = require('fs');
 const pdf = require('pdf-parse');
 
-//const pdfPath = "./input/1806.09514.pdf";
-const pdfPath = "./input/1811.11913.pdf";
+//const pdfPath = "./input/papers/1806.09514.pdf";
+const pdfPath = "./input/papers/1811.11913.pdf";
 
 let dataBuffer = fs.readFileSync(pdfPath);
 
@@ -52,7 +52,7 @@ var render_page = function(pageData) {
     return pageData.getTextContent(render_options)
     .then(function(textContent) {
         let lastY, text = '';
-        console.log("textContent.items length: "+textContent.items.length);
+        //console.log("textContent.items length: "+textContent.items.length);
         
         //var fontNames = collectFontNamesForWholePage(textContent.items);
         var fontNames = groupTextByConsecutiveFontNames(textContent.items);
@@ -76,7 +76,8 @@ var render_page = function(pageData) {
 }
 
 let options = {
-    pagerender: render_page
+    pagerender: render_page,
+    max: 2
 }
  
 pdf(dataBuffer, options).then(function(data) {

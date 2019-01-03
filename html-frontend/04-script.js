@@ -35,21 +35,21 @@ function addCircleTextNode(layer, text, x, y) { //This does not span at exact x,
     return group;
 }
 
-function addCircle(layer, x, y, r) {
+function createCirlce(x, y, r) {
   var circle = new Konva.Circle({
     x: x,
     y: y,
     radius: r,
-    fill: 'red',
-    stroke: 'black',
+    fill: 'black',
+    stroke: 'red',
     strokeWidth: 4
   });
-  layer.add(circle);
+  return circle;
 }
 
-function addConnection(layer, firstNode, secondNode) {
-  var firstShape = firstNode.findOne('Circle');
-  var secondShape = secondNode.findOne('Circle');
+function addConnection(layer, firstShape, secondShape) {
+  //var firstShape = firstNode.findOne('Circle');
+  //var secondShape = secondNode.findOne('Circle');
   
   var firstAbsolutePosition = firstShape.getAbsolutePosition();
   var secondAbsolutePosition = secondShape.getAbsolutePosition();
@@ -68,15 +68,13 @@ function addConnection(layer, firstNode, secondNode) {
   line.moveToBottom();
 }
 
-function addLeafNode(layer, rootNode, leafNode, angle, length) {
-  var rootShape = rootNode.findOne('Circle');
+function addLeafNode(layer, rootShape, angle, length) {
+  angle = - angle;
   var rootShapeAbsolutePosition = rootShape.getAbsolutePosition();
   var rootShapeCenter = {"x": (rootShapeAbsolutePosition.x), "y":(rootShapeAbsolutePosition.y)};
   var rootShapeRadius = rootShape.radius();
 
-  var leafShape = leafNode.findOne('Circle');
-  var leafShapeRadius = leafShape.radius();
-
+  var leafShapeRadius = 10;
   var lineLength = rootShapeRadius + length + leafShapeRadius; //hypotenuse
 
   var angleInRadian = (angle * Math.PI)/180;
@@ -86,25 +84,16 @@ function addLeafNode(layer, rootNode, leafNode, angle, length) {
   var nx = rootShapeCenter.x + dX;
   var ny = rootShapeCenter.y + dY;
 
-  //alert("Center X: "+rootShapeCenter.x+" Center Y: "+rootShapeCenter.y);
-  //alert("Leaf X: "+nx+" Leaf Y: "+ny);
 
-  leafNode.setAbsolutePosition({"x":nx, "y":ny});
-  addConnection(layer, rootNode, leafNode);
-
-
-  var circle = new Konva.Circle({
-      x: nx,
-      y: ny,
-      radius: 10,
-      fill: 'black',
-      stroke: 'black',
-      strokeWidth: 4
-    });
+  var circle = createCirlce(nx, ny, leafShapeRadius);
   layer.add(circle);
-  //setPosiiton of leaf node to new cx,cy
-  //addConnection between nodes.
+  addConnection(layer, rootShape, circle);
 
+
+}
+
+function getShapeFromGroup(group) {
+  return group.findOne('Circle');
 }
 
 function initializeScript() {
@@ -122,13 +111,13 @@ function initializeScript() {
     var layer = new Konva.Layer();
     
     var node1 = addCircleTextNode(layer, "Root Node", 200, 200);
-    var node2 = addCircleTextNode(layer, "Leaf Node", 0, 0);
-    //addConnection(layer, node1, node2)
+    var shape1 = getShapeFromGroup(node1);
 
-    const length = 0;
-    const angle = 360;
-
-    addLeafNode(layer, node1, node2, angle, length);
+    for(var i = 0; i <= 360; i = i + 10) {
+      const length = i;
+      const angle = i;
+      addLeafNode(layer, shape1, angle, length);
+    }
 
   stage.add(layer);
 }

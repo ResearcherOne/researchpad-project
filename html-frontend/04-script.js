@@ -1,14 +1,8 @@
-/* I will need this when I need to implement automatically adding new leaf nodes.
-function rotate(cx, cy, x, y, angle) {
-    var radians = (Math.PI / 180) * angle,
-        cos = Math.cos(radians),
-        sin = Math.sin(radians),
-        nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
-        ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
-    return {"x":nx, "y":ny};
-}
+/*
+TODO
+  Complete addLeafNode function using addCircle. Keep things simple. For now, there is no such thing as TextNode.
 */
-function addCircleTextNode(layer, text, x, y) {
+function addCircleTextNode(layer, text, x, y) { //This does not span at exact x,y. Be aware of that.
   var group = new Konva.Group({
         x: x,
         y: y
@@ -39,6 +33,18 @@ function addCircleTextNode(layer, text, x, y) {
     group.add(complexText);
     layer.add(group);
     return group;
+}
+
+function addCircle(layer, x, y, r) {
+  var circle = new Konva.Circle({
+    x: x,
+    y: y,
+    radius: r,
+    fill: 'red',
+    stroke: 'black',
+    strokeWidth: 4
+  });
+  layer.add(circle);
 }
 
 function addConnection(layer, firstNode, secondNode) {
@@ -73,7 +79,29 @@ function addLeafNode(layer, rootNode, leafNode, angle, length) {
 
   var lineLength = rootShapeRadius + length + leafShapeRadius; //hypotenuse
 
-  //find leafNode cx,cy by using hypotenuse length and angle.
+  var angleInRadian = (angle * Math.PI)/180;
+  var dY = lineLength * Math.sin(angleInRadian);
+  var dX = lineLength * Math.cos(angleInRadian);
+
+  var nx = rootShapeCenter.x + dX;
+  var ny = rootShapeCenter.y + dY;
+
+  //alert("Center X: "+rootShapeCenter.x+" Center Y: "+rootShapeCenter.y);
+  //alert("Leaf X: "+nx+" Leaf Y: "+ny);
+
+  leafNode.setAbsolutePosition({"x":nx, "y":ny});
+  addConnection(layer, rootNode, leafNode);
+
+
+  var circle = new Konva.Circle({
+      x: nx,
+      y: ny,
+      radius: 10,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 4
+    });
+  layer.add(circle);
   //setPosiiton of leaf node to new cx,cy
   //addConnection between nodes.
 
@@ -93,9 +121,14 @@ function initializeScript() {
 
     var layer = new Konva.Layer();
     
-    var node1 = addCircleTextNode(layer, "COMPLEX TEXT 1", 50, 50);
-    var node2 = addCircleTextNode(layer, "COMPLEX TEXT 2", 400, 150);
-    addConnection(layer, node1, node2);
+    var node1 = addCircleTextNode(layer, "Root Node", 200, 200);
+    var node2 = addCircleTextNode(layer, "Leaf Node", 0, 0);
+    //addConnection(layer, node1, node2)
+
+    const length = 0;
+    const angle = 360;
+
+    addLeafNode(layer, node1, node2, angle, length);
 
   stage.add(layer);
 }

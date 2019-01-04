@@ -127,7 +127,8 @@ var visualizerModule = (function () {
 		const nodeIndex = referenceNumber % maxNodeCountPerLayer;
 
 		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
-		const nodeConnectionLength = 50 + 50 * layerIndex;
+		const connectionUnitLength = 40;
+		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
 		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength);
 	}
@@ -143,7 +144,8 @@ var visualizerModule = (function () {
 		const nodeIndex = citedByNumber % maxNodeCountPerLayer;
 
 		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
-		const nodeConnectionLength = 50 + 50 * layerIndex;
+		const connectionUnitLength = 40;
+		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
 		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength);
 	}

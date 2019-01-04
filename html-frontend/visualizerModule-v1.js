@@ -113,11 +113,46 @@ var visualizerModule = (function () {
 
 		layer.add(leafCircle);
 		updateScene();
+		return leafCircle;
+	}
+
+	var createReferenceNode = function(rootNode, referenceNumber) {
+		const maxNodeCountPerLayer = 10;
+		const layerIndex = Math.floor(referenceNumber/maxNodeCountPerLayer);
+
+		const absoluteStartDegree = 120;
+		const absoluteEndDegree = 240;
+
+		const degreePerNode = (absoluteEndDegree - absoluteStartDegree) / maxNodeCountPerLayer;
+		const nodeIndex = referenceNumber % maxNodeCountPerLayer;
+
+		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
+		const nodeConnectionLength = 50 + 50 * layerIndex;
+
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength);
+	}
+
+	var createCitedByNode = function(rootNode, citedByNumber) {
+		const maxNodeCountPerLayer = 10;
+		const layerIndex = Math.floor(citedByNumber/maxNodeCountPerLayer);
+
+		const absoluteStartDegree = 300;
+		const absoluteEndDegree = 60;
+
+		const degreePerNode = ((360 - absoluteStartDegree) + absoluteEndDegree) / maxNodeCountPerLayer;
+		const nodeIndex = citedByNumber % maxNodeCountPerLayer;
+
+		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
+		const nodeConnectionLength = 50 + 50 * layerIndex;
+
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength);
 	}
 
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
-		createLeafNode: createLeafNode
+		createLeafNode: createLeafNode,
+		createReferenceNode: createReferenceNode,
+		createCitedByNode: createCitedByNode
 	}
 })();

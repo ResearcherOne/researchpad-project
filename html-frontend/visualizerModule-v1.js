@@ -10,34 +10,36 @@ var visualizerModule = (function () {
 		return group.findOne('Circle');
 	}
 
-	var createNode = function(x, y, r) {
-		var group = new Konva.Group({
-			x: x,
-			y: y
-		});
+	var createCircle = function(x, y, r) {
 		var circle = new Konva.Circle({
 			x: x,
 			y: y,
 			radius: r,
 			fill: 'black',
-			stroke: 'red',
-			strokeWidth: 4
-		});
-		group.add(circle);
-		return group;
-	}
-
-	function createCircle(x, y, r) {
-		var circle = new Konva.Circle({
-			x: x,
-			y: y,
-			radius: r,
-			fill: 'black',
-			stroke: 'red',
+			stroke: 'blue',
 			strokeWidth: 4
 		});
 		return circle;
 	}
+
+	var addConnection = function(firstShape, secondShape) {
+		var firstAbsolutePosition = firstShape.getAbsolutePosition();
+		var secondAbsolutePosition = secondShape.getAbsolutePosition();
+		var firstCenter = {"x": (firstAbsolutePosition.x), "y":(firstAbsolutePosition.y)};
+		var secondCenter = {"x": (secondAbsolutePosition.x), "y":(secondAbsolutePosition.y)};
+
+		var line = new Konva.Line({
+		points: [firstCenter.x, firstCenter.y, secondCenter.x, secondCenter.y],
+		stroke: 'black',
+		strokeWidth: 3,
+		lineCap: 'round',
+		lineJoin: 'round'
+		});
+
+		layer.add(line);
+		line.moveToBottom();
+	}
+
 
   //Public Functions
 	var initializeModule = function() {
@@ -106,11 +108,9 @@ var visualizerModule = (function () {
 		var nx = rootCircleCenter.x + dX;
 		var ny = rootCircleCenter.y + dY;
 
-		var leafNode = createNode(nx, ny, leafShapeRadius);
-		//addConnection(layer, rootCircle, leafNode);
 		var leafCircle = createCircle(nx, ny, leafShapeRadius);
+		addConnection(rootCircle, leafCircle)
 
-		layer.add(leafNode);
 		layer.add(leafCircle);
 		updateScene();
 	}

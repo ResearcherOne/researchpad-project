@@ -65,49 +65,38 @@ var visualizerModule = (function () {
 		stage.add(layer);
 	};
 
-	var createRootNode = function(text, x, y) { //This does not span at exact x,y. Be aware of that.
-		var group = new Konva.Group({
-		    x: x,
-		    y: y
-		});
-
-		var complexText = new Konva.Text({
+	var createRootNode = function(radius, x, y, rootId, mouseOverCallback, mouseOutCallback) {
+		var circle = new Konva.Circle({
 			x: x,
 			y: y,
-			text: text,
-			fontSize: 18,
-			fontFamily: 'Calibri',
-			fill: '#555',
-		});
-
-		var textWidth = complexText.getWidth();
-		var textHeight = complexText.getHeight();
-
-		var circle = new Konva.Circle({
-			x: x+(textWidth/2),
-			y: y+(textHeight/2),
-			radius: (textWidth*2)/3,
+			radius: radius,
 			fill: 'red',
 			stroke: 'black',
-			strokeWidth: 4
+			strokeWidth: 4,
+			id: rootId
 		});
 
-		group.add(circle);
-		group.add(complexText);
-		layer.add(group);
+		circle.on('mouseover', function () {
+			mouseOverCallback(rootId);
+		});
+		circle.on('mouseout', function () {
+			mouseOutCallback(rootId);
+		});
+
+		layer.add(circle);
 		updateScene();
-		return group;
+		return circle;
 	}
 
-	var createLeafNode = function(rootNode, angle, length, domId, mouseOverCallback, mouseOutCallback) {
-		var rootCircle = getCircleFromNode(rootNode);
+	var createLeafNode = function(rootNode, angle, length, nodeId, radius, mouseOverCallback, mouseOutCallback) {
+		var rootCircle = rootNode;
 		angle = -angle;
 
 		var rootCircleAbsolutePosition = rootCircle.getAbsolutePosition();
 		var rootCircleCenter = {"x":  rootCircleAbsolutePosition.x, "y": rootCircleAbsolutePosition.y};
 		var rootCircleRadius = rootCircle.radius();
 
-		var leafShapeRadius = 10;
+		var leafShapeRadius = radius;
 		var lineLength = rootCircleRadius + length + leafShapeRadius; //hypotenuse
 
 		var angleInRadian = (angle * Math.PI)/180;
@@ -117,7 +106,7 @@ var visualizerModule = (function () {
 		var nx = rootCircleCenter.x + dX;
 		var ny = rootCircleCenter.y + dY;
 
-		var leafCircle = createCircle(nx, ny, leafShapeRadius, domId, mouseOverCallback, mouseOutCallback);
+		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, mouseOverCallback, mouseOutCallback);
 		addConnection(rootCircle, leafCircle)
 
 		layer.add(leafCircle);
@@ -125,7 +114,7 @@ var visualizerModule = (function () {
 		return leafCircle;
 	}
 
-	var createReferenceNode = function(rootNode, referenceNumber, domId, mouseOverCallback, mouseOutCallback) {
+	var createReferenceNode = function(rootNode, referenceNumber, nodeId, radius, mouseOverCallback, mouseOutCallback) {
 		const maxNodeCountPerLayer = 10;
 		const layerIndex = Math.floor(referenceNumber/maxNodeCountPerLayer);
 
@@ -139,10 +128,10 @@ var visualizerModule = (function () {
 		const connectionUnitLength = 40;
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, domId, mouseOverCallback, mouseOutCallback);
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, mouseOverCallback, mouseOutCallback);
 	}
 
-	var createCitedByNode = function(rootNode, citedByNumber, domId, mouseOverCallback, mouseOutCallback) {
+	var createCitedByNode = function(rootNode, citedByNumber, nodeId, radius, mouseOverCallback, mouseOutCallback) {
 		const maxNodeCountPerLayer = 10;
 		const layerIndex = Math.floor(citedByNumber/maxNodeCountPerLayer);
 
@@ -156,7 +145,7 @@ var visualizerModule = (function () {
 		const connectionUnitLength = 40;
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, domId, mouseOverCallback, mouseOutCallback);
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, mouseOverCallback, mouseOutCallback);
 	}
 
 	var getNodeById = function(nodeID) {

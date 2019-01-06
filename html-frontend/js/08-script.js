@@ -10,10 +10,21 @@
     var nodeCenter = visualizerModule.getNodeCenterById(nodeId);
     var nodeRadius = visualizerModule.getNodeRadiusById(nodeId);
 
-    overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), "Node ID: "+nodeId);
+    overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), "Leaf ID: "+nodeId);
   }
 
   function mouseOutLeafNode(nodeId) {
+    overlayerModule.clearTitleOverlay();
+  }
+
+  function mouseOverRootNode(nodeId) {
+    var nodeCenter = visualizerModule.getNodeCenterById(nodeId);
+    var nodeRadius = visualizerModule.getNodeRadiusById(nodeId);
+
+    overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), "Root ID: "+nodeId);
+  }
+
+  function mouseOutRootNode(nodeId) {
     overlayerModule.clearTitleOverlay();
   }
 
@@ -23,14 +34,16 @@
     visualizerModule.initializeModule(konvaDivID);
     overlayerModule.initializeModule(overlayDivID);
 
-    var rootNode = visualizerModule.createRootNode("Root Node", 200, 200);
+    const rootNodeRadius = 30;
+    var rootNode = visualizerModule.createRootNode(rootNodeRadius, 500, 500, "root-0", mouseOverRootNode, mouseOutRootNode);
 
+    const leafNodeRadius = 15;
     for(var i = 0; i < 40; i++) {
-      visualizerModule.createReferenceNode(rootNode, i, "ref"+i.toString(), mouseOverLeafNode, mouseOutLeafNode);
-      visualizerModule.createCitedByNode(rootNode, i, "cited"+i, mouseOverLeafNode, mouseOutLeafNode);
+      visualizerModule.createReferenceNode(rootNode, i, "ref-"+i.toString(), leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
+      visualizerModule.createCitedByNode(rootNode, i, "cited-"+i, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
     }
 
-    var nodeID = "ref0";
+    var nodeID = "ref-0";
     var refNodeNo1 = visualizerModule.getNodeById(nodeID);
     console.log(JSON.stringify(refNodeNo1));
 

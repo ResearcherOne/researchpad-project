@@ -168,6 +168,10 @@ var visualizerModule = (function () {
 		return {"x": nodeCenterPos.x, "y": nodeCenterPos.y};
 	}
 
+	var getNodeRadiusById = function(nodeID) {
+		return stage.findOne('#'+nodeID).radius();
+	}
+
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -175,6 +179,7 @@ var visualizerModule = (function () {
 		createReferenceNode: createReferenceNode,
 		createCitedByNode: createCitedByNode,
 		getNodeById: getNodeById,
-		getNodeCenterById: getNodeCenterById
+		getNodeCenterById: getNodeCenterById,
+		getNodeRadiusById: getNodeRadiusById
 	}
 })();

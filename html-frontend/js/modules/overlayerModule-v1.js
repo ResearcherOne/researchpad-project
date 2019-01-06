@@ -15,8 +15,12 @@ var overlayerModule = (function () {
 
 	var drawTitleOverlay = function(x, y, text) {
 		document.getElementById(divId).style.display = "block";
+
+		var offsetHeight = document.getElementById(divId).offsetHeight;
+		var offsetWidth = document.getElementById(divId).offsetWidth;
+
 	    document.getElementById(divId).style.left = x+"px"; //x
-	    document.getElementById(divId).style.top = y+"px"; //y
+	    document.getElementById(divId).style.top = (y-offsetHeight)+"px"; //y
 	    document.getElementById(titleId).innerHTML = text;
 	}
 

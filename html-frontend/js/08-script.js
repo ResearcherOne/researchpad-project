@@ -8,12 +8,14 @@
 
   function mouseOverLeafNode(nodeId) {
     var nodeCenter = visualizerModule.getNodeCenterById(nodeId);
-    overlayerModule.drawTitleOverlay(nodeCenter.x, nodeCenter.y, "Node ID: "+nodeId);
+    var nodeRadius = visualizerModule.getNodeRadiusById(nodeId);
+
+    overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), "Node ID: "+nodeId);
   }
 
   function mouseOutLeafNode(nodeId) {
     overlayerModule.clearTitleOverlay();
-  } 
+  }
 
   function initializeScript() {
     const konvaDivID = "konva-div";

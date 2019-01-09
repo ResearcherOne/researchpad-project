@@ -1,0 +1,6 @@
+Electron-Forge
+	#Installing Example Project
+		npm install -g @electron-forge/cli@beta
+		electron-forge init my-new-app
+		cd my-new-app
+		npm start

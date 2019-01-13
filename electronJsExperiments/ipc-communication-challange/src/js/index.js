@@ -1,12 +1,9 @@
 const { ipcRenderer } = require('electron')
 
-const backendApi = {
-	cursorStatusPostTopic: "/cursor-status-changed"
-};
-
 const updateCursorStatus = (x, y) => {
 	var mousePos = {"x": x, "y": y};
-	ipcRenderer.send(backendApi.cursorStatusPostTopic, JSON.stringify(mousePos));
+	ipcRenderer.send('cursor-status-changed', JSON.stringify(mousePos));
+	//ipcRenderer.send("YOYO");
 }
 
 function showCoords(event) {

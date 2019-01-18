@@ -6,6 +6,19 @@ var ipcRestRenderer = (function () {
 	var g_listenResponsesTopic;
 	var g_sendRequestsTopic;
 
+	var hashStr = function(str) {
+	    var hash = 0;
+	    if (str.length == 0) {
+	        return hash;
+	    }
+	    for (var i = 0; i < str.length; i++) {
+	        var char = str.charCodeAt(i);
+	        hash = ((hash<<5)-hash)+char;
+	        hash = hash & hash; // Convert to 32bit integer
+	    }
+	    return hash;
+	}
+
 	var sendEncapsulatedIpcMessage = function(id, url, obj) {
 		const encapsulatedObject = {
 			"id": id,
@@ -41,8 +54,8 @@ var ipcRestRenderer = (function () {
 	};
 
 	var request = function(url, objToSend, callback) { //callback(responseObj)
-		//const generatedMessageId = hash(objToSend);
-		const generatedMessageId = Math.floor(Math.random() * 99999999);
+		const randomNum = Math.floor(Math.random() * 99999999);
+		const generatedMessageId = hashStr(url+randomNum);
 
 		sendEncapsulatedIpcMessage(generatedMessageId, url, objToSend);
 

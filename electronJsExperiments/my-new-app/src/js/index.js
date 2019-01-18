@@ -1,12 +1,17 @@
-const { ipcRenderer } = require('electron')
+//const { ipcRenderer } = require('electron')
 
 const backendApi = {
 	cursorStatusPostTopic: "/cursor-status-changed"
 };
 
-const updateCursorStatus = (x, y) => {
-	var mousePos = {"x": x, "y": y};
-	ipcRenderer.send(backendApi.cursorStatusPostTopic, JSON.stringify(mousePos));
+const sendRequestsTopic = "listen-renderer";
+const listenResponsesTopic = "response-to-renderer";
+
+ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
+
+function getRootNodeInfo(doi, callback) {
+	var doiJson = {"doi": doi};
+	//ipcRenderer.send(backendApi.getRootNodeInfoPostTopic, JSON.stringify(doiJson));
 }
 
 function showCoords(event) {
@@ -14,5 +19,10 @@ function showCoords(event) {
 	var y = event.clientY;
 	var coords = "( X coords: " + x + ", Y coords: " + y+ " )";
 	document.getElementById("demo").innerHTML = coords;
-	updateCursorStatus(x,y);
+	var mousePos = {"x": x, "y": y};
+
+	ipcRestRenderer.request(backendApi.cursorStatusPostTopic, mousePos, function(responseObj){
+		console.log("Response received!!!");
+		console.log(JSON.stringify(responseObj));
+	});
 }

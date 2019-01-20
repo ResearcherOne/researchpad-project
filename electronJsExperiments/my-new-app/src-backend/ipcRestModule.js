@@ -17,7 +17,18 @@ response.prototype.send = function(responseObj) {
 	const encapsulatedObject = {
 		"id": this.id,
 		"url": this.url,
-		"obj": responseObj
+		"obj": responseObj,
+		"err": false
+	};
+	this.ipcEvent.sender.send(this.responseTopic, JSON.stringify(encapsulatedObject));
+}
+
+response.prototype.error = function(errorMessage) {
+	const encapsulatedObject = {
+		"id": this.id,
+		"url": this.url,
+		"obj": {"msg": errorMessage},
+		"err": true
 	};
 	this.ipcEvent.sender.send(this.responseTopic, JSON.stringify(encapsulatedObject));
 }

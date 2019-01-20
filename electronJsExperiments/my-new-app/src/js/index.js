@@ -21,8 +21,12 @@ function showCoords(event) {
 	document.getElementById("demo").innerHTML = coords;
 	var mousePos = {"x": x, "y": y};
 
-	ipcRestRenderer.request(backendApi.cursorStatusPostTopic, mousePos, function(responseObj){
+	ipcRestRenderer.request(backendApi.cursorStatusPostTopic, mousePos, function(err, responseObj){
 		console.log("Response received!!!");
-		console.log(JSON.stringify(responseObj));
+		if(!err) {
+			console.log(JSON.stringify(responseObj));
+		} else {
+			console.log("Error occured: "+err.msg);
+		}
 	});
 }

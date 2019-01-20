@@ -33,16 +33,22 @@ var ipcRestRenderer = (function () {
 		const messageId = encapsulatedObject.id;
 		const messageUrl = encapsulatedObject.url;
 		const responseObj = encapsulatedObject.obj;
+		const isErrorOccured = encapsulatedObject.err;
 
-		if(messageId && messageUrl && responseObj) {
-			if(waitingResponseList[messageId]) {
-				waitingResponseList[messageId](responseObj);
-				delete waitingResponseList[messageId];
+		if(!isErrorOccured) {
+			if(messageId && messageUrl && responseObj) {
+				if(waitingResponseList[messageId]) {
+					waitingResponseList[messageId](null, responseObj);
+					delete waitingResponseList[messageId];
+				} else {
+					console.log("Callback not registered for ID "+messageId)
+				}
 			} else {
-				console.log("Callback not registered for ID "+messageId)
+				console.log("Invalid message received.")
 			}
 		} else {
-			console.log("Invalid message received.")
+			waitingResponseList[messageId]({"msg": responseObj.msg}, null);
+			delete waitingResponseList[messageId];
 		}
 	}
 

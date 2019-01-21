@@ -60,7 +60,7 @@ var ipcRestRenderer = (function () {
 	};
 
 	var request = function(url, objToSend, callback) { //callback(responseObj)
-		const randomNum = Math.floor(Math.random() * 99999999);
+		const randomNum = Math.floor(Math.random() * 10000);
 		const generatedMessageId = hashStr(url+randomNum);
 
 		sendEncapsulatedIpcMessage(generatedMessageId, url, objToSend);

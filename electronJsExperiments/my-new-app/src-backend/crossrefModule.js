@@ -18,8 +18,8 @@ function fetchMetadataByDoi(doi, callback) {
 function fetchReferenceMetadataByDoi(doi, callback) {
 	fetchMetadataByDoi(doi, function(err, res){
 		if(!err) {
-			if(reference) {
-				callback(null, reference);
+			if(res && res.reference) {
+				callback(null, res.reference);
 			} else {
 				callback({"msg": "References does not exist in metadata."}, null);
 			}

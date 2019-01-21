@@ -1,7 +1,8 @@
 //const { ipcRenderer } = require('electron')
 
 const backendApi = {
-	cursorStatusPostTopic: "/cursor-status-changed"
+	cursorStatusPostTopic: "/cursor-status-changed",
+	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi"
 };
 
 const sendRequestsTopic = "listen-renderer";
@@ -21,10 +22,22 @@ function showCoords(event) {
 	document.getElementById("demo").innerHTML = coords;
 	var mousePos = {"x": x, "y": y};
 
+	/*
 	ipcRestRenderer.request(backendApi.cursorStatusPostTopic, mousePos, function(err, responseObj){
-		console.log("Response received!!!");
 		if(!err) {
+			//console.log(JSON.stringify(responseObj));
+		} else {
+			console.log("Error occured: "+err.msg);
+		}
+	});
+	*/
+	
+	const requestObj = {"doi": "10.1103/physrevlett.98.010505"};
+	ipcRestRenderer.request(backendApi.getCrossrefMetaDataByDoi, requestObj, function(err, responseObj){
+		if(!err) {
+			console.log("References are fetched from backend.");
 			console.log(JSON.stringify(responseObj));
+			//console.log(JSON.stringify(responseObj));
 		} else {
 			console.log("Error occured: "+err.msg);
 		}

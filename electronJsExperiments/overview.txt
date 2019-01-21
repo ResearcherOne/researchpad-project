@@ -3,4 +3,6 @@ Electron-Forge
 		npm install -g @electron-forge/cli@beta
 		electron-forge init my-new-app
 		cd my-new-app
-		npm start
+		electron-forge start
+	#Installing new npm package
+		npm install your-desired-npm-package --save

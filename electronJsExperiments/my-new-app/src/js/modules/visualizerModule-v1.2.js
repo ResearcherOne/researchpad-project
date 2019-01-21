@@ -11,7 +11,6 @@ var visualizerModule = (function () {
 	}
 
 	var createCircle = function(x, y, r, domId, mouseOverCallback, mouseOutCallback) {
-		console.log(domId);
 		var circle = new Konva.Circle({
 			x: x,
 			y: y,

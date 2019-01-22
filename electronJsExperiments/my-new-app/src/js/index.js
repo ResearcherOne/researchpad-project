@@ -20,13 +20,15 @@ function mouseOutRootNode(nodeId) {
 	overlayerModule.clearTitleOverlay();
 }
 
-function getReferencesMetadataWithDoi(doi, callback) {
+function getMetadataWithDoi(doi, callback) {
 	const requestObj = {"doi": doi}; //doi = "10.1103/physrevlett.98.010505"
 	ipcRestRenderer.request(backendApi.getCrossrefMetaDataByDoi, requestObj, function(err, responseObj){
 		if(!err) {
-			console.log("References are fetched from backend.");
-			//console.log(JSON.stringify(responseObj));
-			callback(null, responseObj.references);
+			var metadata = responseObj.metadata;
+
+			console.log("Metadatafetched from backend.");
+			//console.log(JSON.stringify(metadata));
+			callback(null, metadata);
 		} else {
 			console.log("Error occured: "+err.msg);
 			callback(err, null);
@@ -50,10 +52,7 @@ function initializeScript() {
 	visualizerModule.initializeModule(konvaDivID);
 	overlayerModule.initializeModule(overlayDivID);
 
-	const rootNodeRadius = 30;
-	var rootNode = visualizerModule.createRootNode(rootNodeRadius, 500, 500, "root-0", mouseOverRootNode, mouseOutRootNode);
 
-	const leafNodeRadius = 15;
 
 	/*
 	for(var i = 0; i < 40; i++) {
@@ -72,15 +71,29 @@ function initializeScript() {
 	*/
 
 	const doi = "10.1103/physrevlett.98.010505";
-	getReferencesMetadataWithDoi(doi, function(err, referencesList){
+	getMetadataWithDoi(doi, function(err, metadata){
 		if(!err) {
-			var referenceNo = 0;
-			referencesList.forEach(function(referenceObj){
-				visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.key, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
-				referenceNo++;
-			});
+			if(metadata.DOI) {
+				const rootNodeRadius = 30;
+				var rootNode = visualizerModule.createRootNode(rootNodeRadius, 500, 500, "root-"+metadata.DOI, mouseOverRootNode, mouseOutRootNode);
+				
+				var referencesList = metadata.reference;
+
+				const leafNodeRadius = 15;
+				var referenceNo = 0;
+				referencesList.forEach(function(referenceObj){
+					if(referenceObj.DOI) {
+						visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.DOI, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
+					} else {
+						visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.key, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
+					}
+					referenceNo++;
+				});
+			} else {
+				console.log("Doi does not exist in rootnode metadata");
+			}
 		} else {
-			console.log("Error occured while fetching referencem metadata");
+			console.log("Error occured while fetching metadata");
 		}
 	});
 }

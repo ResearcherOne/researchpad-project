@@ -8,20 +8,10 @@ doi = '10.1103/physrevlett.98.010505'
 function fetchMetadataByDoi(doi, callback) {
 	crossref.work(doi, function(err, res){
 		if(!err) {
-			callback(null, res);
-		} else {
-			callback(err, null);
-		}
-	});
-}
-
-function fetchReferenceMetadataByDoi(doi, callback) {
-	fetchMetadataByDoi(doi, function(err, res){
-		if(!err) {
-			if(res && res.reference) {
-				callback(null, res.reference);
+			if(res) {
+				callback(null, res);
 			} else {
-				callback({"msg": "References does not exist in metadata."}, null);
+				callback({"msg": "Metadata does not exist."}, null);
 			}
 		} else {
 			callback(err, null);
@@ -30,6 +20,5 @@ function fetchReferenceMetadataByDoi(doi, callback) {
 }
 
 module.exports = {
-	fetchMetadataByDoi: fetchMetadataByDoi,
-	fetchReferenceMetadataByDoi: fetchReferenceMetadataByDoi
+	fetchMetadataByDoi: fetchMetadataByDoi
 }

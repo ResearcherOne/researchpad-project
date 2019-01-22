@@ -30,9 +30,9 @@ function initializeBackend() {
 	ipcRestModule.listen(backendApi.getCrossrefMetaDataByDoi, function(request, response){
 		const doi = request.doi;
 
-		crossrefModule.fetchReferenceMetadataByDoi(doi, function(err, res) {
+		crossrefModule.fetchMetadataByDoi(doi, function(err, res) {
 			if(!err) {
-				response.send({"references": res});
+				response.send({"metadata": res});
 			} else {
 				response.error("OOps, unable to fetch metadata from crossref.");
 			}

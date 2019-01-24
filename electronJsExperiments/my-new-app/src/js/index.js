@@ -9,16 +9,6 @@ function mouseOutLeafNode(nodeId) {
 	overlayerModule.clearTitleOverlay();
 }
 
-function mouseOverRootNode(nodeId) {
-	var nodeCenter = visualizerModule.getNodeCenterById(nodeId);
-	var nodeRadius = visualizerModule.getNodeRadiusById(nodeId);
-
-	overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), "Root ID: "+nodeId);
-}
-
-function mouseOutRootNode(nodeId) {
-	overlayerModule.clearTitleOverlay();
-}
 
 function getMetadataWithDoi(doi, callback) {
 	const requestObj = {"doi": doi}; //doi = "10.1103/physrevlett.98.010505"
@@ -46,6 +36,58 @@ const listenResponsesTopic = "response-to-renderer";
 
 const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
+
+function ReferenceNode(metadata, rootNode, radius, ID) {
+
+}
+
+function RootNode(metadata, x, y, radius, ID) {
+	this.metadata = metadata;
+	this.x = x;
+	this.y = y;
+	this.radius = radius;
+	this.ID = ID;
+
+	this.references = [];
+	this.visualObject;
+
+	var mouseOver = function(rootNodeObject) {
+		var nodeCenter = visualizerModule.getNodeCenterById(rootNodeObject.getID());
+		var nodeRadius = visualizerModule.getNodeRadiusById(rootNodeObject.getID());
+
+		var overlayText; 
+		var rootNodeTitle = rootNodeObject.getTitle();
+		if (rootNodeTitle) {
+			overlayText = rootNodeTitle;
+		} else {
+			overlayText = "Title not available.";
+		}
+		console.log(overlayText);
+		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), overlayText);
+	};
+
+	var mouseOut = function(rootNodeObject) {
+		overlayerModule.clearTitleOverlay();
+	};
+
+	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this);
+
+	this.getVisualObject = function() {
+		return this.visualObject;
+	}
+
+	this.getID = function() {
+		return this.ID;
+	}
+
+	this.getTitle = function() {
+		return this.metadata.title;
+	}
+
+	this.createReference = function() {
+		
+	}
+}
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
@@ -75,7 +117,8 @@ function initializeScript() {
 		if(!err) {
 			if(metadata.DOI) {
 				const rootNodeRadius = 30;
-				var rootNode = visualizerModule.createRootNode(rootNodeRadius, 500, 500, "root-"+metadata.DOI, mouseOverRootNode, mouseOutRootNode);
+				var rootNodeObject = new RootNode(metadata, 500, 500, 30, "root-"+metadata.DOI);
+				var rootNode = rootNodeObject.getVisualObject();
 				
 				var referencesList = metadata.reference;
 
@@ -83,6 +126,7 @@ function initializeScript() {
 				var referenceNo = 0;
 				referencesList.forEach(function(referenceObj){
 					if(referenceObj.DOI) {
+						//rootNodeObject.createReference(referenceMetadata, radius, ID);
 						visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.DOI, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
 					} else {
 						visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.key, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);

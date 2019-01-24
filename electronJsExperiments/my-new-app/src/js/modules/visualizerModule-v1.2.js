@@ -64,7 +64,7 @@ var visualizerModule = (function () {
 		stage.add(layer);
 	};
 
-	var createRootNode = function(radius, x, y, rootId, mouseOverCallback, mouseOutCallback) {
+	var createRootNode = function(radius, x, y, rootId, mouseOverCallback, mouseOutCallback, rootNodeObject) {
 		var circle = new Konva.Circle({
 			x: x,
 			y: y,
@@ -76,10 +76,10 @@ var visualizerModule = (function () {
 		});
 
 		circle.on('mouseover', function () {
-			mouseOverCallback(rootId);
+			mouseOverCallback(rootNodeObject);
 		});
 		circle.on('mouseout', function () {
-			mouseOutCallback(rootId);
+			mouseOutCallback(rootNodeObject);
 		});
 
 		layer.add(circle);

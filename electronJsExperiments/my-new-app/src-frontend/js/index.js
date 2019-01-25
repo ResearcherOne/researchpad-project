@@ -1,6 +1,22 @@
+
+const backendApi = {
+	cursorStatusPostTopic: "/cursor-status-changed",
+	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi"
+};
+
+const sendRequestsTopic = "listen-renderer";
+const listenResponsesTopic = "response-to-renderer";
+
+const konvaDivID = "konva-div";
+const overlayDivID = "overlay-div";
+
+function request(apiUrl, requestObj, callback) {
+	ipcRestRenderer.request(apiUrl, requestObj, callback);
+}
+
 function getMetadataWithDoi(doi, callback) {
 	const requestObj = {"doi": doi}; //doi = "10.1103/physrevlett.98.010505"
-	ipcRestRenderer.request(backendApi.getCrossrefMetaDataByDoi, requestObj, function(err, responseObj){
+	request(backendApi.getCrossrefMetaDataByDoi, requestObj, function(err, responseObj){
 		if(!err) {
 			var metadata = responseObj.metadata;
 
@@ -13,17 +29,6 @@ function getMetadataWithDoi(doi, callback) {
 		}
 	});
 }
-
-const backendApi = {
-	cursorStatusPostTopic: "/cursor-status-changed",
-	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi"
-};
-
-const sendRequestsTopic = "listen-renderer";
-const listenResponsesTopic = "response-to-renderer";
-
-const konvaDivID = "konva-div";
-const overlayDivID = "overlay-div";
 
 function getDoiListOfReferences(referenceList) {
 	var doiList = [];
@@ -56,7 +61,7 @@ function initializeScript() {
 				const leafNodeRadius = 15;
 				var fetchedMetadataCount = 0;
 				const doiCount = referenceDoiList.length;
-				const fetchIntervalMs = 1000;
+				const fetchIntervalMs = 300;
 				var myVar = setInterval(function(){
 						fetchedMetadataCount++;
 						if(fetchedMetadataCount==doiCount) clearInterval(myVar);

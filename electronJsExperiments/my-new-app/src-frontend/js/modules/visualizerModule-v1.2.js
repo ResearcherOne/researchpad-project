@@ -10,7 +10,7 @@ var visualizerModule = (function () {
 		return group.findOne('Circle');
 	}
 
-	var createCircle = function(x, y, r, domId, mouseOverCallback, mouseOutCallback, callbackReturnObject) {
+	var createCircle = function(x, y, r, domId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject) {
 		var circle = new Konva.Circle({
 			x: x,
 			y: y,
@@ -18,7 +18,8 @@ var visualizerModule = (function () {
 			fill: 'black',
 			stroke: 'blue',
 			strokeWidth: 4,
-			id: domId
+			id: domId,
+			draggable: isDraggable
 		});
 
 		circle.on('mouseover', function () {
@@ -87,7 +88,7 @@ var visualizerModule = (function () {
 		return circle;
 	}
 
-	var createLeafNode = function(rootNode, angle, length, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject) {
+	var createLeafNode = function(rootNode, angle, length, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject) {
 		var rootCircle = rootNode;
 		angle = -angle;
 
@@ -105,7 +106,7 @@ var visualizerModule = (function () {
 		var nx = rootCircleCenter.x + dX;
 		var ny = rootCircleCenter.y + dY;
 
-		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, mouseOverCallback, mouseOutCallback, callbackReturnObject);
+		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject);
 		addConnection(rootCircle, leafCircle)
 
 		layer.add(leafCircle);
@@ -127,7 +128,8 @@ var visualizerModule = (function () {
 		const connectionUnitLength = 40;
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject);
+		const isDraggable = true;
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject);
 	}
 
 	var createCitedByNode = function(rootNode, citedByNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject) {
@@ -144,7 +146,8 @@ var visualizerModule = (function () {
 		const connectionUnitLength = 40;
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject);
+		const isDraggable = true;
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject);
 	}
 
 	var getNodeById = function(nodeID) {

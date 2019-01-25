@@ -70,6 +70,7 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition) {
 	this.futureRootMetadata;
 
 	var mouseOverLeafNode = function(referenceNodeObject) {
+		document.body.style.cursor = 'pointer';
 		var nodeCenter = visualizerModule.getNodeCenterById(referenceNodeObject.getID());
 		var nodeRadius = visualizerModule.getNodeRadiusById(referenceNodeObject.getID());
 
@@ -84,6 +85,7 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition) {
 	}
 
 	var mouseOutLeafNode = function(referenceNodeObject) {
+		document.body.style.cursor = 'default';
 		overlayerModule.clearTitleOverlay();
 	}
 

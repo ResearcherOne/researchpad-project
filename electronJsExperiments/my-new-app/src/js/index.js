@@ -25,6 +25,18 @@ const listenResponsesTopic = "response-to-renderer";
 const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
 
+function getDoiListOfReferences(referenceList) {
+	var doiList = [];
+	referenceList.forEach(function(referenceObj){
+		if(referenceObj.DOI) {
+			doiList.push(referenceObj.DOI);
+		} else {
+			console.log("No DOI found for given reference metadata.");
+		}
+	});
+	return doiList;
+}
+
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
 	visualizerModule.initializeModule(konvaDivID);
@@ -38,24 +50,24 @@ function initializeScript() {
 				var rootNodeObject = new RootNode("root-"+metadata.DOI, metadata, 30, 500, 500);
 				var rootNode = rootNodeObject.getVisualObject();
 				
-				var referencesList = metadata.reference;
+				var referenceList = metadata.reference;
+				var referenceDoiList = getDoiListOfReferences(referenceList);
 
 				const leafNodeRadius = 15;
-				referencesList.forEach(function(referenceObj){
-					if(referenceObj.DOI) {
-						rootNodeObject.createReference("ref-"+referenceObj.DOI, referenceObj, leafNodeRadius);
-					} else {
-						rootNodeObject.createReference("ref-"+referenceObj.key, referenceObj, leafNodeRadius);
-					}
-				});
-
-				referencesList.forEach(function(referenceObj){
-					if(referenceObj.DOI) {
-						rootNodeObject.createCitedBy("citedby-"+referenceObj.DOI, referenceObj, leafNodeRadius);
-					} else {
-						rootNodeObject.createCitedBy("citedby-"+referenceObj.key, referenceObj, leafNodeRadius);
-					}
-				});
+				var fetchedMetadataCount = 0;
+				const doiCount = referenceDoiList.length;
+				const fetchIntervalMs = 1000;
+				var myVar = setInterval(function(){
+						fetchedMetadataCount++;
+						if(fetchedMetadataCount==doiCount) clearInterval(myVar);
+						getMetadataWithDoi(referenceDoiList[fetchedMetadataCount-1], function(err, refMetadata){
+							if(!err && refMetadata.DOI) {
+								rootNodeObject.createReference("ref-"+refMetadata.DOI, refMetadata, leafNodeRadius);
+							} else {
+								console.log("OOps, something went wrong while fetching reference metadata.");
+							} 
+						});
+				}, fetchIntervalMs);
 			} else {
 				console.log("Doi does not exist in rootnode metadata");
 			}

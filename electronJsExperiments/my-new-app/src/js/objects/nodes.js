@@ -36,7 +36,6 @@ function RootNode(ID, metadata, radius, x, y) {
 		} else {
 			overlayText = "Title not available.";
 		}
-		console.log(overlayText);
 		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), overlayText);
 	};
 	var mouseOut = function(rootNodeObject) {
@@ -68,6 +67,7 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition) {
 
 	this.rootNode = rootNode;
 	this.referencePosition = referencePosition;
+	this.futureRootMetadata;
 
 	var mouseOverLeafNode = function(referenceNodeObject) {
 		var nodeCenter = visualizerModule.getNodeCenterById(referenceNodeObject.getID());

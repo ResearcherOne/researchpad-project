@@ -1,15 +1,3 @@
-function mouseOverLeafNode(nodeId) {
-	var nodeCenter = visualizerModule.getNodeCenterById(nodeId);
-	var nodeRadius = visualizerModule.getNodeRadiusById(nodeId);
-
-	overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), "Leaf ID: "+nodeId);
-}
-
-function mouseOutLeafNode(nodeId) {
-	overlayerModule.clearTitleOverlay();
-}
-
-
 function getMetadataWithDoi(doi, callback) {
 	const requestObj = {"doi": doi}; //doi = "10.1103/physrevlett.98.010505"
 	ipcRestRenderer.request(backendApi.getCrossrefMetaDataByDoi, requestObj, function(err, responseObj){
@@ -37,19 +25,67 @@ const listenResponsesTopic = "response-to-renderer";
 const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
 
-function ReferenceNode(metadata, rootNode, radius, ID) {
+function Node(ID, metadata, radius){
+	this.ID = ID;
+	this.metadata = metadata;
+	this.radius = radius;
 
+	this.visualObject;
+
+	this.getVisualObject = function() {
+		return this.visualObject;
+	}
+
+	this.getID = function() {
+		return this.ID;
+	}
+
+	this.getTitle = function() {
+		return this.metadata.title;
+	}
 }
 
-function RootNode(metadata, x, y, radius, ID) {
-	this.metadata = metadata;
+function ReferenceNode(rootNode, ID, metadata, radius, referencePosition) {
+	Node.call(this, ID, metadata, radius);
+
+	this.rootNode = rootNode;
+	this.referencePosition = referencePosition;
+
+	var mouseOverLeafNode = function(referenceNodeObject) {
+		var nodeCenter = visualizerModule.getNodeCenterById(referenceNodeObject.getID());
+		var nodeRadius = visualizerModule.getNodeRadiusById(referenceNodeObject.getID());
+
+		var title = referenceNodeObject.getTitle();
+		var overlayText; 
+		if (title) {
+			overlayText = title;
+		} else {
+			overlayText = "Title not available.";
+		}
+		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), overlayText);
+	}
+
+	var mouseOutLeafNode = function(referenceNodeObject) {
+		overlayerModule.clearTitleOverlay();
+	}
+
+	//this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOverLeafNode, mouseOutLeafNode, this);
+	this.visualObject = visualizerModule.createReferenceNode(this.rootNode.getVisualObject(), this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this);
+
+	ReferenceNode.prototype = Object.create(Node.prototype);
+	Object.defineProperty(ReferenceNode.prototype, 'constructor', { 
+	    value: ReferenceNode, 
+	    enumerable: false, // so that it does not appear in 'for in' loop
+	    writable: true
+	});
+}
+
+function RootNode(ID, metadata, radius, x, y) {
+	Node.call(this, ID, metadata, radius);
+	
 	this.x = x;
 	this.y = y;
-	this.radius = radius;
-	this.ID = ID;
-
 	this.references = [];
-	this.visualObject;
 
 	var mouseOver = function(rootNodeObject) {
 		var nodeCenter = visualizerModule.getNodeCenterById(rootNodeObject.getID());
@@ -65,28 +101,24 @@ function RootNode(metadata, x, y, radius, ID) {
 		console.log(overlayText);
 		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), overlayText);
 	};
-
 	var mouseOut = function(rootNodeObject) {
 		overlayerModule.clearTitleOverlay();
 	};
 
 	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this);
 
-	this.getVisualObject = function() {
-		return this.visualObject;
+	this.createReference = function(ID, metadata, radius) {
+		const referencePosition = this.references.length;
+		var referenceNode = new ReferenceNode(this, ID, metadata, radius, referencePosition);
+		this.references.push(referenceNode);
 	}
 
-	this.getID = function() {
-		return this.ID;
-	}
-
-	this.getTitle = function() {
-		return this.metadata.title;
-	}
-
-	this.createReference = function() {
-		
-	}
+	RootNode.prototype = Object.create(Node.prototype);
+	Object.defineProperty(RootNode.prototype, 'constructor', { 
+	    value: RootNode, 
+	    enumerable: false, // so that it does not appear in 'for in' loop
+	    writable: true
+	});
 }
 
 function initializeScript() {
@@ -117,7 +149,7 @@ function initializeScript() {
 		if(!err) {
 			if(metadata.DOI) {
 				const rootNodeRadius = 30;
-				var rootNodeObject = new RootNode(metadata, 500, 500, 30, "root-"+metadata.DOI);
+				var rootNodeObject = new RootNode("root-"+metadata.DOI, metadata, 30, 500, 500);
 				var rootNode = rootNodeObject.getVisualObject();
 				
 				var referencesList = metadata.reference;
@@ -126,10 +158,11 @@ function initializeScript() {
 				var referenceNo = 0;
 				referencesList.forEach(function(referenceObj){
 					if(referenceObj.DOI) {
-						//rootNodeObject.createReference(referenceMetadata, radius, ID);
-						visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.DOI, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
+						rootNodeObject.createReference("ref-"+referenceObj.DOI, referenceObj, leafNodeRadius);
+						//visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.DOI, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
 					} else {
-						visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.key, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
+						rootNodeObject.createReference("ref-"+referenceObj.key, referenceObj, leafNodeRadius);
+						//visualizerModule.createReferenceNode(rootNode, referenceNo, "ref-"+referenceObj.key, leafNodeRadius, mouseOverLeafNode, mouseOutLeafNode);
 					}
 					referenceNo++;
 				});

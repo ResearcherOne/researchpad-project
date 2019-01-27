@@ -42,37 +42,74 @@ function getDoiListOfReferences(referenceList) {
 	return doiList;
 }
 
-function initializeScript() {
-	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-	visualizerModule.initializeModule(konvaDivID);
-	overlayerModule.initializeModule(overlayDivID);
+function dragStart(nodeObject){
+	console.log("Drag Start "+nodeObject.ID);
+	if(nodeObject.constructor.name == "RootNode") {
+		console.log("Type of rootnode");
+	} else if (nodeObject.constructor.name == "ReferenceNode") {
+		console.log("Type of reference node");
+	} else if (nodeObject.constructor.name == "CitedByNode") {
+		console.log("Type of citedby node");
+	} else {
+		console.log("Unknown type.");
+		console.log(nodeObject.constructor.name);
+	}
+}
+function dragEnd(nodeObject) {
+	console.log("Drag Start "+nodeObject.ID);
+	if(nodeObject.constructor.name == "RootNode") {
+		console.log("Type of rootnode");
+	} else if (nodeObject.constructor.name == "ReferenceNode") {
+		console.log("Type of reference node");
+		//console.log(JSON.stringify(nodeObject.metadata));
+		const x = nodeObject.getCenterX();
+		const y = nodeObject.getCenterY();
+		const doi = nodeObject.metadata.DOI;
+		const ID = nodeObject.getID();
 
-	const doi = "10.1103/physrevlett.98.010505";
+		var rootNodeOfReference = nodeObject.getRootNode();
+		rootNodeOfReference.removeReference(ID);
+		createRootNodeFromDoi(doi, x, y);
+			//register sibling reference node to rootNode
+	} else if (nodeObject.constructor.name == "CitedByNode") {
+		console.log("Type of citedby node");
+	} else {
+		console.log("Unknown type.");
+		console.log(nodeObject.constructor.name);
+	}
+}
+
+function createRootNodeFromDoi(doi, x, y){
 	getMetadataWithDoi(doi, function(err, metadata){
 		if(!err) {
 			if(metadata.DOI) {
 				const rootNodeRadius = 30;
-				var rootNodeObject = new RootNode("root-"+metadata.DOI, metadata, 30, 500, 500);
+				var rootNodeObject = new RootNode("root-"+metadata.DOI, metadata, 30, x, y, dragStart, dragEnd);
 				var rootNode = rootNodeObject.getVisualObject();
 				
-				var referenceList = metadata.reference;
-				var referenceDoiList = getDoiListOfReferences(referenceList);
+				if(metadata.reference) {
+					var referenceList = metadata.reference;
+					var referenceDoiList = getDoiListOfReferences(referenceList);
 
-				const leafNodeRadius = 15;
-				var fetchedMetadataCount = 0;
-				const doiCount = referenceDoiList.length;
-				const fetchIntervalMs = 300;
-				var myVar = setInterval(function(){
-						fetchedMetadataCount++;
-						if(fetchedMetadataCount==doiCount) clearInterval(myVar);
-						getMetadataWithDoi(referenceDoiList[fetchedMetadataCount-1], function(err, refMetadata){
-							if(!err && refMetadata.DOI) {
-								rootNodeObject.createReference("ref-"+refMetadata.DOI, refMetadata, leafNodeRadius);
-							} else {
-								console.log("OOps, something went wrong while fetching reference metadata.");
-							} 
-						});
-				}, fetchIntervalMs);
+					const leafNodeRadius = 15;
+					var fetchedMetadataCount = 0;
+					const doiCount = referenceDoiList.length;
+					const fetchIntervalMs = 100;
+					var myVar = setInterval(function(){
+							fetchedMetadataCount++;
+							if(fetchedMetadataCount==doiCount) clearInterval(myVar);
+							getMetadataWithDoi(referenceDoiList[fetchedMetadataCount-1], function(err, refMetadata){
+								if(!err && refMetadata.DOI) {
+									rootNodeObject.createReference("ref-"+refMetadata.DOI, refMetadata, leafNodeRadius);
+								} else {
+									console.log("OOps, something went wrong while fetching reference metadata.");
+								} 
+							});
+					}, fetchIntervalMs);
+				} else {
+					console.log("Unable to find references.");
+					console.log(JSON.stringify(metadata));
+				}
 			} else {
 				console.log("Doi does not exist in rootnode metadata");
 			}
@@ -80,6 +117,17 @@ function initializeScript() {
 			console.log("Error occured while fetching metadata");
 		}
 	});
+}
+
+function initializeScript() {
+	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
+	visualizerModule.initializeModule(konvaDivID);
+	overlayerModule.initializeModule(overlayDivID);
+
+	const doi = "10.1103/physrevlett.98.010505";
+	const x = 500;
+	const y = 500;
+	createRootNodeFromDoi(doi, x, y);
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

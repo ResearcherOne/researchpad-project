@@ -16,16 +16,39 @@ function Node(ID, metadata, radius){
 	this.getTitle = function() {
 		return this.metadata.title;
 	}
+
+	this.getCenterX = function() {
+		return visualizerModule.getPositionOfVisualObject(this.visualObject).x;
+	}
+
+	this.getCenterY = function() {
+		return visualizerModule.getPositionOfVisualObject(this.visualObject).y;
+	}
+
+	this.destroy = function() {
+		visualizerModule.removeVisualObject(this.visualObject);
+	}
 }
-function RootNode(ID, metadata, radius, x, y) {
+function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, metadata, radius);
 	
 	this.x = x;
 	this.y = y;
-	this.references = [];
-	this.citedByNodes = []
+
+	this.references = {};
+	this.referenceCount = 0;
+
+	this.citedByNodes = {};
+	this.citedByCount = 0;
+
+	this.siblingReferences = {};
+	this.siblingReferenceCount = 0;
+
+	this.siblingCitedBy = {};
+	this.siblingCitedByCount = 0;
 
 	var mouseOver = function(rootNodeObject) {
+		document.body.style.cursor = 'pointer';
 		var nodeCenter = visualizerModule.getNodeCenterById(rootNodeObject.getID());
 		var nodeRadius = visualizerModule.getNodeRadiusById(rootNodeObject.getID());
 
@@ -39,22 +62,33 @@ function RootNode(ID, metadata, radius, x, y) {
 		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), overlayText);
 	};
 	var mouseOut = function(rootNodeObject) {
+		document.body.style.cursor = 'default';
 		overlayerModule.clearTitleOverlay();
 	};
 
-	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this);
+	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 
 	this.createReference = function(ID, metadata, radius) {
-		const referencePosition = this.references.length;
-		var referenceNode = new ReferenceNode(this, ID, metadata, radius, referencePosition);
-		this.references.push(referenceNode);
+		const referencePosition = this.referenceCount;
+		this.references[ID] = new ReferenceNode(this, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback);
+		this.referenceCount++;
+		console.log("Reference Count: "+Object.keys(this.references).length);
 	}
 	this.createCitedBy = function(ID, metadata, radius) {
-		const referencePosition = this.citedByNodes.length;
-		var citedByNode = new CitedByNode(this, ID, metadata, radius, referencePosition);
-		this.citedByNodes.push(citedByNode);
+		const citedByPosition = this.citedByCount;
+		this.citedByNodes[ID] = new CitedByNode(this, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback);
+		this.citedByCount++;
+		console.log("Cited by Count: "+Object.keys(this.citedByNodes).length);
 	}
-
+	this.removeReference = function(ID) {
+		this.references[ID].destroy();
+		this.references[ID] = undefined;
+	}
+	this.removeCitedBy = function(ID) {
+		this.siblingCitedBy[ID].destroy();
+		this.siblingCitedBy[ID] = undefined;
+	}
+	
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 
 	    value: RootNode, 
@@ -62,12 +96,11 @@ function RootNode(ID, metadata, radius, x, y) {
 	    writable: true
 	});
 }
-function ReferenceNode(rootNode, ID, metadata, radius, referencePosition) {
+function ReferenceNode(rootNode, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, metadata, radius);
 
 	this.rootNode = rootNode;
 	this.referencePosition = referencePosition;
-	this.futureRootMetadata;
 
 	var mouseOverLeafNode = function(referenceNodeObject) {
 		document.body.style.cursor = 'pointer';
@@ -89,7 +122,11 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition) {
 		overlayerModule.clearTitleOverlay();
 	}
 
-	this.visualObject = visualizerModule.createReferenceNode(this.rootNode.getVisualObject(), this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this);
+	this.visualObject = visualizerModule.createReferenceNode(this.rootNode.getVisualObject(), this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
+
+	this.getRootNode = function() {
+		return this.rootNode;
+	}
 
 	ReferenceNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(ReferenceNode.prototype, 'constructor', { 
@@ -98,7 +135,7 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition) {
 	    writable: true
 	});
 }
-function CitedByNode(rootNode, ID, metadata, radius, referencePosition) {
+function CitedByNode(rootNode, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, metadata, radius);
 
 	this.rootNode = rootNode;
@@ -122,7 +159,7 @@ function CitedByNode(rootNode, ID, metadata, radius, referencePosition) {
 		overlayerModule.clearTitleOverlay();
 	}
 
-	this.visualObject = visualizerModule.createCitedByNode(this.rootNode.getVisualObject(), this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this);
+	this.visualObject = visualizerModule.createCitedByNode(this.rootNode.getVisualObject(), this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
 
 	CitedByNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(CitedByNode.prototype, 'constructor', { 

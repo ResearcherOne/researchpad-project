@@ -48,6 +48,7 @@ function dragStart(nodeObject){
 		console.log("Type of rootnode");
 	} else if (nodeObject.constructor.name == "ReferenceNode") {
 		console.log("Type of reference node");
+		//referenceNode.activateShadow
 	} else if (nodeObject.constructor.name == "CitedByNode") {
 		console.log("Type of citedby node");
 	} else {
@@ -61,7 +62,6 @@ function dragEnd(nodeObject) {
 		console.log("Type of rootnode");
 	} else if (nodeObject.constructor.name == "ReferenceNode") {
 		console.log("Type of reference node");
-		//console.log(JSON.stringify(nodeObject.metadata));
 		const x = nodeObject.getCenterX();
 		const y = nodeObject.getCenterY();
 		const doi = nodeObject.metadata.DOI;
@@ -69,8 +69,9 @@ function dragEnd(nodeObject) {
 
 		var rootNodeOfReference = nodeObject.getRootNode();
 		rootNodeOfReference.removeReference(ID);
-		createRootNodeFromDoi(doi, x, y);
-			//register sibling reference node to rootNode
+		createRootNodeFromDoi(doi, x, y, function(newRootNode){
+			rootNodeOfReference.addSiblingReference(newRootNode);
+		});
 	} else if (nodeObject.constructor.name == "CitedByNode") {
 		console.log("Type of citedby node");
 	} else {
@@ -79,14 +80,14 @@ function dragEnd(nodeObject) {
 	}
 }
 
-function createRootNodeFromDoi(doi, x, y){
+function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 	getMetadataWithDoi(doi, function(err, metadata){
 		if(!err) {
 			if(metadata.DOI) {
 				const rootNodeRadius = 30;
 				var rootNodeObject = new RootNode("root-"+metadata.DOI, metadata, 30, x, y, dragStart, dragEnd);
+				rootNodeCreatedCallback(rootNodeObject);
 				var rootNode = rootNodeObject.getVisualObject();
-				
 				if(metadata.reference) {
 					var referenceList = metadata.reference;
 					var referenceDoiList = getDoiListOfReferences(referenceList);
@@ -127,7 +128,9 @@ function initializeScript() {
 	const doi = "10.1103/physrevlett.98.010505";
 	const x = 500;
 	const y = 500;
-	createRootNodeFromDoi(doi, x, y);
+	createRootNodeFromDoi(doi, x, y, function(rootNode){
+		console.log("Root node created");
+	});
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

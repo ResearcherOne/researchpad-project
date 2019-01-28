@@ -26,6 +26,7 @@ function Node(ID, metadata, radius){
 	}
 
 	this.destroy = function() {
+		//if shadow exists, remove it.
 		visualizerModule.removeVisualObject(this.visualObject);
 	}
 }
@@ -79,6 +80,12 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 		this.citedByNodes[ID] = new CitedByNode(this, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback);
 		this.citedByCount++;
 		console.log("Cited by Count: "+Object.keys(this.citedByNodes).length);
+	}
+	this.addSiblingReference = function(rootNode) { //connection maintainers are references or citedbys
+		this.siblingReferences[rootNode.getID()] = rootNode;
+		this.siblingReferenceCount;
+		visualizerModule.connectVisualObjects(this.visualObject, rootNode.getVisualObject());
+			//need to store connection. V0-2
 	}
 	this.removeReference = function(ID) {
 		this.references[ID].destroy();

@@ -37,7 +37,7 @@ var visualizerModule = (function () {
 		return circle;
 	}
 
-	var addConnection = function(firstShape, secondShape) {
+	var createConnection = function(firstShape, secondShape) {
 		var firstAbsolutePosition = firstShape.getAbsolutePosition();
 		var secondAbsolutePosition = secondShape.getAbsolutePosition();
 		var firstCenter = {"x": (firstAbsolutePosition.x), "y":(firstAbsolutePosition.y)};
@@ -122,7 +122,7 @@ var visualizerModule = (function () {
 		var ny = rootCircleCenter.y + dY;
 
 		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback);
-		leafCircle.connection = addConnection(rootCircle, leafCircle)
+		leafCircle.connection = createConnection(rootCircle, leafCircle)
 
 		layer.add(leafCircle);
 		updateScene();
@@ -188,6 +188,16 @@ var visualizerModule = (function () {
 		visualObject.destroy();
 	}
 
+	var removeVisualObject = function(visualObject) {
+		if(visualObject.connection) visualObject.connection.destroy();
+		visualObject.destroy();
+	}
+
+	var connectVisualObjects = function(visualObject1, visualObject2) {
+		var connection = createConnection(visualObject1, visualObject2);
+		return connection;
+	}
+
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -198,6 +208,7 @@ var visualizerModule = (function () {
 		getNodeCenterById: getNodeCenterById,
 		getNodeRadiusById: getNodeRadiusById,
 
+		connectVisualObjects: connectVisualObjects,		
 		getPositionOfVisualObject: getPositionOfVisualObject,
 		removeVisualObject: removeVisualObject
 	}

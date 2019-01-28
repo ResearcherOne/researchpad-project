@@ -14,7 +14,8 @@ const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1600,
-    height: 1200,
+    height: 1000,
+    resizable: false
   });
 
   // and load the index.html of the app.

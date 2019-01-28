@@ -120,17 +120,22 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 	});
 }
 
-function initializeScript() {
-	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-	visualizerModule.initializeModule(konvaDivID);
-	overlayerModule.initializeModule(overlayDivID);
+function searchboxInputReceived() {
+	//const doi = "10.1103/physrevlett.98.010505";
+	const doi = document.getElementById("searchbox").value;
+	document.getElementById("searchbox").value = "";
 
-	const doi = "10.1103/physrevlett.98.010505";
 	const x = 500;
 	const y = 500;
 	createRootNodeFromDoi(doi, x, y, function(rootNode){
 		console.log("Root node created");
 	});
+}
+
+function initializeScript() {
+	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
+	visualizerModule.initializeModule(konvaDivID, 1200, 1200);
+	overlayerModule.initializeModule(overlayDivID);
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

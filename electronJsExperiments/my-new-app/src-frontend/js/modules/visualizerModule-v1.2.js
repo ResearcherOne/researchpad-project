@@ -59,10 +59,7 @@ var visualizerModule = (function () {
 
 
   //Public Functions
-	var initializeModule = function(konvaDivID) {
-		var w = window.innerWidth;
-		var h = window.innerHeight;
-
+	var initializeModule = function(konvaDivID, w, h) {
 		stage = new Konva.Stage({
 			container: konvaDivID,
 			width: w,

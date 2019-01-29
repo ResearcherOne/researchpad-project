@@ -48,7 +48,7 @@ function dragStart(nodeObject){
 		console.log("Type of rootnode");
 	} else if (nodeObject.constructor.name == "ReferenceNode") {
 		console.log("Type of reference node");
-		nodeObject.setPlaceholderState(true);
+		//nodeObject.setPlaceholderState(true);
 	} else if (nodeObject.constructor.name == "CitedByNode") {
 		console.log("Type of citedby node");
 	} else {
@@ -132,10 +132,36 @@ function searchboxInputReceived() {
 	});
 }
 
+var emptyRootNodeConfig = {
+	emptyRootNode: null,
+	x: 50,
+	y: 50,
+	ID: "emptyRootNode",
+	radius: 30
+}
+function emptyRootNodeDragStart(rootNode) {
+	console.log("Empty rootnode: drag start");
+}
+
+function emptyRootNodeEnd(rootNode) {
+	console.log("Empty rootnode: drag end");
+	//prompt user with overlay
+	//if successfull, create rootnode at current position
+	//else show error
+
+	//reposition node back to initial place.
+}
+
+function initializeVisualToolset() {
+	emptyRootNodeConfig.emptyRootNode = DummyNode(emptyRootNodeConfig.ID, emptyRootNodeConfig.radius, emptyRootNodeConfig.x, emptyRootNodeConfig.y, emptyRootNodeDragStart, emptyRootNodeEnd);
+}
+
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
 	visualizerModule.initializeModule(konvaDivID, 1200, 1200);
 	overlayerModule.initializeModule(overlayDivID);
+
+	initializeVisualToolset();
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

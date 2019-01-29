@@ -194,14 +194,18 @@ var visualizerModule = (function () {
 		var connection = createConnection(visualObject1, visualObject2);
 		return connection;
 	}
-
+	/*
 	var createPlaceholderVisualObject = function(visualObject) {
 		var placeholder = visualObject.clone({opacity: 0.5});
 		layer.add(placeholder);
 		updateScene();
 		return placeholder;
 	}
-
+	*/
+	var changeFillColorOfVisualObject = function(visualObject, color) {
+		visualObject.fill(color);
+		updateScene();
+	}
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -212,7 +216,8 @@ var visualizerModule = (function () {
 		getNodeCenterById: getNodeCenterById,
 		getNodeRadiusById: getNodeRadiusById,
 
-		createPlaceholderVisualObject: createPlaceholderVisualObject,
+		//createPlaceholderVisualObject: createPlaceholderVisualObject,
+		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
 		connectVisualObjects: connectVisualObjects,		
 		getPositionOfVisualObject: getPositionOfVisualObject,
 		removeVisualObject: removeVisualObject

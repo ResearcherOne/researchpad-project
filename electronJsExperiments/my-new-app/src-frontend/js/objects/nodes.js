@@ -25,7 +25,7 @@ function Node(ID, metadata, radius){
 	this.getCenterY = function() {
 		return visualizerModule.getPositionOfVisualObject(this.visualObject).y;
 	}
-
+	/*
 	this.setPlaceholderState = function(isActivated) {
 		if(isActivated) {
 			this.placeholderVisualObject = visualizerModule.createPlaceholderVisualObject(this.visualObject);
@@ -33,9 +33,9 @@ function Node(ID, metadata, radius){
 			visualizerModule.removeVisualObject(this.placeholderVisualObject);
 		}
 	}
-
+	*/
 	this.destroy = function() {
-		if(this.placeholderVisualObject) visualizerModule.removeVisualObject(this.placeholderVisualObject);
+		//if(this.placeholderVisualObject) visualizerModule.removeVisualObject(this.placeholderVisualObject);
 		visualizerModule.removeVisualObject(this.visualObject);
 	}
 }
@@ -178,6 +178,25 @@ function CitedByNode(rootNode, ID, metadata, radius, referencePosition, dragstar
 	CitedByNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(CitedByNode.prototype, 'constructor', { 
 	    value: CitedByNode, 
+	    enumerable: false, // so that it does not appear in 'for in' loop
+	    writable: true
+	});
+}
+function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
+	Node.call(this, ID, {}, radius);
+
+	this.x = x;
+	this.y = y;
+
+	var mouseOver = function() {};
+	var mouseOut = function() {};
+
+	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
+	visualizerModule.changeFillColorOfVisualObject(this.visualObject, "grey");
+	
+	DummyNode.prototype = Object.create(Node.prototype);
+	Object.defineProperty(DummyNode.prototype, 'constructor', { 
+	    value: DummyNode, 
 	    enumerable: false, // so that it does not appear in 'for in' loop
 	    writable: true
 	});

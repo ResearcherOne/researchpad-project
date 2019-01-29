@@ -20,7 +20,7 @@ function getMetadataWithDoi(doi, callback) {
 		if(!err) {
 			var metadata = responseObj.metadata;
 
-			console.log("Metadatafetched from backend.");
+			//console.log("Metadatafetched from backend.");
 			//console.log(JSON.stringify(metadata));
 			callback(null, metadata);
 		} else {
@@ -48,7 +48,7 @@ function dragStart(nodeObject){
 		console.log("Type of rootnode");
 	} else if (nodeObject.constructor.name == "ReferenceNode") {
 		console.log("Type of reference node");
-		//referenceNode.activateShadow
+		nodeObject.setPlaceholderState(true);
 	} else if (nodeObject.constructor.name == "CitedByNode") {
 		console.log("Type of citedby node");
 	} else {
@@ -109,7 +109,7 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 					}, fetchIntervalMs);
 				} else {
 					console.log("Unable to find references.");
-					console.log(JSON.stringify(metadata));
+					//console.log(JSON.stringify(metadata));
 				}
 			} else {
 				console.log("Doi does not exist in rootnode metadata");
@@ -121,8 +121,8 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 }
 
 function searchboxInputReceived() {
-	//const doi = "10.1103/physrevlett.98.010505";
-	const doi = document.getElementById("searchbox").value;
+	const doi = "10.1103/physrevlett.98.010505";
+	//const doi = document.getElementById("searchbox").value;
 	document.getElementById("searchbox").value = "";
 
 	const x = 500;

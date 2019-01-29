@@ -15,8 +15,8 @@ var visualizerModule = (function () {
 			x: x,
 			y: y,
 			radius: r,
-			fill: 'black',
-			stroke: 'blue',
+			fill: 'blue',
+			stroke: 'black',
 			strokeWidth: 4,
 			id: domId,
 			draggable: isDraggable
@@ -195,6 +195,13 @@ var visualizerModule = (function () {
 		return connection;
 	}
 
+	var createPlaceholderVisualObject = function(visualObject) {
+		var placeholder = visualObject.clone({opacity: 0.5});
+		layer.add(placeholder);
+		updateScene();
+		return placeholder;
+	}
+
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -205,6 +212,7 @@ var visualizerModule = (function () {
 		getNodeCenterById: getNodeCenterById,
 		getNodeRadiusById: getNodeRadiusById,
 
+		createPlaceholderVisualObject: createPlaceholderVisualObject,
 		connectVisualObjects: connectVisualObjects,		
 		getPositionOfVisualObject: getPositionOfVisualObject,
 		removeVisualObject: removeVisualObject

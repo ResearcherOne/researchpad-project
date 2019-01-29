@@ -4,6 +4,7 @@ function Node(ID, metadata, radius){
 	this.radius = radius;
 
 	this.visualObject;
+	this.placeholderVisualObject;
 
 	this.getVisualObject = function() {
 		return this.visualObject;
@@ -25,8 +26,16 @@ function Node(ID, metadata, radius){
 		return visualizerModule.getPositionOfVisualObject(this.visualObject).y;
 	}
 
+	this.setPlaceholderState = function(isActivated) {
+		if(isActivated) {
+			this.placeholderVisualObject = visualizerModule.createPlaceholderVisualObject(this.visualObject);
+		} else {
+			visualizerModule.removeVisualObject(this.placeholderVisualObject);
+		}
+	}
+
 	this.destroy = function() {
-		//if shadow exists, remove it.
+		if(this.placeholderVisualObject) visualizerModule.removeVisualObject(this.placeholderVisualObject);
 		visualizerModule.removeVisualObject(this.visualObject);
 	}
 }
@@ -73,13 +82,11 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 		const referencePosition = this.referenceCount;
 		this.references[ID] = new ReferenceNode(this, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback);
 		this.referenceCount++;
-		console.log("Reference Count: "+Object.keys(this.references).length);
 	}
 	this.createCitedBy = function(ID, metadata, radius) {
 		const citedByPosition = this.citedByCount;
 		this.citedByNodes[ID] = new CitedByNode(this, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback);
 		this.citedByCount++;
-		console.log("Cited by Count: "+Object.keys(this.citedByNodes).length);
 	}
 	this.addSiblingReference = function(rootNode) { //connection maintainers are references or citedbys
 		this.siblingReferences[rootNode.getID()] = rootNode;

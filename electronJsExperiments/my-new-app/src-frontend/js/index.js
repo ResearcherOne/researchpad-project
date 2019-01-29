@@ -120,31 +120,32 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 	});
 }
 
-function searchboxInputReceived() {
-	const doi = "10.1103/physrevlett.98.010505";
-	//const doi = document.getElementById("searchbox").value;
-	document.getElementById("searchbox").value = "";
-
-	const x = 500;
-	const y = 500;
-	createRootNodeFromDoi(doi, x, y, function(rootNode){
-		console.log("Root node created");
-	});
-}
-
 var emptyRootNodeConfig = {
 	emptyRootNode: null,
 	x: 50,
 	y: 50,
 	ID: "emptyRootNode",
-	radius: 30
-}
-function emptyRootNodeDragStart(rootNode) {
+	radius: 30,
+	opacity: 0.6
+};
+
+function emptyRootNodeDragStart(emptyRootNode) {
+	emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
 	console.log("Empty rootnode: drag start");
 }
 
-function emptyRootNodeEnd(rootNode) {
+function emptyRootNodeEnd(emptyRootNode) {
+	const x = emptyRootNode.getCenterX();
+	const y = emptyRootNode.getCenterY();
+
 	console.log("Empty rootnode: drag end");
+	overlayerModule.promptUser("Insert DOI", function(userInput){
+		console.log("HEY HEY HEY!!!!" + userInput);
+		emptyRootNode.setPosition(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
+		createRootNodeFromDoi(userInput, x, y, function(newRootNode){
+			console.log("Root node created");
+		});
+	});
 	//prompt user with overlay
 	//if successfull, create rootnode at current position
 	//else show error
@@ -158,7 +159,7 @@ function initializeVisualToolset() {
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-	visualizerModule.initializeModule(konvaDivID, 1200, 1200);
+	visualizerModule.initializeModule(konvaDivID, 1600, 1200);
 	overlayerModule.initializeModule(overlayDivID);
 
 	initializeVisualToolset();

@@ -38,6 +38,10 @@ function Node(ID, metadata, radius){
 		//if(this.placeholderVisualObject) visualizerModule.removeVisualObject(this.placeholderVisualObject);
 		visualizerModule.removeVisualObject(this.visualObject);
 	}
+
+	this.setPosition = function(x, y) {
+		visualizerModule.setPosition(this.visualObject, x,y);
+	}
 }
 function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, metadata, radius);
@@ -193,7 +197,11 @@ function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 
 	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 	visualizerModule.changeFillColorOfVisualObject(this.visualObject, "grey");
-	
+
+	this.setOpacity = function(opacity) {
+		visualizerModule.setOpacity(this.visualObject, opacity);
+	}
+
 	DummyNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(DummyNode.prototype, 'constructor', { 
 	    value: DummyNode, 

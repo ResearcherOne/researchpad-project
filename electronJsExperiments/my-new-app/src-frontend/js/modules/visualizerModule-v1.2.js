@@ -206,6 +206,17 @@ var visualizerModule = (function () {
 		visualObject.fill(color);
 		updateScene();
 	}
+	var setPosition = function(visualObject, x, y) {
+		visualObject.position({
+			x: x,
+			y: y
+		});
+		updateScene();
+	}
+	var setOpacity = function(visualObject, opacity) {
+		visualObject.opacity(opacity);
+		updateScene();
+	}
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -217,6 +228,8 @@ var visualizerModule = (function () {
 		getNodeRadiusById: getNodeRadiusById,
 
 		//createPlaceholderVisualObject: createPlaceholderVisualObject,
+		setOpacity: setOpacity,
+		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
 		connectVisualObjects: connectVisualObjects,		
 		getPositionOfVisualObject: getPositionOfVisualObject,

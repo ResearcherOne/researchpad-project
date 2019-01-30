@@ -217,6 +217,24 @@ var visualizerModule = (function () {
 		visualObject.opacity(opacity);
 		updateScene();
 	}
+	var scaleCanvasWithMouseWheelDeltaY = function(deltaY, scaleBy) {
+		var oldScale = stage.scaleX();
+
+		var mousePointTo = {
+			x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+			y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+		};
+
+		var newScale = deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+		stage.scale({ x: newScale, y: newScale });
+
+		var newPos = {
+			x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+			y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
+		};
+		stage.position(newPos);
+		stage.batchDraw();
+	}
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -228,6 +246,7 @@ var visualizerModule = (function () {
 		getNodeRadiusById: getNodeRadiusById,
 
 		//createPlaceholderVisualObject: createPlaceholderVisualObject,
+		scaleCanvasWithMouseWheelDeltaY: scaleCanvasWithMouseWheelDeltaY,
 		setOpacity: setOpacity,
 		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,

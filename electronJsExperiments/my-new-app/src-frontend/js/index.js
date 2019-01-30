@@ -129,6 +129,8 @@ var emptyRootNodeConfig = {
 	opacity: 0.6
 };
 
+var knowledgeTree = null;
+
 function emptyRootNodeDragStart(emptyRootNode) {
 	emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
 	console.log("Empty rootnode: drag start");
@@ -140,17 +142,11 @@ function emptyRootNodeEnd(emptyRootNode) {
 
 	console.log("Empty rootnode: drag end");
 	overlayerModule.promptUser("Insert DOI", function(userInput){
-		console.log("HEY HEY HEY!!!!" + userInput);
 		emptyRootNode.setPosition(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
 		createRootNodeFromDoi(userInput, x, y, function(newRootNode){
 			console.log("Root node created");
 		});
 	});
-	//prompt user with overlay
-	//if successfull, create rootnode at current position
-	//else show error
-
-	//reposition node back to initial place.
 }
 
 function initializeVisualToolset() {
@@ -159,10 +155,16 @@ function initializeVisualToolset() {
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-	visualizerModule.initializeModule(konvaDivID, 1600, 1200);
 	overlayerModule.initializeModule(overlayDivID);
+	knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
 
 	initializeVisualToolset();
+
+	var scaleBy = 1.05;
+	window.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		knowledgeTree.scaleKnowledgeTreeWithMouseWheelDeltaY(e.deltaY, scaleBy);
+	});
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

@@ -209,3 +209,11 @@ function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 	    writable: true
 	});
 }
+
+function KnowledgeTree(konvaDivID, width, height) {
+	visualizerModule.initializeModule(konvaDivID, width, height);
+
+	this.scaleKnowledgeTreeWithMouseWheelDeltaY = function(deltaY, scaleBy) {
+		visualizerModule.scaleCanvasWithMouseWheelDeltaY(deltaY, scaleBy);
+	}
+}

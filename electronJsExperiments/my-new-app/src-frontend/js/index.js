@@ -182,13 +182,14 @@ function initializeScript() {
 			knowledgeTree.moveCamera(0,-50);
 		}
 	});
-
+/* CLick to create rootnode
 	document.getElementById("body").addEventListener("click", function(event) {
 		console.log("Camera Posiiton"+JSON.stringify(knowledgeTree.getCameraPosition()));
 		console.log("Mouse Position on Camera"+JSON.stringify(knowledgeTree.getMousePositionOnCamera()));
 		console.log("Mouse Absolute Position "+JSON.stringify(knowledgeTree.getMouseAbsolutePosition()));
 		createRootNodeFromDoi("10.1103/physrevlett.98.010505", knowledgeTree.getMouseAbsolutePosition().x, knowledgeTree.getMouseAbsolutePosition().y, function(){});
 	});
+*/
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

@@ -98,8 +98,8 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 	}
 	this.addSiblingReference = function(rootNode) { //connection maintainers are references or citedbys
 		this.siblingReferences[rootNode.getID()] = rootNode;
-		this.siblingReferenceCount;
-		visualizerModule.connectVisualObjects(this.visualObject, rootNode.getVisualObject());
+		this.siblingReferenceCount++;
+		visualizerModule.connectVisualObjectsByID(this.ID, rootNode.getID());
 			//need to store connection. V0-2
 	}
 	this.removeReference = function(ID) {

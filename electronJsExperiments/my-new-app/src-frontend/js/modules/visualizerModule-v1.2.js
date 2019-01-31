@@ -71,7 +71,7 @@ var visualizerModule = (function () {
 			stroke: 'black',
 			strokeWidth: 4,
 			id: rootId,
-			draggable: true
+			draggable: false
 		});
 
 		circle.on('mouseover', function () {
@@ -187,12 +187,13 @@ var visualizerModule = (function () {
 		visualObject.destroy();
 	}
 
-	var connectVisualObjects = function(visualObject1, visualObject2) {
-		//get visualobject pos
-		//get visualobject pos2
-		var connection = createConnection(visualObject1, visualObject2);
+	var connectVisualObjectsByID = function(ID1, ID2) {
+		var nodeCenterPos1 = getNodeCenterById(ID1);
+		var nodeCenterPos2 = getNodeCenterById(ID2);
+
+		var connection = createConnection(nodeCenterPos1.x, nodeCenterPos1.y, nodeCenterPos2.x, nodeCenterPos2.y);
 		layer.add(connection);
-		layer.moveToBottom(connection);
+		connection.moveToBottom();
 		updateScene();
 		return connection;
 	}
@@ -249,7 +250,7 @@ var visualizerModule = (function () {
 		setOpacity: setOpacity,
 		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
-		connectVisualObjects: connectVisualObjects,		
+		connectVisualObjectsByID: connectVisualObjectsByID,		
 		//getPositionOfVisualObject: getPositionOfVisualObject,
 		removeVisualObject: removeVisualObject
 	}

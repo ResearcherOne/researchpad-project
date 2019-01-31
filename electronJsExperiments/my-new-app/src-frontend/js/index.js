@@ -15,7 +15,6 @@ function request(apiUrl, requestObj, callback) {
 }
 
 function getMetadataWithDoi(doi, callback) {
-	doi = "10.1103/physrevlett.98.010505"
 	const requestObj = {"doi": doi};
 	request(backendApi.getCrossrefMetaDataByDoi, requestObj, function(err, responseObj){
 		if(!err) {
@@ -60,8 +59,8 @@ function dragEnd(nodeObject) {
 		console.log("Type of rootnode");
 	} else if (nodeObject.constructor.name == "ReferenceNode") {
 		console.log("Type of reference node");
-		const x = nodeObject.getCenterX();
-		const y = nodeObject.getCenterY();
+		const x = nodeObject.getAbsolutePosition().x;
+		const y = nodeObject.getAbsolutePosition().y;
 		const doi = nodeObject.metadata.DOI;
 		const ID = nodeObject.getID();
 
@@ -78,13 +77,17 @@ function dragEnd(nodeObject) {
 	}
 }
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
 function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 	console.log("Create root node at "+x+","+y);
 	getMetadataWithDoi(doi, function(err, metadata){
 		if(!err) {
 			if(metadata.DOI) {
 				const rootNodeRadius = 30;
-				var rootNodeObject = new RootNode("root-"+metadata.DOI, metadata, 30, x, y, dragStart, dragEnd);
+				var rootNodeObject = new RootNode("root-"+metadata.DOI+getRandomInt(99999), metadata, 30, x, y, dragStart, dragEnd);
 				rootNodeCreatedCallback(rootNodeObject);
 				var rootNode = rootNodeObject.getVisualObject();
 				if(metadata.reference) {
@@ -100,7 +103,7 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 							if(fetchedMetadataCount==doiCount) clearInterval(myVar);
 							getMetadataWithDoi(referenceDoiList[fetchedMetadataCount-1], function(err, refMetadata){
 								if(!err && refMetadata.DOI) {
-									rootNodeObject.createReference("ref-"+refMetadata.DOI, refMetadata, leafNodeRadius);
+									rootNodeObject.createReference("ref-"+refMetadata.DOI+getRandomInt(99999), refMetadata, leafNodeRadius);
 								} else {
 									console.log("OOps, something went wrong while fetching reference metadata.");
 								} 
@@ -121,8 +124,8 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 
 var emptyRootNodeConfig = {
 	emptyRootNode: null,
-	x: 50,
-	y: 50,
+	x: 40,
+	y: 40,
 	ID: "emptyRootNode",
 	radius: 30,
 	opacity: 0.6
@@ -136,8 +139,8 @@ function emptyRootNodeDragStart(emptyRootNode) {
 }
 
 function emptyRootNodeEnd(emptyRootNode) {
-	const x = emptyRootNode.getCenterX();
-	const y = emptyRootNode.getCenterY();
+	const x = emptyRootNode.getAbsolutePosition().x;
+	const y = emptyRootNode.getAbsolutePosition().y;
 
 	console.log("Empty rootnode: drag end");
 	overlayerModule.promptUser("Insert DOI", function(userInput){
@@ -184,7 +187,7 @@ function initializeScript() {
 		console.log("Camera Posiiton"+JSON.stringify(knowledgeTree.getCameraPosition()));
 		console.log("Mouse Position on Camera"+JSON.stringify(knowledgeTree.getMousePositionOnCamera()));
 		console.log("Mouse Absolute Position "+JSON.stringify(knowledgeTree.getMouseAbsolutePosition()));
-		createRootNodeFromDoi("doi", knowledgeTree.getMouseAbsolutePosition().x, knowledgeTree.getMouseAbsolutePosition().y, function(){});
+		createRootNodeFromDoi("10.1103/physrevlett.98.010505", knowledgeTree.getMouseAbsolutePosition().x, knowledgeTree.getMouseAbsolutePosition().y, function(){});
 	});
 }
 

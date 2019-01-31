@@ -110,7 +110,6 @@ var visualizerModule = (function () {
 		var nx = rootCircleCenter.x + dX;
 		var ny = rootCircleCenter.y + dY;
 
-		console.log("nx: "+nx+" ny: "+ny);
 		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback);
 		leafCircle.connection = createConnection(rootCircleCenter.x, rootCircleCenter.y, nx, ny);
 
@@ -169,14 +168,15 @@ var visualizerModule = (function () {
 	var getNodeRadiusById = function(nodeID) {
 		return stage.findOne('#'+nodeID).radius();
 	}
-
+	/* For some weird reason visualObject.getAbsolutePosition(); returns dummy node's coordinates
 	var getPositionOfVisualObject = function(visualObject) {
 		var visualObjectPos = visualObject.getAbsolutePosition();
+		console.log("visual object absolute pos info "+JSON.stringify(visualObjectPos));
 		var stageX = stage.x();
 		var stageY = stage.y();
 		return {"x": visualObjectPos.x-stageX, "y": visualObjectPos.y-stageY};
 	}
-
+	*/
 	var removeVisualObject = function(visualObject) {
 		if(visualObject.connection) visualObject.connection.destroy();
 		visualObject.destroy();
@@ -250,7 +250,7 @@ var visualizerModule = (function () {
 		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
 		connectVisualObjects: connectVisualObjects,		
-		getPositionOfVisualObject: getPositionOfVisualObject,
+		//getPositionOfVisualObject: getPositionOfVisualObject,
 		removeVisualObject: removeVisualObject
 	}
 })();

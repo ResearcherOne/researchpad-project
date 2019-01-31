@@ -18,12 +18,15 @@ function Node(ID, metadata, radius){
 		return this.metadata.title;
 	}
 
-	this.getCenterX = function() {
-		return visualizerModule.getPositionOfVisualObject(this.visualObject).x;
+	this.getAbsolutePosition = function() {
+		return {x: visualizerModule.getNodeCenterById(this.ID).x, y:visualizerModule.getNodeCenterById(this.ID).y};
 	}
 
-	this.getCenterY = function() {
-		return visualizerModule.getPositionOfVisualObject(this.visualObject).y;
+	this.getPositionOnCamera = function() {
+		var cameraPos = visualizerModule.getCanvasPos();
+		var nodePos = visualizerModule.getNodeCenterById(this.ID);
+		var nodeOnCameraPos = {x: cameraPos.x+nodePos.x, y: cameraPos.y+nodePos.y};
+		return nodeOnCameraPos;
 	}
 	/*
 	this.setPlaceholderState = function(isActivated) {
@@ -61,11 +64,12 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 	this.siblingCitedBy = {};
 	this.siblingCitedByCount = 0;
 
-	var mouseOver = function(rootNodeObject) {
+	var mouseOver = function(rootNodeObject) { //SHALL NOT USE "this", when you pass callback to other object, "this" context will vary!!!
 		document.body.style.cursor = 'pointer';
-		var nodeCenter = visualizerModule.getNodeCenterById(rootNodeObject.getID());
+		var nodeCenter = rootNodeObject.getPositionOnCamera();
 		var nodeRadius = visualizerModule.getNodeRadiusById(rootNodeObject.getID());
 
+		rootNodeObject.getPositionOnCamera();
 		var overlayText; 
 		var rootNodeTitle = rootNodeObject.getTitle();
 		if (rootNodeTitle) {
@@ -107,7 +111,6 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 		this.siblingCitedBy[ID] = undefined;
 	}
 	
-	console.log("ROOT NODE X: "+this.getCenterX()+" Y: "+this.getCenterY());
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 
 	    value: RootNode, 
@@ -123,7 +126,7 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition, dragst
 
 	var mouseOverLeafNode = function(referenceNodeObject) {
 		document.body.style.cursor = 'pointer';
-		var nodeCenter = visualizerModule.getNodeCenterById(referenceNodeObject.getID());
+		var nodeCenter = referenceNodeObject.getPositionOnCamera();
 		var nodeRadius = visualizerModule.getNodeRadiusById(referenceNodeObject.getID());
 
 		var title = referenceNodeObject.getTitle();
@@ -161,7 +164,7 @@ function CitedByNode(rootNode, ID, metadata, radius, referencePosition, dragstar
 	this.referencePosition = referencePosition;
 
 	var mouseOverLeafNode = function(referenceNodeObject) {
-		var nodeCenter = visualizerModule.getNodeCenterById(referenceNodeObject.getID());
+		var nodeCenter = referenceNodeObject.getPositionOnCamera();
 		var nodeRadius = visualizerModule.getNodeRadiusById(referenceNodeObject.getID());
 
 		var title = referenceNodeObject.getTitle();

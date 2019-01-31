@@ -107,6 +107,7 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 		this.siblingCitedBy[ID] = undefined;
 	}
 	
+	console.log("ROOT NODE X: "+this.getCenterX()+" Y: "+this.getCenterY());
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 
 	    value: RootNode, 
@@ -213,7 +214,21 @@ function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 function KnowledgeTree(konvaDivID, width, height) {
 	visualizerModule.initializeModule(konvaDivID, width, height);
 
-	this.scaleKnowledgeTreeWithMouseWheelDeltaY = function(deltaY, scaleBy) {
-		visualizerModule.scaleCanvasWithMouseWheelDeltaY(deltaY, scaleBy);
+	this.moveCamera = function(x, y) {
+		visualizerModule.moveCanvas(x, y);
+	}
+
+	this.getMousePositionOnCamera = function() {
+		return {x: visualizerModule.getMousePosOnCanvas().x, y: visualizerModule.getMousePosOnCanvas().y};
+	}
+
+	this.getMouseAbsolutePosition = function() {
+		var absoluteMouseX = visualizerModule.getMousePosOnCanvas().x - visualizerModule.getCanvasPos().x;
+		var absoluteMouseY = visualizerModule.getMousePosOnCanvas().y - visualizerModule.getCanvasPos().y;
+		return {x: absoluteMouseX, y: absoluteMouseY};
+	}
+
+	this.getCameraPosition = function() {
+		return {x: visualizerModule.getCanvasPos().x, y: visualizerModule.getCanvasPos().y};
 	}
 }

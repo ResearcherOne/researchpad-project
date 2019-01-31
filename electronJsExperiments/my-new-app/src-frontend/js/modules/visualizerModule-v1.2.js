@@ -3,7 +3,8 @@ var visualizerModule = (function () {
 	var layer;
 
 	var updateScene = function() {
-		layer.batchDraw();
+		//layer.batchDraw();
+		stage.batchDraw();
 	}
 
 	var getCircleFromNode = function(group) {
@@ -37,23 +38,14 @@ var visualizerModule = (function () {
 		return circle;
 	}
 
-	var createConnection = function(firstShape, secondShape) {
-		var firstAbsolutePosition = firstShape.getAbsolutePosition();
-		var secondAbsolutePosition = secondShape.getAbsolutePosition();
-		var firstCenter = {"x": (firstAbsolutePosition.x), "y":(firstAbsolutePosition.y)};
-		var secondCenter = {"x": (secondAbsolutePosition.x), "y":(secondAbsolutePosition.y)};
-
+	var createConnection = function(x1, y1, x2, y2) {
 		var line = new Konva.Line({
-		points: [firstCenter.x, firstCenter.y, secondCenter.x, secondCenter.y],
+		points: [x1, y1, x2, y2],
 		stroke: 'black',
 		strokeWidth: 3,
 		lineCap: 'round',
 		lineJoin: 'round'
 		});
-
-		layer.add(line);
-		line.moveToBottom();
-
 		return line;
 	}
 
@@ -105,7 +97,7 @@ var visualizerModule = (function () {
 		angle = -angle;
 
 		var rootCircleAbsolutePosition = rootCircle.getAbsolutePosition();
-		var rootCircleCenter = {"x":  rootCircleAbsolutePosition.x, "y": rootCircleAbsolutePosition.y};
+		var rootCircleCenter = {"x":  rootCircleAbsolutePosition.x-stage.x(), "y": rootCircleAbsolutePosition.y-stage.y()};
 		var rootCircleRadius = rootCircle.radius();
 
 		var leafShapeRadius = radius;
@@ -118,9 +110,12 @@ var visualizerModule = (function () {
 		var nx = rootCircleCenter.x + dX;
 		var ny = rootCircleCenter.y + dY;
 
+		console.log("nx: "+nx+" ny: "+ny);
 		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback);
-		leafCircle.connection = createConnection(rootCircle, leafCircle)
+		leafCircle.connection = createConnection(rootCircleCenter.x, rootCircleCenter.y, nx, ny);
 
+		layer.add(leafCircle.connection);
+		leafCircle.connection.moveToBottom();
 		layer.add(leafCircle);
 		updateScene();
 		return leafCircle;
@@ -168,7 +163,7 @@ var visualizerModule = (function () {
 
 	var getNodeCenterById = function(nodeID) {
 		var nodeCenterPos = stage.findOne('#'+nodeID).getAbsolutePosition();
-		return {"x": nodeCenterPos.x, "y": nodeCenterPos.y};
+		return {"x": nodeCenterPos.x-stage.x(), "y": nodeCenterPos.y-stage.y()};
 	}
 
 	var getNodeRadiusById = function(nodeID) {
@@ -177,7 +172,9 @@ var visualizerModule = (function () {
 
 	var getPositionOfVisualObject = function(visualObject) {
 		var visualObjectPos = visualObject.getAbsolutePosition();
-		return {"x": visualObjectPos.x, "y": visualObjectPos.y};
+		var stageX = stage.x();
+		var stageY = stage.y();
+		return {"x": visualObjectPos.x-stageX, "y": visualObjectPos.y-stageY};
 	}
 
 	var removeVisualObject = function(visualObject) {
@@ -191,7 +188,12 @@ var visualizerModule = (function () {
 	}
 
 	var connectVisualObjects = function(visualObject1, visualObject2) {
+		//get visualobject pos
+		//get visualobject pos2
 		var connection = createConnection(visualObject1, visualObject2);
+		layer.add(connection);
+		layer.moveToBottom(connection);
+		updateScene();
 		return connection;
 	}
 	/*
@@ -217,23 +219,18 @@ var visualizerModule = (function () {
 		visualObject.opacity(opacity);
 		updateScene();
 	}
-	var scaleCanvasWithMouseWheelDeltaY = function(deltaY, scaleBy) {
-		var oldScale = stage.scaleX();
-
-		var mousePointTo = {
-			x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-			y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-		};
-
-		var newScale = deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-		stage.scale({ x: newScale, y: newScale });
-
-		var newPos = {
-			x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-			y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale
-		};
-		stage.position(newPos);
-		stage.batchDraw();
+	var moveCanvas = function(x, y) {
+		stage.move({
+			x: x,
+			y: y
+		});
+		updateScene();
+	}
+	var getMousePosOnCanvas = function(){
+		return {x: stage.getPointerPosition().x, y: stage.getPointerPosition().y};
+	}
+	var getCanvasPos = function() {
+		return {x: stage.x(), y: stage.y()};
 	}
 	return {
 		initializeModule: initializeModule,
@@ -246,7 +243,9 @@ var visualizerModule = (function () {
 		getNodeRadiusById: getNodeRadiusById,
 
 		//createPlaceholderVisualObject: createPlaceholderVisualObject,
-		scaleCanvasWithMouseWheelDeltaY: scaleCanvasWithMouseWheelDeltaY,
+		getCanvasPos: getCanvasPos,
+		getMousePosOnCanvas: getMousePosOnCanvas,
+		moveCanvas: moveCanvas,
 		setOpacity: setOpacity,
 		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,

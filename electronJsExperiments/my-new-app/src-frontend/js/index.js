@@ -15,13 +15,11 @@ function request(apiUrl, requestObj, callback) {
 }
 
 function getMetadataWithDoi(doi, callback) {
-	const requestObj = {"doi": doi}; //doi = "10.1103/physrevlett.98.010505"
+	doi = "10.1103/physrevlett.98.010505"
+	const requestObj = {"doi": doi};
 	request(backendApi.getCrossrefMetaDataByDoi, requestObj, function(err, responseObj){
 		if(!err) {
 			var metadata = responseObj.metadata;
-
-			//console.log("Metadatafetched from backend.");
-			//console.log(JSON.stringify(metadata));
 			callback(null, metadata);
 		} else {
 			console.log("Error occured: "+err.msg);
@@ -81,6 +79,7 @@ function dragEnd(nodeObject) {
 }
 
 function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
+	console.log("Create root node at "+x+","+y);
 	getMetadataWithDoi(doi, function(err, metadata){
 		if(!err) {
 			if(metadata.DOI) {
@@ -160,10 +159,26 @@ function initializeScript() {
 
 	initializeVisualToolset();
 
-	var scaleBy = 1.05;
-	window.addEventListener('wheel', (e) => {
-		e.preventDefault();
-		knowledgeTree.scaleKnowledgeTreeWithMouseWheelDeltaY(e.deltaY, scaleBy);
+	const LEFT = 37;
+	const RIGHT = 39;
+	//const UP = 38;
+	//const DOWN = 40;
+	document.getElementById("body").addEventListener("keyup", function(event) {
+		event.preventDefault();
+		if (event.keyCode === LEFT) {
+			console.log("LEFT");
+			knowledgeTree.moveCamera(50,0);
+		} else if (event.keyCode === RIGHT) {
+			console.log("RIGHT");
+			knowledgeTree.moveCamera(-50,0);
+		}
+	});
+
+	document.getElementById("body").addEventListener("click", function(event) {
+		console.log("Camera Posiiton"+JSON.stringify(knowledgeTree.getCameraPosition()));
+		console.log("Mouse Position on Camera"+JSON.stringify(knowledgeTree.getMousePositionOnCamera()));
+		console.log("Mouse Absolute Position "+JSON.stringify(knowledgeTree.getMouseAbsolutePosition()));
+		createRootNodeFromDoi("doi", knowledgeTree.getMouseAbsolutePosition().x, knowledgeTree.getMouseAbsolutePosition().y, function(){});
 	});
 }
 

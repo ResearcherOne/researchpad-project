@@ -161,8 +161,8 @@ function initializeScript() {
 
 	const LEFT = 37;
 	const RIGHT = 39;
-	//const UP = 38;
-	//const DOWN = 40;
+	const UP = 38;
+	const DOWN = 40;
 	document.getElementById("body").addEventListener("keyup", function(event) {
 		event.preventDefault();
 		if (event.keyCode === LEFT) {
@@ -171,6 +171,12 @@ function initializeScript() {
 		} else if (event.keyCode === RIGHT) {
 			console.log("RIGHT");
 			knowledgeTree.moveCamera(-50,0);
+		} else if (event.keyCode === UP) {
+			console.log("UP");
+			knowledgeTree.moveCamera(0,50);
+		} else if (event.keyCode === DOWN) {
+			console.log("DOWN");
+			knowledgeTree.moveCamera(0,-50);
 		}
 	});
 

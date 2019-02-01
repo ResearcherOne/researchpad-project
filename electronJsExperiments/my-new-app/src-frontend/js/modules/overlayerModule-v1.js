@@ -23,7 +23,6 @@ var overlayerModule = (function () {
 	}
 
 	var drawTitleOverlay = function(x, y, text) {
-		console.log("drawTitleOverlay: "+x +" "+y);
 		document.getElementById(divId).style.display = "block";
 
 		var offsetHeight = document.getElementById(divId).offsetHeight;

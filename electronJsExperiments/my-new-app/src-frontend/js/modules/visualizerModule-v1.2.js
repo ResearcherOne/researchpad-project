@@ -62,7 +62,7 @@ var visualizerModule = (function () {
 		stage.add(layer);
 	};
 
-	var createRootNode = function(radius, x, y, rootId, mouseOverCallback, mouseOutCallback, rootNodeObject, dragstartCallback, dragendCallback) {
+	var createRootNode = function(radius, x, y, rootId, isDraggable, mouseOverCallback, mouseOutCallback, rootNodeObject, dragstartCallback, dragendCallback) {
 		var circle = new Konva.Circle({
 			x: x,
 			y: y,
@@ -71,7 +71,7 @@ var visualizerModule = (function () {
 			stroke: 'black',
 			strokeWidth: 4,
 			id: rootId,
-			draggable: false
+			draggable: isDraggable
 		});
 
 		circle.on('mouseover', function () {

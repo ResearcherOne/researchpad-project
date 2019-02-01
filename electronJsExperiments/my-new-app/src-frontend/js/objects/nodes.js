@@ -65,7 +65,7 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 	this.siblingCitedByCount = 0;
 
 	var mouseOver = function(rootNodeObject) { //SHALL NOT USE "this", when you pass callback to other object, "this" context will vary!!!
-		document.body.style.cursor = 'pointer';
+		//document.body.style.cursor = 'pointer';
 		var nodeCenter = rootNodeObject.getPositionOnCamera();
 		var nodeRadius = visualizerModule.getNodeRadiusById(rootNodeObject.getID());
 
@@ -80,11 +80,12 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), overlayText);
 	};
 	var mouseOut = function(rootNodeObject) {
-		document.body.style.cursor = 'default';
+		//document.body.style.cursor = 'default';
 		overlayerModule.clearTitleOverlay();
 	};
 
-	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
+	const isDraggable = false;
+	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 
 	this.createReference = function(ID, metadata, radius) {
 		const referencePosition = this.referenceCount;
@@ -199,7 +200,15 @@ function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 	var mouseOver = function() {};
 	var mouseOut = function() {};
 
-	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
+	var mouseOver = function(rootNodeObject) { //SHALL NOT USE "this", when you pass callback to other object, "this" context will vary!!!
+		document.body.style.cursor = 'pointer';
+	};
+	var mouseOut = function(rootNodeObject) {
+		document.body.style.cursor = 'default';
+	};
+
+	const isDraggable = true;
+	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 	visualizerModule.changeFillColorOfVisualObject(this.visualObject, "grey");
 
 	this.setOpacity = function(opacity) {

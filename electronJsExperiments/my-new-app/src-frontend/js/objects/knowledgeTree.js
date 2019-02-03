@@ -1,4 +1,4 @@
-function Node(ID, metadata, radius){
+function Node(ID, metadata, radius){ //Abstract Class
 	this.ID = ID;
 	this.metadata = metadata;
 	this.radius = radius;
@@ -58,11 +58,8 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 	this.citedByNodes = {};
 	this.citedByCount = 0;
 
-	this.siblingReferences = {};
-	this.siblingReferenceCount = 0;
-
-	this.siblingCitedBy = {};
-	this.siblingCitedByCount = 0;
+	this.siblingIDs = {};
+	this.siblingCount = 0;
 
 	var mouseOver = function(rootNodeObject) { //SHALL NOT USE "this", when you pass callback to other object, "this" context will vary!!!
 		//document.body.style.cursor = 'pointer';
@@ -91,25 +88,33 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 		const referencePosition = this.referenceCount;
 		this.references[ID] = new ReferenceNode(this, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback);
 		this.referenceCount++;
+		console.log("Ref count: "+this.referenceCount);
 	}
 	this.createCitedBy = function(ID, metadata, radius) {
 		const citedByPosition = this.citedByCount;
 		this.citedByNodes[ID] = new CitedByNode(this, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback);
 		this.citedByCount++;
+		console.log("Citedby count: "+this.citedByCount);
 	}
-	this.addSiblingReference = function(rootNode) { //connection maintainers are references or citedbys
-		this.siblingReferences[rootNode.getID()] = rootNode;
-		this.siblingReferenceCount++;
-		visualizerModule.connectVisualObjectsByID(this.ID, rootNode.getID());
-			//need to store connection. V0-2
+	this.setSibling = function(nodeID, siblingType) {
+		this.siblingIDs[nodeID] = siblingType;
+		this.siblingCount++;
+	}
+	this.removeSibling = function(nodeID) {
+		this.siblingIDs[nodeID] = null;
+		this.siblingCount--;
 	}
 	this.removeReference = function(ID) {
 		this.references[ID].destroy();
 		this.references[ID] = undefined;
+		this.referenceCount--;
+		console.log("Ref count: "+this.referenceCount);
 	}
 	this.removeCitedBy = function(ID) {
-		this.siblingCitedBy[ID].destroy();
-		this.siblingCitedBy[ID] = undefined;
+		this.citedByNodes[ID].destroy();
+		this.citedByNodes[ID] = undefined;
+		this.citedByCount--;
+		console.log("Citedby count: "+this.citedByCount);
 	}
 	
 	RootNode.prototype = Object.create(Node.prototype);
@@ -193,12 +198,8 @@ function CitedByNode(rootNode, ID, metadata, radius, referencePosition, dragstar
 }
 function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, {}, radius);
-
 	this.x = x;
 	this.y = y;
-
-	var mouseOver = function() {};
-	var mouseOut = function() {};
 
 	var mouseOver = function(rootNodeObject) { //SHALL NOT USE "this", when you pass callback to other object, "this" context will vary!!!
 		document.body.style.cursor = 'pointer';
@@ -206,11 +207,13 @@ function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 	var mouseOut = function(rootNodeObject) {
 		document.body.style.cursor = 'default';
 	};
-
 	const isDraggable = true;
+
+	//Initialization
 	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 	visualizerModule.changeFillColorOfVisualObject(this.visualObject, "grey");
 
+	//Public Functions
 	this.setOpacity = function(opacity) {
 		visualizerModule.setOpacity(this.visualObject, opacity);
 	}
@@ -224,8 +227,129 @@ function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 }
 
 function KnowledgeTree(konvaDivID, width, height) {
-	visualizerModule.initializeModule(konvaDivID, width, height);
+	//Config & Private Functions
+	this.konvaDivID = konvaDivID;
+	this.width = width;
+	this.height = height;
 
+	this.rootNodes = {};
+	this.rootNodeCount = 0;
+
+	this.siblingConnections = {};
+	this.siblingConnectionCount = 0;
+
+	var dragStartCallback = null;
+	var dragEndCallback = null;
+
+	var nodeCreateRequestCallback = null;
+	var emptyRootNode = null;
+	var emptyRootNodeConfig = {
+		x: 40,
+		y: 40,
+		ID: "emptyRootNode",
+		radius: 30,
+		opacity: 0.6
+	};
+
+	var emptyRootNodeDragStart = function(emptyRootNode) {
+		emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
+	}
+
+	var emptyRootNodeEnd = function(emptyRootNode) {
+		const x = emptyRootNode.getAbsolutePosition().x;
+		const y = emptyRootNode.getAbsolutePosition().y;
+
+		emptyRootNode.setPosition(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
+
+		if(nodeCreateRequestCallback) nodeCreateRequestCallback(x, y);
+	}
+
+	var nodeDragStartCallback = function(nodeObj) {
+		if(dragStartCallback) {
+			if(nodeObj.constructor.name == "RootNode") {
+				console.log("Type of rootnode");
+				dragStartCallback("root", nodeObj);
+			} else if (nodeObj.constructor.name == "ReferenceNode") {
+				console.log("Type of reference node");
+				dragStartCallback("ref", nodeObj);
+			} else if (nodeObj.constructor.name == "CitedByNode") {
+				console.log("Type of citedby node");
+				dragStartCallback("citedby", nodeObj);
+			} else {
+				console.log("Unknown type.");
+				console.log(nodeObj.constructor.name);
+				dragStartCallback("unknown", nodeObj);
+			}
+		} else {
+			//callback not set.
+		}
+
+	}
+	var nodeDragEndCallback = function(nodeObj) {
+		if(dragEndCallback) {
+			if(nodeObj.constructor.name == "RootNode") {
+				console.log("Type of rootnode");
+				dragEndCallback("root", nodeObj);
+			} else if (nodeObj.constructor.name == "ReferenceNode") {
+				console.log("Type of reference node");
+				dragEndCallback("ref", nodeObj);
+			} else if (nodeObj.constructor.name == "CitedByNode") {
+				console.log("Type of citedby node");
+				dragEndCallback("citedby", nodeObj);
+			} else {
+				console.log("Unknown type.");
+				console.log(nodeObj.constructor.name);
+				dragEndCallback("unknown", nodeObj);
+			}
+		} else {
+			//callback not set.
+		}
+	}
+
+	var initializeVisualToolset = function() {
+		emptyRootNode = DummyNode(emptyRootNodeConfig.ID, emptyRootNodeConfig.radius, emptyRootNodeConfig.x, emptyRootNodeConfig.y, emptyRootNodeDragStart, emptyRootNodeEnd);
+	}
+
+	var getRandomInt = function(max) {
+		return Math.floor(Math.random() * Math.floor(max));
+	}
+
+	//Initialization
+	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height);
+	initializeVisualToolset();
+
+	//Public Functions
+	this.createRootNode = function (metadata, radius, x, y) {
+		const ID = "root-"+metadata.DOI+getRandomInt(99999);
+		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback);
+		this.rootNodeCount++;
+		return ID;
+	}
+	this.addReferenceToRootNode = function(rootID, refMetadata, radius) {
+		const refID = "ref-"+refMetadata.DOI+getRandomInt(99999);
+		this.rootNodes[rootID].createReference(refID, refMetadata, radius);
+		return refID;
+	}
+	this.removeReferenceFromRootNode = function(rootID, refID) {
+		this.rootNodes[rootID].removeReference(refID);
+	}
+	this.setSiblingReference = function(rootID, siblingReferenceRootID) {
+		var connectionObj = visualizerModule.connectVisualObjectsByID(rootID, siblingReferenceRootID);
+		const connectionID = rootID + siblingReferenceRootID;
+		this.siblingConnections[connectionID] = connectionObj;
+		this.siblingConnectionCount++;
+
+		this.rootNodes[rootID].setSibling(siblingReferenceRootID, "reference");
+	}
+	this.setNodeDragStartCallback = function(callback) {
+		dragStartCallback = callback;
+	}
+	this.setNodeDragEndCallback = function(callback) {
+		dragEndCallback = callback;
+	}
+	this.setNodeCreateRequestCallback = function(callback) {
+		nodeCreateRequestCallback = callback;
+	}
 	this.moveCamera = function(x, y) {
 		visualizerModule.moveCanvas(x, y);
 	}

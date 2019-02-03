@@ -39,46 +39,40 @@ function getDoiListOfReferences(referenceList) {
 	return doiList;
 }
 
-function dragStart(nodeObject){
-	console.log("Drag Start "+nodeObject.ID);
-	if(nodeObject.constructor.name == "RootNode") {
+function nodeDragStartCallback(nodeType, nodeObj) {
+	if(nodeType == "root") {
 		console.log("Type of rootnode");
-	} else if (nodeObject.constructor.name == "ReferenceNode") {
+	} else if (nodeType == "ref") {
 		console.log("Type of reference node");
-		//nodeObject.setPlaceholderState(true);
-	} else if (nodeObject.constructor.name == "CitedByNode") {
+	} else if (nodeType == "citedby") {
 		console.log("Type of citedby node");
 	} else {
-		console.log("Unknown type.");
-		console.log(nodeObject.constructor.name);
+		console.log("Unknown type: "+nodeType);
 	}
 }
-function dragEnd(nodeObject) {
-	console.log("Drag Start "+nodeObject.ID);
-	if(nodeObject.constructor.name == "RootNode") {
-		console.log("Type of rootnode");
-	} else if (nodeObject.constructor.name == "ReferenceNode") {
-		console.log("Type of reference node");
-		const x = nodeObject.getAbsolutePosition().x;
-		const y = nodeObject.getAbsolutePosition().y;
-		const doi = nodeObject.metadata.DOI;
-		const ID = nodeObject.getID();
 
-		var rootNodeOfReference = nodeObject.getRootNode();
-		rootNodeOfReference.removeReference(ID);
-		createRootNodeFromDoi(doi, x, y, function(newRootNode){
-			rootNodeOfReference.addSiblingReference(newRootNode);
+function nodeDragEndCallback(nodeType, nodeObj) {
+	if(nodeType == "root") {
+		console.log("Type of rootnode");
+	} else if (nodeType == "ref") {
+		console.log("Type of reference node");
+		const x = nodeObj.getAbsolutePosition().x;
+		const y = nodeObj.getAbsolutePosition().y;
+		const doi = nodeObj.metadata.DOI;
+		const ID = nodeObj.getID();
+
+		var rootNodeOfReference = nodeObj.getRootNode();
+		knowledgeTree.removeReferenceFromRootNode(rootNodeOfReference.getID(), ID);
+		createRootNodeFromDoi(doi, x, y, function(newRootNodeID){
+			//rootNodeOfReference.addSiblingReference(newRootNode);
+			const rootID = rootNodeOfReference.getID();
+			knowledgeTree.setSiblingReference(rootID, newRootNodeID);
 		});
-	} else if (nodeObject.constructor.name == "CitedByNode") {
+	} else if (nodeType == "citedby") {
 		console.log("Type of citedby node");
 	} else {
-		console.log("Unknown type.");
-		console.log(nodeObject.constructor.name);
+		console.log("Unknown type: "+nodeType);
 	}
-}
-
-function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
 }
 
 function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
@@ -87,9 +81,8 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 		if(!err) {
 			if(metadata.DOI) {
 				const rootNodeRadius = 30;
-				var rootNodeObject = new RootNode("root-"+metadata.DOI+getRandomInt(99999), metadata, 30, x, y, dragStart, dragEnd);
-				rootNodeCreatedCallback(rootNodeObject);
-				var rootNode = rootNodeObject.getVisualObject();
+				var rootNodeObjectID = knowledgeTree.createRootNode(metadata, 30, x, y);
+				rootNodeCreatedCallback(rootNodeObjectID);
 				if(metadata.reference) {
 					var referenceList = metadata.reference;
 					var referenceDoiList = getDoiListOfReferences(referenceList);
@@ -103,7 +96,7 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 							if(fetchedMetadataCount==doiCount) clearInterval(myVar);
 							getMetadataWithDoi(referenceDoiList[fetchedMetadataCount-1], function(err, refMetadata){
 								if(!err && refMetadata.DOI) {
-									rootNodeObject.createReference("ref-"+refMetadata.DOI+getRandomInt(99999), refMetadata, leafNodeRadius);
+									knowledgeTree.addReferenceToRootNode(rootNodeObjectID, refMetadata, leafNodeRadius);
 								} else {
 									console.log("OOps, something went wrong while fetching reference metadata.");
 								} 
@@ -122,45 +115,24 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 	});
 }
 
-var emptyRootNodeConfig = {
-	emptyRootNode: null,
-	x: 40,
-	y: 40,
-	ID: "emptyRootNode",
-	radius: 30,
-	opacity: 0.6
-};
 
-var knowledgeTree = null;
-
-function emptyRootNodeDragStart(emptyRootNode) {
-	emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
-	console.log("Empty rootnode: drag start");
-}
-
-function emptyRootNodeEnd(emptyRootNode) {
-	const x = emptyRootNode.getAbsolutePosition().x;
-	const y = emptyRootNode.getAbsolutePosition().y;
-
-	console.log("Empty rootnode: drag end");
+function createNodeRequestCallback(x, y) {
 	overlayerModule.promptUser("Insert DOI", function(userInput){
-		emptyRootNode.setPosition(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
-		createRootNodeFromDoi(userInput, x, y, function(newRootNode){
-			console.log("Root node created");
+		createRootNodeFromDoi(userInput, x, y, function(newRootNodeID){
+			console.log("Root node created: "+newRootNodeID);
 		});
 	});
 }
-
-function initializeVisualToolset() {
-	emptyRootNodeConfig.emptyRootNode = DummyNode(emptyRootNodeConfig.ID, emptyRootNodeConfig.radius, emptyRootNodeConfig.x, emptyRootNodeConfig.y, emptyRootNodeDragStart, emptyRootNodeEnd);
-}
+var knowledgeTree = null;
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
 	overlayerModule.initializeModule(overlayDivID);
 	knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
 
-	initializeVisualToolset();
+	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestCallback);
+	knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
+	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 
 	const LEFT = 37;
 	const RIGHT = 39;

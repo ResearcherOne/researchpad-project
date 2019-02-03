@@ -139,16 +139,17 @@ function initializeScript() {
 	const UP = 38;
 	const DOWN = 40;
 	const SPACE = 32;
-	document.getElementById("body").addEventListener("keyup", function(event) {
+	document.addEventListener("keydown", function(event) {
 		event.preventDefault();
+		const moveLength = 60;
 		if (event.keyCode === LEFT) {
-			knowledgeTree.moveCamera(50,0);
+			knowledgeTree.moveCamera(moveLength,0);
 		} else if (event.keyCode === RIGHT) {
-			knowledgeTree.moveCamera(-50,0);
+			knowledgeTree.moveCamera(-moveLength,0);
 		} else if (event.keyCode === UP) {
-			knowledgeTree.moveCamera(0,50);
+			knowledgeTree.moveCamera(0,moveLength);
 		} else if (event.keyCode === DOWN) {
-			knowledgeTree.moveCamera(0,-50);
+			knowledgeTree.moveCamera(0,-moveLength);
 		} else if (event.keyCode === SPACE) {
 			console.log("SPACE");
 			console.log(knowledgeTree.serialize());

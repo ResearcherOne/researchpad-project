@@ -151,7 +151,7 @@ function initializeScript() {
 			knowledgeTree.moveCamera(0,-50);
 		} else if (event.keyCode === SPACE) {
 			console.log("SPACE");
-			knowledgeTree.serialize();
+			console.log(knowledgeTree.serialize());
 		}
 	});
 /* CLick to create rootnode

@@ -126,11 +126,12 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		serializedNodeObj.radius = this.radius;
 		serializedNodeObj.x = this.getAbsolutePosition().x;
 		serializedNodeObj.y = this.getAbsolutePosition().y;
+
 		serializedNodeObj.references = getSerializedLeafNodesObj(this.references);
 		serializedNodeObj.referenceCount = this.referenceCount;
 
-		//this.citedByNodes = {};
-		//this.citedByCount = 0;
+		serializedNodeObj.citedByNodes = getSerializedLeafNodesObj(this.citedByNodes);
+		serializedNodeObj.citedByCount = this.citedByCount;
 
 		serializedNodeObj.siblingIDs = this.siblingIDs;
 		serializedNodeObj.siblingCount = this.siblingCount;
@@ -221,6 +222,18 @@ function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, refere
 
 	this.visualObject = visualizerModule.createCitedByNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
 
+	this.serialize = function() {
+		var serializedObj = {};
+		serializedObj.ID = this.ID;
+		serializedObj.metadata = this.metadata;
+		serializedObj.radius = this.radius;
+
+		serializedObj.rootNodeID = this.rootNodeID;
+		serializedObj.referencePosition = this.referencePosition;
+
+		return JSON.stringify(serializedObj);
+	}
+
 	CitedByNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(CitedByNode.prototype, 'constructor', { 
 	    value: CitedByNode, 
@@ -254,6 +267,22 @@ function DummyNode(ID, radius, initalX, initialY, dragstartCallback, dragendCall
 	    enumerable: false, // so that it does not appear in 'for in' loop
 	    writable: true
 	});
+}
+
+function SiblingConnection(ID, firstNodeID, secondNodeID) {
+	this.ID = ID;
+	this.firstNodeID = firstNodeID;
+	this.secondNodeID = secondNodeID;
+
+	this.visualObj = visualizerModule.connectVisualObjectsByID(this.firstNodeID, this.secondNodeID);
+
+	this.serialize = function() {
+		return JSON.stringify({
+			ID: this.ID,
+			firstNodeID: this.firstNodeID,
+			secondNodeID: this.secondNodeID
+		});
+	}
 }
 
 function KnowledgeTree(konvaDivID, width, height) {
@@ -344,20 +373,12 @@ function KnowledgeTree(konvaDivID, width, height) {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
 
-	var serializeRootNodes = function(rootNodes) {
-		var serializedRootNodes = {};
-
-		for (var rootNodeObjID in rootNodes){
-			serializedRootNodes[rootNodeObjID] = rootNodes[rootNodeObjID].serialize();
-			console.log(serializedRootNodes[rootNodeObjID]);
+	var getSerializeCallMappedObj = function(obj) {
+		var serializedObj = {};
+		for (var elementKey in obj){
+			serializedObj[elementKey] = obj[elementKey].serialize();
 		}
-		//for each key
-			//call class.serialize() and store it
-		//return obj
-	}
-
-	var serializeSiblingConnections = function(obj) {
-
+		return serializedObj;		
 	}
 
 	//Initialization
@@ -380,8 +401,8 @@ function KnowledgeTree(konvaDivID, width, height) {
 		this.rootNodes[rootID].removeReference(refID);
 	}
 	this.setSiblingReference = function(rootID, siblingReferenceRootID) {
-		var connectionObj = visualizerModule.connectVisualObjectsByID(rootID, siblingReferenceRootID);
 		const connectionID = rootID + siblingReferenceRootID;
+		var connectionObj = new SiblingConnection(connectionID, rootID, siblingReferenceRootID);
 		this.siblingConnections[connectionID] = connectionObj;
 		this.siblingConnectionCount++;
 
@@ -416,10 +437,12 @@ function KnowledgeTree(konvaDivID, width, height) {
 	}
 	this.serialize = function() {
 		var serializedKnowledgeTree = {};
-		serializedKnowledgeTree.rootNodes = serializeRootNodes(this.rootNodes);
+		serializedKnowledgeTree.rootNodes = getSerializeCallMappedObj(this.rootNodes);
 		serializedKnowledgeTree.rootNodeCount = this.rootNodeCount;
 
-		//this.siblingConnections = {};
-		//this.siblingConnectionCount = 0;
+		serializedKnowledgeTree.siblingConnections = getSerializeCallMappedObj(this.siblingConnections);
+		serializedKnowledgeTree.siblingConnectionCount = this.siblingConnectionCount;
+
+		return JSON.stringify(serializedKnowledgeTree);
 	}
 }

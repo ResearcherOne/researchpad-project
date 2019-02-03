@@ -46,11 +46,8 @@ function Node(ID, metadata, radius){ //Abstract Class
 		visualizerModule.setPosition(this.visualObject, x,y);
 	}
 }
-function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback) {
+function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, metadata, radius);
-	
-	this.x = x;
-	this.y = y;
 
 	this.references = {};
 	this.referenceCount = 0;
@@ -80,21 +77,26 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 		//document.body.style.cursor = 'default';
 		overlayerModule.clearTitleOverlay();
 	};
+	var getSerializedLeafNodesObj = function(leafNodes) {
+		var serializedLeafNodes = {};
+		for (var leafNodeID in leafNodes){
+			serializedLeafNodes[leafNodeID] = leafNodes[leafNodeID].serialize();
+		}
+		return serializedLeafNodes;
+	}
 
 	const isDraggable = false;
-	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 
 	this.createReference = function(ID, metadata, radius) {
 		const referencePosition = this.referenceCount;
-		this.references[ID] = new ReferenceNode(this, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback);
+		this.references[ID] = new ReferenceNode(this.ID, this.visualObject, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback);
 		this.referenceCount++;
-		console.log("Ref count: "+this.referenceCount);
 	}
 	this.createCitedBy = function(ID, metadata, radius) {
 		const citedByPosition = this.citedByCount;
-		this.citedByNodes[ID] = new CitedByNode(this, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback);
+		this.citedByNodes[ID] = new CitedByNode(this.ID, this.visualObject, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback);
 		this.citedByCount++;
-		console.log("Citedby count: "+this.citedByCount);
 	}
 	this.setSibling = function(nodeID, siblingType) {
 		this.siblingIDs[nodeID] = siblingType;
@@ -102,19 +104,37 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 	}
 	this.removeSibling = function(nodeID) {
 		this.siblingIDs[nodeID] = null;
+		delete this.siblingIDs[nodeID];
 		this.siblingCount--;
 	}
 	this.removeReference = function(ID) {
 		this.references[ID].destroy();
 		this.references[ID] = undefined;
+		delete this.references[ID];
 		this.referenceCount--;
-		console.log("Ref count: "+this.referenceCount);
 	}
 	this.removeCitedBy = function(ID) {
 		this.citedByNodes[ID].destroy();
 		this.citedByNodes[ID] = undefined;
+		delete this.citedByNodes[ID];
 		this.citedByCount--;
-		console.log("Citedby count: "+this.citedByCount);
+	}
+	this.serialize = function() {
+		var serializedNodeObj = {};
+		serializedNodeObj.ID = this.ID;
+		serializedNodeObj.metadata = this.metadata;
+		serializedNodeObj.radius = this.radius;
+		serializedNodeObj.x = this.getAbsolutePosition().x;
+		serializedNodeObj.y = this.getAbsolutePosition().y;
+		serializedNodeObj.references = getSerializedLeafNodesObj(this.references);
+		serializedNodeObj.referenceCount = this.referenceCount;
+
+		//this.citedByNodes = {};
+		//this.citedByCount = 0;
+
+		serializedNodeObj.siblingIDs = this.siblingIDs;
+		serializedNodeObj.siblingCount = this.siblingCount;
+		return JSON.stringify(serializedNodeObj);
 	}
 	
 	RootNode.prototype = Object.create(Node.prototype);
@@ -124,10 +144,10 @@ function RootNode(ID, metadata, radius, x, y, dragstartCallback, dragendCallback
 	    writable: true
 	});
 }
-function ReferenceNode(rootNode, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback) {
+function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, metadata, radius);
 
-	this.rootNode = rootNode;
+	this.rootNodeID = rootNodeID;
 	this.referencePosition = referencePosition;
 
 	var mouseOverLeafNode = function(referenceNodeObject) {
@@ -150,10 +170,22 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition, dragst
 		overlayerModule.clearTitleOverlay();
 	}
 
-	this.visualObject = visualizerModule.createReferenceNode(this.rootNode.getVisualObject(), this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createReferenceNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
 
-	this.getRootNode = function() {
-		return this.rootNode;
+	this.getRootNodeID = function() {
+		return this.rootNodeID;
+	}
+
+	this.serialize = function() {
+		var serializedReferenceObj = {};
+		serializedReferenceObj.ID = this.ID;
+		serializedReferenceObj.metadata = this.metadata;
+		serializedReferenceObj.radius = this.radius;
+
+		serializedReferenceObj.rootNodeID = this.rootNodeID;
+		serializedReferenceObj.referencePosition = this.referencePosition;
+
+		return JSON.stringify(serializedReferenceObj);
 	}
 
 	ReferenceNode.prototype = Object.create(Node.prototype);
@@ -163,10 +195,10 @@ function ReferenceNode(rootNode, ID, metadata, radius, referencePosition, dragst
 	    writable: true
 	});
 }
-function CitedByNode(rootNode, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback) {
+function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, metadata, radius);
 
-	this.rootNode = rootNode;
+	this.rootNodeID = rootNodeID;
 	this.referencePosition = referencePosition;
 
 	var mouseOverLeafNode = function(referenceNodeObject) {
@@ -187,7 +219,7 @@ function CitedByNode(rootNode, ID, metadata, radius, referencePosition, dragstar
 		overlayerModule.clearTitleOverlay();
 	}
 
-	this.visualObject = visualizerModule.createCitedByNode(this.rootNode.getVisualObject(), this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createCitedByNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
 
 	CitedByNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(CitedByNode.prototype, 'constructor', { 
@@ -196,10 +228,8 @@ function CitedByNode(rootNode, ID, metadata, radius, referencePosition, dragstar
 	    writable: true
 	});
 }
-function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
+function DummyNode(ID, radius, initalX, initialY, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, {}, radius);
-	this.x = x;
-	this.y = y;
 
 	var mouseOver = function(rootNodeObject) { //SHALL NOT USE "this", when you pass callback to other object, "this" context will vary!!!
 		document.body.style.cursor = 'pointer';
@@ -210,7 +240,7 @@ function DummyNode(ID, radius, x, y, dragstartCallback, dragendCallback) {
 	const isDraggable = true;
 
 	//Initialization
-	this.visualObject = visualizerModule.createRootNode(this.radius, this.x, this.y, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createRootNode(this.radius, initalX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 	visualizerModule.changeFillColorOfVisualObject(this.visualObject, "grey");
 
 	//Public Functions
@@ -314,6 +344,22 @@ function KnowledgeTree(konvaDivID, width, height) {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
 
+	var serializeRootNodes = function(rootNodes) {
+		var serializedRootNodes = {};
+
+		for (var rootNodeObjID in rootNodes){
+			serializedRootNodes[rootNodeObjID] = rootNodes[rootNodeObjID].serialize();
+			console.log(serializedRootNodes[rootNodeObjID]);
+		}
+		//for each key
+			//call class.serialize() and store it
+		//return obj
+	}
+
+	var serializeSiblingConnections = function(obj) {
+
+	}
+
 	//Initialization
 	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height);
 	initializeVisualToolset();
@@ -340,6 +386,7 @@ function KnowledgeTree(konvaDivID, width, height) {
 		this.siblingConnectionCount++;
 
 		this.rootNodes[rootID].setSibling(siblingReferenceRootID, "reference");
+		this.rootNodes[siblingReferenceRootID].setSibling(rootID, "citedby");
 	}
 	this.setNodeDragStartCallback = function(callback) {
 		dragStartCallback = callback;
@@ -366,5 +413,13 @@ function KnowledgeTree(konvaDivID, width, height) {
 
 	this.getCameraPosition = function() {
 		return {x: visualizerModule.getCanvasPos().x, y: visualizerModule.getCanvasPos().y};
+	}
+	this.serialize = function() {
+		var serializedKnowledgeTree = {};
+		serializedKnowledgeTree.rootNodes = serializeRootNodes(this.rootNodes);
+		serializedKnowledgeTree.rootNodeCount = this.rootNodeCount;
+
+		//this.siblingConnections = {};
+		//this.siblingConnectionCount = 0;
 	}
 }

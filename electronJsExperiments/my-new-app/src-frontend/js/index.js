@@ -61,11 +61,11 @@ function nodeDragEndCallback(nodeType, nodeObj) {
 		const doi = nodeObj.metadata.DOI;
 		const ID = nodeObj.getID();
 
-		var rootNodeOfReference = nodeObj.getRootNode();
-		knowledgeTree.removeReferenceFromRootNode(rootNodeOfReference.getID(), ID);
+		var rootNodeOfReferenceID = nodeObj.getRootNodeID();
+		knowledgeTree.removeReferenceFromRootNode(rootNodeOfReferenceID, ID);
 		createRootNodeFromDoi(doi, x, y, function(newRootNodeID){
 			//rootNodeOfReference.addSiblingReference(newRootNode);
-			const rootID = rootNodeOfReference.getID();
+			const rootID = rootNodeOfReferenceID;
 			knowledgeTree.setSiblingReference(rootID, newRootNodeID);
 		});
 	} else if (nodeType == "citedby") {
@@ -116,10 +116,10 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 }
 
 
-function createNodeRequestCallback(x, y) {
+function createNodeRequestReceivedCallback(x, y) {
 	overlayerModule.promptUser("Insert DOI", function(userInput){
 		createRootNodeFromDoi(userInput, x, y, function(newRootNodeID){
-			console.log("Root node created: "+newRootNodeID);
+			//console.log("Root node created: "+newRootNodeID);
 		});
 	});
 }
@@ -130,7 +130,7 @@ function initializeScript() {
 	overlayerModule.initializeModule(overlayDivID);
 	knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
 
-	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestCallback);
+	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 	knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 
@@ -138,20 +138,20 @@ function initializeScript() {
 	const RIGHT = 39;
 	const UP = 38;
 	const DOWN = 40;
+	const SPACE = 32;
 	document.getElementById("body").addEventListener("keyup", function(event) {
 		event.preventDefault();
 		if (event.keyCode === LEFT) {
-			console.log("LEFT");
 			knowledgeTree.moveCamera(50,0);
 		} else if (event.keyCode === RIGHT) {
-			console.log("RIGHT");
 			knowledgeTree.moveCamera(-50,0);
 		} else if (event.keyCode === UP) {
-			console.log("UP");
 			knowledgeTree.moveCamera(0,50);
 		} else if (event.keyCode === DOWN) {
-			console.log("DOWN");
 			knowledgeTree.moveCamera(0,-50);
+		} else if (event.keyCode === SPACE) {
+			console.log("SPACE");
+			knowledgeTree.serialize();
 		}
 	});
 /* CLick to create rootnode

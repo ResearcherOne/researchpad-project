@@ -55,7 +55,7 @@ var overlayerModule = (function () {
 	    document.getElementById("promptButton").onclick = promptUserCallback;
 	    promptCallback = callback;
 
-	    document.getElementById("promptTextBox").value = "10.1103/physrevlett.98.010505";
+	    document.getElementById("promptTextBox").value = "";//10.1103/physrevlett.98.010505
 	    document.getElementById("promptTextBox").addEventListener("keyup", function(event) {
 			// Cancel the default action, if needed
 			event.preventDefault();

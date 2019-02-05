@@ -1,7 +1,7 @@
 
 const backendApi = {
-	cursorStatusPostTopic: "/cursor-status-changed",
-	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi"
+	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
+	getHostname: "/get-hostname"
 };
 
 const sendRequestsTopic = "listen-renderer";
@@ -11,8 +11,51 @@ const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
 const upperPanelDivID = "overlay-controlset-upper-panel";
 
+var errorArray = [];
+var pushErrorTimeout = null;
+var pushErrorTimeoutSec = 5;
+
+function error(type, msg) {
+	msg = msg.replace(/\s+/g, '-').toLowerCase();
+	errorArray.push(type+"-"+msg);
+	if(pushErrorTimeout) {
+		clearTimeout(pushErrorTimeout);
+	}
+	pushErrorTimeout = setTimeout(function(){
+		console.log("error-bulk: "+JSON.stringify(errorArray));
+		mixpanel.track("error-bulk", {"errors":errorArray});
+		errorArray = [];
+	}, pushErrorTimeoutSec*1000);
+	
+}
+
+function log(type, msg, extraData) {
+	msg = msg.replace(/\s+/g, '-').toLowerCase();
+	console.log("system-log-"+type+": "+msg);
+	if(extraData) {
+		extraData.systemMessage = msg;
+		mixpanel.track(type+"-"+msg, extraData);
+	} else {
+		mixpanel.track(type+"-"+msg);
+	}
+}
+
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
+}
+
+function getHostname(callback) {
+	const requestObj = {};
+	request(backendApi.getHostname, requestObj, function(err, responseObj){
+		if(!err) {
+			var hostname = responseObj.hostname;
+			callback(null, hostname);
+		} else {
+			//console.log("Error occured: "+err.msg);
+			error("error", "unable to get hostname");
+			callback(err, null);
+		}
+	});
 }
 
 function getMetadataWithDoi(doi, callback) {
@@ -22,7 +65,7 @@ function getMetadataWithDoi(doi, callback) {
 			var metadata = responseObj.metadata;
 			callback(null, metadata);
 		} else {
-			console.log("Error occured: "+err.msg);
+			error("error", "unable to get metadataWithDoi");
 			callback(err, null);
 		}
 	});
@@ -34,7 +77,7 @@ function getDoiListOfReferences(referenceList) {
 		if(referenceObj.DOI) {
 			doiList.push(referenceObj.DOI);
 		} else {
-			console.log("No DOI found for given reference metadata.");
+			error("error", "No DOI found for given reference metadata.");
 		}
 	});
 	return doiList;
@@ -42,21 +85,21 @@ function getDoiListOfReferences(referenceList) {
 
 function nodeDragStartCallback(nodeType, nodeObj) {
 	if(nodeType == "root") {
-		console.log("Type of rootnode");
+		//console.log("Type of rootnode");
 	} else if (nodeType == "ref") {
-		console.log("Type of reference node");
+		//console.log("Type of reference node");
 	} else if (nodeType == "citedby") {
-		console.log("Type of citedby node");
+		//console.log("Type of citedby node");
 	} else {
-		console.log("Unknown type: "+nodeType);
+		//console.log("Unknown type: "+nodeType);
 	}
 }
 
 function nodeDragEndCallback(nodeType, nodeObj) {
 	if(nodeType == "root") {
-		console.log("Type of rootnode");
+		//console.log("Type of rootnode");
 	} else if (nodeType == "ref") {
-		console.log("Type of reference node");
+		//console.log("Type of reference node");
 		const x = nodeObj.getAbsolutePosition().x;
 		const y = nodeObj.getAbsolutePosition().y;
 		const doi = nodeObj.metadata.DOI;
@@ -70,14 +113,14 @@ function nodeDragEndCallback(nodeType, nodeObj) {
 			knowledgeTree.setSiblingReference(rootID, newRootNodeID);
 		});
 	} else if (nodeType == "citedby") {
-		console.log("Type of citedby node");
+		//console.log("Type of citedby node");
 	} else {
-		console.log("Unknown type: "+nodeType);
+		//console.log("Unknown type: "+nodeType);
 	}
+	log("action", "nodeDragEnd", {"type": nodeType});
 }
 
 function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
-	console.log("Create root node at "+x+","+y);
 	getMetadataWithDoi(doi, function(err, metadata){
 		if(!err) {
 			if(metadata.DOI) {
@@ -99,31 +142,54 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 								if(!err && refMetadata.DOI) {
 									knowledgeTree.addReferenceToRootNode(rootNodeObjectID, refMetadata, leafNodeRadius);
 								} else {
-									console.log("OOps, something went wrong while fetching reference metadata.");
+									error("error", "unable to fetch reference metadata");
 								} 
 							});
 					}, fetchIntervalMs);
 				} else {
-					console.log("Unable to find references.");
-					//console.log(JSON.stringify(metadata));
+					error("error", "unable to find references");
 				}
 			} else {
-				console.log("Doi does not exist in rootnode metadata");
+				error("error", "DOI does not exist in fetched metadata");
 			}
 		} else {
-			console.log("Error occured while fetching metadata");
+			error("error", "Error while fetching metadata");
 		}
 	});
+	log("action", "createRootNodeFromDoi", {"x": x, "y": y, "doi": doi});
 }
 
 
 function createNodeRequestReceivedCallback(x, y) {
+	log("action", "emptyNodeDragged");
 	overlayerModule.promptUser("Insert DOI", function(userInput){
 		createRootNodeFromDoi(userInput, x, y, function(newRootNodeID){
 			//console.log("Root node created: "+newRootNodeID);
 		});
+		log("action", "usertInsertedDOI", {"userInput": userInput});
 	});
 }
+
+function initializeMixpanel(hostname) {
+	mixpanel.identify(hostname);
+	mixpanel.people.set({
+		"$hostname": hostname,    // only special properties need the $
+		"$last_login": new Date(),         // properties can be dates...
+	});
+	/*
+	mixpanel.people.set({
+		"$email": "jsmith@example.com",    // only special properties need the $
+
+		"$created": "2011-03-16 16:53:54",
+		"$last_login": new Date(),         // properties can be dates...
+
+		"credits": 150,                    // ...or numbers
+
+		"gender": "Male"                    // feel free to define your own properties
+	});
+	*/
+}
+
 var knowledgeTree = null;
 
 function initializeScript() {
@@ -135,13 +201,18 @@ function initializeScript() {
 	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 	knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
+
+	getHostname(function(err, hostname){
+		initializeMixpanel(hostname);
+		log("action", "userlogin", {"username": hostname});
+	});
 	
 	const loadedKnowledgeTreeData = localStorage.getItem("knowledgeTree");
 	if(loadedKnowledgeTreeData) {
-		console.log("Knowledge Tree loaded.");
 		knowledgeTree.importSerializedData(loadedKnowledgeTreeData);
+		log("log", "knowledge tree loaded");
 	} else {
-		console.log("No saved knowledge tree found.");
+		log("log", "no saved knowledge tree found");
 	}
 	
 
@@ -152,17 +223,21 @@ function initializeScript() {
 	document.addEventListener("keydown", function(event) {
 		const moveLength = 60;
 		if (event.keyCode === LEFT) {
+			event.preventDefault();
 			knowledgeTree.moveCamera(moveLength,0);
-			event.preventDefault();
+			log("action", "keypressed", {"direction": "left"});
 		} else if (event.keyCode === RIGHT) {
+			event.preventDefault();
 			knowledgeTree.moveCamera(-moveLength,0);
-			event.preventDefault();
+			log("action", "keypressed", {"direction": "right"});
 		} else if (event.keyCode === UP) {
+			event.preventDefault();
 			knowledgeTree.moveCamera(0,moveLength);
-			event.preventDefault();
+			log("action", "keypressed", {"direction": "up"});
 		} else if (event.keyCode === DOWN) {
-			knowledgeTree.moveCamera(0,-moveLength);
 			event.preventDefault();
+			knowledgeTree.moveCamera(0,-moveLength);
+			log("action", "keypressed", {"direction": "down"});
 		}
 	});
 
@@ -170,7 +245,7 @@ function initializeScript() {
 		event.preventDefault();
 		localStorage.setItem("knowledgeTree", knowledgeTree.serialize());
 		overlayerModule.displayInfo("Saved.");
-		console.log("SAVE pressed, knowledgeTree is saved.");
+		log("action", "save button clicked");
 	});
 
 	document.getElementById("reset-button").addEventListener("click", function(event){
@@ -184,14 +259,15 @@ function initializeScript() {
 		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 
 		overlayerModule.displayInfo("Resetted.");
-		console.log("RESET pressed, knowledgeTree deleted.");
+		log("action", "reset button clicked");
 	});
+
+	//implement built-in exit button (disable default one as well) to also log exit event.
 
 	overlayerModule.displayInfo("Welcome!");
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-	mixpanel.track("login");
-	console.log("DOM fully loaded and parsed");
 	initializeScript();
+	console.log("DOM fully loaded and parsed");
 });

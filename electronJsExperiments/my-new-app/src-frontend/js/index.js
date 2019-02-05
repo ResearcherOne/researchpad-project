@@ -9,6 +9,7 @@ const listenResponsesTopic = "response-to-renderer";
 
 const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
+const upperPanelDivID = "overlay-controlset-upper-panel";
 
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
@@ -127,45 +128,70 @@ var knowledgeTree = null;
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-	overlayerModule.initializeModule(overlayDivID);
+	overlayerModule.initializeModule(overlayDivID, upperPanelDivID);
+
 	knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
 
 	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 	knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
+	
+	const loadedKnowledgeTreeData = localStorage.getItem("knowledgeTree");
+	if(loadedKnowledgeTreeData) {
+		console.log("Knowledge Tree loaded.");
+		knowledgeTree.importSerializedData(loadedKnowledgeTreeData);
+	} else {
+		console.log("No saved knowledge tree found.");
+	}
+	
 
 	const LEFT = 37;
 	const RIGHT = 39;
 	const UP = 38;
 	const DOWN = 40;
-	const SPACE = 32;
 	document.addEventListener("keydown", function(event) {
-		event.preventDefault();
 		const moveLength = 60;
 		if (event.keyCode === LEFT) {
 			knowledgeTree.moveCamera(moveLength,0);
+			event.preventDefault();
 		} else if (event.keyCode === RIGHT) {
 			knowledgeTree.moveCamera(-moveLength,0);
+			event.preventDefault();
 		} else if (event.keyCode === UP) {
 			knowledgeTree.moveCamera(0,moveLength);
+			event.preventDefault();
 		} else if (event.keyCode === DOWN) {
 			knowledgeTree.moveCamera(0,-moveLength);
-		} else if (event.keyCode === SPACE) {
-			console.log("SPACE");
-			console.log(knowledgeTree.serialize());
+			event.preventDefault();
 		}
 	});
-/* CLick to create rootnode
-	document.getElementById("body").addEventListener("click", function(event) {
-		console.log("Camera Posiiton"+JSON.stringify(knowledgeTree.getCameraPosition()));
-		console.log("Mouse Position on Camera"+JSON.stringify(knowledgeTree.getMousePositionOnCamera()));
-		console.log("Mouse Absolute Position "+JSON.stringify(knowledgeTree.getMouseAbsolutePosition()));
-		createRootNodeFromDoi("10.1103/physrevlett.98.010505", knowledgeTree.getMouseAbsolutePosition().x, knowledgeTree.getMouseAbsolutePosition().y, function(){});
+
+	document.getElementById("save-button").addEventListener("click", function(event){
+		event.preventDefault();
+		localStorage.setItem("knowledgeTree", knowledgeTree.serialize());
+		overlayerModule.displayInfo("Saved.");
+		console.log("SAVE pressed, knowledgeTree is saved.");
 	});
-*/
+
+	document.getElementById("reset-button").addEventListener("click", function(event){
+		event.preventDefault();
+		localStorage.removeItem("knowledgeTree");
+		knowledgeTree.destroy();
+		knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
+
+		knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
+		knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
+		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
+
+		overlayerModule.displayInfo("Resetted.");
+		console.log("RESET pressed, knowledgeTree deleted.");
+	});
+
+	overlayerModule.displayInfo("Welcome!");
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
+	mixpanel.track("login");
 	console.log("DOM fully loaded and parsed");
 	initializeScript();
 });

@@ -2,8 +2,13 @@ var overlayerModule = (function () {
 	var divId;
 	var titleId;
 
+	var upperPanelId;
+	var infoDivId;
+
 	var divWidthVw;
 	var divHeightVh;
+
+	var displayInfoTimeout;
 
 	var promptCallback = null;
 
@@ -14,9 +19,12 @@ var overlayerModule = (function () {
 		document.getElementById(divId).style.display = "none";
 	}
 
-	var initializeModule = function(overlayDivId) {
+	var initializeModule = function(overlayDivId, upperPanelDivId) {
 		divId = overlayDivId;
 		titleId = divId + "-text";
+
+		upperPanelId = upperPanelDivId;
+		infoDivId = upperPanelId + "-info-div";
 
 		divWidthVw = document.getElementById(divId).style.width;
 		divHeightVh = document.getElementById(divId).style.height;
@@ -59,6 +67,19 @@ var overlayerModule = (function () {
 		});
 	}
 
+	var displayInfo = function(text) {
+		const durationSec = 5;
+
+		document.getElementById(infoDivId).innerHTML = text;
+		if(displayInfoTimeout) {
+			clearTimeout(displayInfoTimeout);
+		}
+
+		displayInfoTimeout = setTimeout(function(){
+			document.getElementById(infoDivId).innerHTML = "";
+		}, durationSec*1000);
+	}
+
 	var clearTitleOverlay = function() {
 		document.getElementById(divId).style.display = "none";
 	}
@@ -67,6 +88,7 @@ var overlayerModule = (function () {
 		initializeModule: initializeModule,
 		drawTitleOverlay: drawTitleOverlay,
 		clearTitleOverlay: clearTitleOverlay,
-		promptUser: promptUser
+		promptUser: promptUser,
+		displayInfo: displayInfo
 	}
 })();

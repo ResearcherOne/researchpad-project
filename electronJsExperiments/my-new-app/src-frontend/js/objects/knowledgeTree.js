@@ -137,7 +137,17 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		serializedNodeObj.siblingCount = this.siblingCount;
 		return JSON.stringify(serializedNodeObj);
 	}
-	
+
+	this.importSerializedReferences = function(serializedReferences, refCount) {
+		var reconstructedReferences = {}
+		for (var referenceNodeID in serializedReferences){
+			var referenceNodeData = JSON.parse(serializedReferences[referenceNodeID]);
+			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, referenceNodeData.ID, referenceNodeData.metadata, referenceNodeData.radius, referenceNodeData.referencePosition, dragstartCallback, dragendCallback);
+		}
+		this.referenceCount = refCount;
+		this.references = reconstructedReferences;
+	}
+
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 
 	    value: RootNode, 
@@ -373,12 +383,34 @@ function KnowledgeTree(konvaDivID, width, height) {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
 
-	var getSerializeCallMappedObj = function(obj) {
+	var mapSerializeCallOnObj = function(obj) {
 		var serializedObj = {};
 		for (var elementKey in obj){
 			serializedObj[elementKey] = obj[elementKey].serialize();
 		}
 		return serializedObj;		
+	}
+
+	var reconstructRootNodes = function(serializedRootNodes) {
+		var reconstructedRootNodes = {}
+		for (var serializedRootNodeID in serializedRootNodes){
+			var rootNodeData = JSON.parse(serializedRootNodes[serializedRootNodeID]);
+			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.metadata, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback);
+			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.referenceCount);
+			
+			reconstructedRootNodes[serializedRootNodeID].siblingIDs = rootNodeData.siblingIDs;
+			reconstructedRootNodes[serializedRootNodeID].siblingCount = rootNodeData.siblingCount;
+		}
+		return reconstructedRootNodes;	
+	}
+
+	var reconstructSiblingConnections = function(serializedSiblingConnections) {
+		var reconstructedSiblingConnections = {}
+		for (var siblingConnectionID in serializedSiblingConnections){
+			var siblingConnectionData = JSON.parse(serializedSiblingConnections[siblingConnectionID]);
+			reconstructedSiblingConnections[siblingConnectionID] = new SiblingConnection(siblingConnectionData.ID, siblingConnectionData.firstNodeID, siblingConnectionData.secondNodeID);
+		}
+		return reconstructedSiblingConnections;	
 	}
 
 	//Initialization
@@ -437,12 +469,23 @@ function KnowledgeTree(konvaDivID, width, height) {
 	}
 	this.serialize = function() {
 		var serializedKnowledgeTree = {};
-		serializedKnowledgeTree.rootNodes = getSerializeCallMappedObj(this.rootNodes);
+		serializedKnowledgeTree.rootNodes = mapSerializeCallOnObj(this.rootNodes);
 		serializedKnowledgeTree.rootNodeCount = this.rootNodeCount;
 
-		serializedKnowledgeTree.siblingConnections = getSerializeCallMappedObj(this.siblingConnections);
+		serializedKnowledgeTree.siblingConnections = mapSerializeCallOnObj(this.siblingConnections);
 		serializedKnowledgeTree.siblingConnectionCount = this.siblingConnectionCount;
 
 		return JSON.stringify(serializedKnowledgeTree);
+	}
+	this.importSerializedData = function(serializedKnowledgeTree) {
+		var knowledgeTreeData = JSON.parse(serializedKnowledgeTree);
+		this.rootNodes = reconstructRootNodes(knowledgeTreeData.rootNodes);
+		this.rootNodeCount = knowledgeTreeData.rootNodeCount;
+
+		this.siblingConnections = reconstructSiblingConnections(knowledgeTreeData.siblingConnections);
+		this.siblingConnectionCount = knowledgeTreeData.siblingConnectionCount;
+	}
+	this.destroy = function() {
+		visualizerModule.destroy();
 	}
 }

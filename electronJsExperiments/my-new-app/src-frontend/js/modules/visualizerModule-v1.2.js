@@ -233,6 +233,9 @@ var visualizerModule = (function () {
 	var getCanvasPos = function() {
 		return {x: stage.x(), y: stage.y()};
 	}
+	var destroy = function() {
+		stage.destroy();
+	}
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -252,6 +255,7 @@ var visualizerModule = (function () {
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
 		connectVisualObjectsByID: connectVisualObjectsByID,		
 		//getPositionOfVisualObject: getPositionOfVisualObject,
-		removeVisualObject: removeVisualObject
+		removeVisualObject: removeVisualObject,
+		destroy: destroy
 	}
 })();

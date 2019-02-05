@@ -3,7 +3,6 @@ var visualizerModule = (function () {
 	var layer;
 
 	var updateScene = function() {
-		//layer.batchDraw();
 		stage.batchDraw();
 	}
 
@@ -168,15 +167,6 @@ var visualizerModule = (function () {
 	var getNodeRadiusById = function(nodeID) {
 		return stage.findOne('#'+nodeID).radius();
 	}
-	/* For some weird reason visualObject.getAbsolutePosition(); returns dummy node's coordinates
-	var getPositionOfVisualObject = function(visualObject) {
-		var visualObjectPos = visualObject.getAbsolutePosition();
-		console.log("visual object absolute pos info "+JSON.stringify(visualObjectPos));
-		var stageX = stage.x();
-		var stageY = stage.y();
-		return {"x": visualObjectPos.x-stageX, "y": visualObjectPos.y-stageY};
-	}
-	*/
 	var removeVisualObject = function(visualObject) {
 		if(visualObject.connection) visualObject.connection.destroy();
 		visualObject.destroy();
@@ -197,14 +187,6 @@ var visualizerModule = (function () {
 		updateScene();
 		return connection;
 	}
-	/*
-	var createPlaceholderVisualObject = function(visualObject) {
-		var placeholder = visualObject.clone({opacity: 0.5});
-		layer.add(placeholder);
-		updateScene();
-		return placeholder;
-	}
-	*/
 	var changeFillColorOfVisualObject = function(visualObject, color) {
 		visualObject.fill(color);
 		updateScene();
@@ -236,6 +218,20 @@ var visualizerModule = (function () {
 	var destroy = function() {
 		stage.destroy();
 	}
+	var moveObject = function(visualObject, x, y) {
+		visualObject.move({
+			x: x,
+			y: y
+		});
+		updateScene();
+	}
+	var setPositionOnCamera = function(visualObject, x, y) {
+		const canvasPos = getCanvasPos();
+		visualObject.position({
+			x: x-canvasPos.x,
+			y: y-canvasPos.y
+		});
+	}
 	return {
 		initializeModule: initializeModule,
 		createRootNode: createRootNode,
@@ -246,7 +242,6 @@ var visualizerModule = (function () {
 		getNodeCenterById: getNodeCenterById,
 		getNodeRadiusById: getNodeRadiusById,
 
-		//createPlaceholderVisualObject: createPlaceholderVisualObject,
 		getCanvasPos: getCanvasPos,
 		getMousePosOnCanvas: getMousePosOnCanvas,
 		moveCanvas: moveCanvas,
@@ -254,8 +249,10 @@ var visualizerModule = (function () {
 		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
 		connectVisualObjectsByID: connectVisualObjectsByID,		
-		//getPositionOfVisualObject: getPositionOfVisualObject,
+
 		removeVisualObject: removeVisualObject,
-		destroy: destroy
+		destroy: destroy,
+		moveObject: moveObject,
+		setPositionOnCamera: setPositionOnCamera
 	}
 })();

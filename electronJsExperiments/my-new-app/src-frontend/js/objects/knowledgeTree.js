@@ -4,8 +4,7 @@ function Node(ID, metadata, radius){ //Abstract Class
 	this.radius = radius;
 
 	this.visualObject;
-	this.placeholderVisualObject;
-
+	
 	this.getVisualObject = function() {
 		return this.visualObject;
 	}
@@ -28,22 +27,17 @@ function Node(ID, metadata, radius){ //Abstract Class
 		var nodeOnCameraPos = {x: cameraPos.x+nodePos.x, y: cameraPos.y+nodePos.y};
 		return nodeOnCameraPos;
 	}
-	/*
-	this.setPlaceholderState = function(isActivated) {
-		if(isActivated) {
-			this.placeholderVisualObject = visualizerModule.createPlaceholderVisualObject(this.visualObject);
-		} else {
-			visualizerModule.removeVisualObject(this.placeholderVisualObject);
-		}
-	}
-	*/
+
 	this.destroy = function() {
-		//if(this.placeholderVisualObject) visualizerModule.removeVisualObject(this.placeholderVisualObject);
 		visualizerModule.removeVisualObject(this.visualObject);
 	}
 
 	this.setPosition = function(x, y) {
 		visualizerModule.setPosition(this.visualObject, x,y);
+	}
+
+	this.move = function(x, y) {
+		visualizerModule.moveObject(this.visualObject, x, y);
 	}
 }
 function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, dragendCallback) {
@@ -251,8 +245,11 @@ function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, refere
 	    writable: true
 	});
 }
-function DummyNode(ID, radius, initalX, initialY, dragstartCallback, dragendCallback) {
+function DummyNode(ID, radius, initialX, initialY, dragstartCallback, dragendCallback) {
 	Node.call(this, ID, {}, radius);
+
+	this.initialCameraX = initialX; //TODO: Fetch camera pos from visualizer module
+	this.initialCameraY = initialY; //TODO: Fetch camera pos from visualizer module
 
 	var mouseOver = function(rootNodeObject) { //SHALL NOT USE "this", when you pass callback to other object, "this" context will vary!!!
 		document.body.style.cursor = 'pointer';
@@ -263,12 +260,16 @@ function DummyNode(ID, radius, initalX, initialY, dragstartCallback, dragendCall
 	const isDraggable = true;
 
 	//Initialization
-	this.visualObject = visualizerModule.createRootNode(this.radius, initalX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
 	visualizerModule.changeFillColorOfVisualObject(this.visualObject, "grey");
 
 	//Public Functions
 	this.setOpacity = function(opacity) {
 		visualizerModule.setOpacity(this.visualObject, opacity);
+	}
+
+	this.setPositionOnCamera = function(x, y) {
+		visualizerModule.setPositionOnCamera(this.visualObject, x, y);
 	}
 
 	DummyNode.prototype = Object.create(Node.prototype);
@@ -307,18 +308,20 @@ function KnowledgeTree(konvaDivID, width, height) {
 	this.siblingConnections = {};
 	this.siblingConnectionCount = 0;
 
-	var dragStartCallback = null;
-	var dragEndCallback = null;
-
-	var nodeCreateRequestCallback = null;
-	var emptyRootNode = null;
+	this.emptyRootNode = null;
+	
 	var emptyRootNodeConfig = {
-		x: 40,
-		y: 40,
+		x: 50,
+		y: 50,
 		ID: "emptyRootNode",
 		radius: 30,
 		opacity: 0.6
 	};
+	
+	var dragStartCallback = null;
+	var dragEndCallback = null;
+
+	var nodeCreateRequestCallback = null;
 
 	var emptyRootNodeDragStart = function(emptyRootNode) {
 		emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
@@ -328,7 +331,7 @@ function KnowledgeTree(konvaDivID, width, height) {
 		const x = emptyRootNode.getAbsolutePosition().x;
 		const y = emptyRootNode.getAbsolutePosition().y;
 
-		emptyRootNode.setPosition(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
+		emptyRootNode.setPositionOnCamera(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
 
 		if(nodeCreateRequestCallback) nodeCreateRequestCallback(x, y);
 	}
@@ -375,10 +378,6 @@ function KnowledgeTree(konvaDivID, width, height) {
 		}
 	}
 
-	var initializeVisualToolset = function() {
-		emptyRootNode = DummyNode(emptyRootNodeConfig.ID, emptyRootNodeConfig.radius, emptyRootNodeConfig.x, emptyRootNodeConfig.y, emptyRootNodeDragStart, emptyRootNodeEnd);
-	}
-
 	var getRandomInt = function(max) {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
@@ -415,8 +414,8 @@ function KnowledgeTree(konvaDivID, width, height) {
 
 	//Initialization
 	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height);
-	initializeVisualToolset();
-
+	this.emptyRootNode = new DummyNode(emptyRootNodeConfig.ID, emptyRootNodeConfig.radius, emptyRootNodeConfig.x, emptyRootNodeConfig.y, emptyRootNodeDragStart, emptyRootNodeEnd);
+	this.emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
 	//Public Functions
 	this.createRootNode = function (metadata, radius, x, y) {
 		const ID = "root-"+metadata.DOI+getRandomInt(99999);
@@ -452,6 +451,7 @@ function KnowledgeTree(konvaDivID, width, height) {
 	}
 	this.moveCamera = function(x, y) {
 		visualizerModule.moveCanvas(x, y);
+		this.emptyRootNode.setPositionOnCamera(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
 	}
 
 	this.getMousePositionOnCamera = function() {

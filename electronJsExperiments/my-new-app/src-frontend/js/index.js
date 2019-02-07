@@ -10,6 +10,7 @@ const listenResponsesTopic = "response-to-renderer";
 const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
 const upperPanelDivID = "overlay-controlset-upper-panel";
+const searchPanelDivID = "overlay-search-panel";
 
 var errorArray = [];
 var pushErrorTimeout = null;
@@ -165,6 +166,8 @@ function createNodeRequestReceivedCallback(x, y) {
 	overlayerModule.promptUser("Insert DOI", function(userInput){
 		createRootNodeFromDoi(userInput, x, y, function(newRootNodeID){
 			//console.log("Root node created: "+newRootNodeID);
+			const title = knowledgeTree.getRootNodeTitleById(newRootNodeID);
+			searchPanel.addResultElement(title);
 		});
 		log("action", "usertInsertedDOI", {"userInput": userInput});
 	});
@@ -191,6 +194,7 @@ function initializeMixpanel(hostname) {
 }
 
 var knowledgeTree = null;
+var searchPanel = null;
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
@@ -201,6 +205,8 @@ function initializeScript() {
 	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 	knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
+
+	searchPanel = new SearchPanel(searchPanelDivID);
 
 	getHostname(function(err, hostname){
 		initializeMixpanel(hostname);

@@ -12,7 +12,7 @@ const listenRenderer = "listen-renderer";
 const responseRenderer = "response-to-renderer";
 
 function initializeBackend() {
-	console.log("Backend initialized.");
+	//console.log("Backend initialized.");
 
 	ipcRestModule.initialize(listenRenderer, responseRenderer);
 

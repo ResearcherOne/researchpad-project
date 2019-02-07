@@ -5,11 +5,9 @@
   "description": "My Electron application description",
   "main": "main.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+	 "start": "electron main.js",
+   "build": "electron-packager . my-new-app --overwrite",
+   "package": "asar pack my-new-app-linux-x64/resources/app out/app.asar"
   },
   "keywords": [],
   "author": "researcher1",
@@ -51,6 +49,8 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.30",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.30",
     "@electron-forge/maker-zip": "^6.0.0-beta.30",
-    "electron": "4.0.1"
+    "asar": "^0.14.6",
+    "electron": "4.0.1",
+    "electron-packager": "^13.0.1"
   }
 }

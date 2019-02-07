@@ -10,7 +10,8 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 		<script src="./js/modules/visualizerModule-v1.2.js"></script>
 		<script src="./js/modules/overlayerModule-v1.js"></script>
 		<script src="./js/modules/ipcRestRenderer.js"></script>
-		<script src="./js/objects/knowledgeTree.js"></script>
+		<script src="./js/objects/KnowledgeTree.js"></script>
+		<script src="./js/objects/SearchPanel.js"></script>
 		<script src="./js/index.js"></script>
 		<style>
 			body {
@@ -53,7 +54,7 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 			#overlay-controlset-upper-panel {
 				position: fixed;
 				display: block;
-				width: 93vw;
+				width: 73vw;
 				height: 8vh;
 				top: 1vh;
 				left: 6vw;
@@ -85,6 +86,73 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 				text-align: center;
 		    }
 
+		    #overlay-search-panel {
+				position: fixed;
+				display: block;
+				width: 20vw;
+				height: 98vh;
+				top: 1vh;
+				left: 80vw;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0,0,0,0.75);
+				z-index: 2;
+				border-top-left-radius: 5px;
+				border-bottom-left-radius: 5px;
+				text-align: center;
+		    }
+
+		    #search-box-div {
+		    	width: 19vw;
+		    	height: 10vh;
+		    	display: inline-block;
+				border-radius: 5px;
+				margin-top: 1vh;
+				background-color: rgba(0,0,0,0.25);
+		    }
+
+		    #search-box-div p {
+		    	color: white;
+		    }
+
+		    #google-scholar-searchbox {
+		    	height: 2vh;
+		    	width: 18vw;
+				z-index: 2;
+				border-radius: 5px;
+		    }
+
+		    #search-results-div {
+		    	display: inline-block;
+		    	width: 19vw;
+				height: 85vh;
+				border-radius: 5px;
+				margin-top: 1vh;
+				background-color: rgba(0,0,0,0.25);
+		    }
+
+		   	#search-results-div div {
+		    	display: inline-block;
+		    	width: 18.5vw;
+				border-radius: 5px;
+				margin-left: 0.25vw;
+				margin-right: 0.25vw;
+				margin-top: 0.25vh;
+				background-color: rgba(0,0,0,0.25);
+		    }
+
+		    #search-results-div div p{
+		    	color: white;
+		    }
+
+			.unselectable {
+			    -webkit-touch-callout: none;
+			    -webkit-user-select: none;
+			    -khtml-user-select: none;
+			    -moz-user-select: none;
+			    -ms-user-select: none;
+			    user-select: none;
+			}
 		 </style>
 	</head>
 	<body id="body">
@@ -96,6 +164,24 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 				<button id="save-button" type="button">SAVE</button>
 				<button id="reset-button" type="button">RESET</button>
 				<div id="overlay-controlset-upper-panel-info-div"></div>
+			</div>
+			<div id="overlay-search-panel">
+				<div class="unselectable" id="search-box-div">
+					<p> Google Scholar </p>
+					<input id="google-scholar-searchbox" type="text" placeholder="Search on Google Scholar">
+					<button id="search-button" type="button">SEARCH</button>
+				</div>
+				<div id="search-results-div">
+					<div>
+						<p class="unselectable"> GENI: A federated testbed for innovative network experiments </p>
+					</div>
+					<div>
+						<p class="unselectable"> GENI: A federated testbed for innovative network experiments </p>
+					</div>
+					<div>
+						<p class="unselectable"> GENI: A federated testbed for innovative network experiments </p>
+					</div>
+				</div>
 			</div>
 			<div id="konva-div">
 			</div>

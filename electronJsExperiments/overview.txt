@@ -6,3 +6,26 @@ Electron-Forge
 		electron-forge start
 	#Installing new npm package
 		npm install your-desired-npm-package --save
+#Building vanilla electronjs
+	cd researchpad-project/electronJsExperiments/my-new-app
+	mkdir out
+	touch ./out/.gitkeep
+
+	npm install electron-packager --save-dev
+	npm install asar --save-dev
+
+	nano package.json
+		Change following:
+			"scripts": {
+			    "start": "electron-forge start",
+			    "package": "electron-forge package",
+			    "make": "electron-forge make",
+			    "publish": "electron-forge publish",
+			    "lint": "echo \"No linting configured\""
+			  },
+		To this:
+			"scripts": {
+			    "start": "electron main.js",
+			    "build": "electron-packager . my-new-app",
+			    "package": "asar pack my-new-app-linux-x64/resources/app out/app.asar"
+			  },

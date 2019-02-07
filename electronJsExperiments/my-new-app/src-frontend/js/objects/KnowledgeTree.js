@@ -417,6 +417,9 @@ function KnowledgeTree(konvaDivID, width, height) {
 	this.emptyRootNode = new DummyNode(emptyRootNodeConfig.ID, emptyRootNodeConfig.radius, emptyRootNodeConfig.x, emptyRootNodeConfig.y, emptyRootNodeDragStart, emptyRootNodeEnd);
 	this.emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
 	//Public Functions
+	this.getRootNodeTitleById = function(ID) {
+		return this.rootNodes[ID].getTitle();
+	}
 	this.createRootNode = function (metadata, radius, x, y) {
 		const ID = "root-"+metadata.DOI+getRandomInt(99999);
 		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback);

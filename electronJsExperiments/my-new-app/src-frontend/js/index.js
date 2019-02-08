@@ -1,7 +1,8 @@
 
 const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
-	getHostname: "/get-hostname"
+	getHostname: "/get-hostname",
+	searchGoogleScholar: "/search-google-scholar"
 };
 
 const sendRequestsTopic = "listen-renderer";
@@ -67,6 +68,19 @@ function getMetadataWithDoi(doi, callback) {
 			callback(null, metadata);
 		} else {
 			error("error", "unable to get metadataWithDoi");
+			callback(err, null);
+		}
+	});
+}
+
+function searchGoogle(searchText, callback) {
+	const requestObj = {"searchText": searchText};
+	request(backendApi.searchGoogleScholar, requestObj, function(err, responseObj){
+		if(!err) {
+			var resultList = responseObj.resultList;
+			callback(null, resultList);
+		} else {
+			error("error", "unable to get data from google scholar.");
 			callback(err, null);
 		}
 	});
@@ -166,11 +180,21 @@ function createNodeRequestReceivedCallback(x, y) {
 	overlayerModule.promptUser("Insert DOI", function(userInput){
 		createRootNodeFromDoi(userInput, x, y, function(newRootNodeID){
 			//console.log("Root node created: "+newRootNodeID);
-			const title = knowledgeTree.getRootNodeTitleById(newRootNodeID);
-			searchPanel.addResultElement(title);
 		});
 		log("action", "usertInsertedDOI", {"userInput": userInput});
 	});
+}
+
+function searchRequestReceivedCallback(userInput) {
+	if(userInput.length > 0) {
+		searchGoogle(userInput, function(err, result){
+			console.log(result);
+
+			result.forEach(function(element){
+				searchPanel.addResultElement(element.title);
+			});
+		});
+	}
 }
 
 function initializeMixpanel(hostname) {
@@ -207,6 +231,7 @@ function initializeScript() {
 	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 
 	searchPanel = new SearchPanel(searchPanelDivID);
+	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
 
 	getHostname(function(err, hostname){
 		initializeMixpanel(hostname);

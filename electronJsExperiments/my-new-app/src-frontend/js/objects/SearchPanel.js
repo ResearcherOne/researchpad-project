@@ -9,6 +9,16 @@ function SearchPanel(searchPanelDivId){
 
 	this.resultsDiv = secondDivInSearchPanel;
 
+	var searchRequestReceivedCallback;
+
+	var searchButtonPressedCallback = function() {
+		const userInput = firstDivInSearchPanel.getElementsByTagName('input')[0].value;
+		searchRequestReceivedCallback(userInput);
+		firstDivInSearchPanel.getElementsByTagName('input')[0].value = "";
+	}
+
+	this.searchButton.addEventListener("click", searchButtonPressedCallback);
+
 	this.addResultElement = function(paperTitle) {
 		console.log("PAPER TITLE: "+paperTitle);
 		var newDiv = document.createElement("div");
@@ -23,5 +33,9 @@ function SearchPanel(searchPanelDivId){
 
 	this.clearResults = function() {
 		this.resultsDiv.innerHTML = "";
+	}
+
+	this.setSearchRequestReceivedCallback = function(callback) {
+		searchRequestReceivedCallback = callback;
 	}
 }

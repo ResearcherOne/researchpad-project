@@ -5,9 +5,9 @@
   "description": "My Electron application description",
   "main": "main.js",
   "scripts": {
-	 "start": "electron main.js",
-   "build": "electron-packager . my-new-app --overwrite",
-   "package": "asar pack my-new-app-linux-x64/resources/app out/app.asar"
+    "start": "electron main.js",
+    "build": "electron-packager . my-new-app --overwrite",
+    "package": "asar pack my-new-app-linux-x64/resources/app out/app.asar"
   },
   "keywords": [],
   "author": "researcher1",
@@ -41,7 +41,8 @@
   },
   "dependencies": {
     "crossref": "^1.2.1",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "puppeteer": "^1.12.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.30",

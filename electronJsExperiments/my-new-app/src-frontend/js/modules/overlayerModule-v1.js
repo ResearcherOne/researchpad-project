@@ -8,15 +8,17 @@ var overlayerModule = (function () {
 	var divWidthVw;
 	var divHeightVh;
 
-	var displayInfoTimeout;
-
 	var promptCallback = null;
 
 	function promptUserCallback() {
-		const userInput = document.getElementById("promptTextBox").value;
-		promptCallback(userInput);
-		promptCallback = null;
-		document.getElementById(divId).style.display = "none";
+		if(promptCallback) {
+			const userInput = document.getElementById("promptTextBox").value;
+			promptCallback(userInput);
+			promptCallback = null;
+			document.getElementById(divId).style.display = "none";	
+		} else {
+			document.getElementById(divId).style.display = "none";	
+		}
 	}
 
 	var initializeModule = function(overlayDivId, upperPanelDivId) {
@@ -56,28 +58,26 @@ var overlayerModule = (function () {
 	    promptCallback = callback;
 
 	    document.getElementById("promptTextBox").value = "";//10.1103/physrevlett.98.010505
-	    document.getElementById("promptTextBox").addEventListener("keyup", function(event) {
-			// Cancel the default action, if needed
-			event.preventDefault();
-			// Number 13 is the "Enter" key on the keyboard
-			if (event.keyCode === 13) {
-			// Trigger the button element with a click
-			document.getElementById("promptButton").click();
+	    document.getElementById("promptTextBox").addEventListener("keydown", function(event) {
+	    	const ENTER = 13;
+			if (event.keyCode === ENTER) {
+				event.preventDefault();
+				document.getElementById("promptButton").click();
 			}
 		});
 	}
 
-	var displayInfo = function(text) {
-		const durationSec = 5;
+	var informUser = function(text) {
+		document.getElementById(divId).style.display = "block";
 
-		document.getElementById(infoDivId).innerHTML = text;
-		if(displayInfoTimeout) {
-			clearTimeout(displayInfoTimeout);
-		}
+		var offsetHeight = document.getElementById(divId).offsetHeight;
+		var offsetWidth = document.getElementById(divId).offsetWidth;
 
-		displayInfoTimeout = setTimeout(function(){
-			document.getElementById(infoDivId).innerHTML = "";
-		}, durationSec*1000);
+	    document.getElementById(divId).style.left = 500+"px"; //x
+	    document.getElementById(divId).style.top = (500-offsetHeight)+"px"; //y
+
+	    document.getElementById(titleId).innerHTML = text+'<br><button id="promptButton">OK</button>';
+	    document.getElementById("promptButton").onclick = promptUserCallback;
 	}
 
 	var clearTitleOverlay = function() {
@@ -89,6 +89,6 @@ var overlayerModule = (function () {
 		drawTitleOverlay: drawTitleOverlay,
 		clearTitleOverlay: clearTitleOverlay,
 		promptUser: promptUser,
-		displayInfo: displayInfo
+		informUser: informUser
 	}
 })();

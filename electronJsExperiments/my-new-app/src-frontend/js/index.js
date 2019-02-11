@@ -186,15 +186,20 @@ function createNodeRequestReceivedCallback(x, y) {
 }
 
 function searchRequestReceivedCallback(userInput) {
-	if(userInput.length > 0) {
-		searchGoogle(userInput, function(err, result){
+	searchPanel.clearResults();
+	searchGoogle(userInput, function(err, result){
+		if(result) {
 			console.log(result);
-
 			result.forEach(function(element){
 				searchPanel.addResultElement(element.title);
 			});
-		});
-	}
+			searchPanel.enableNextSearch();
+		} else {
+			console.log("Unable to connect to Google Scholar.");
+			overlayerModule.informUser("Unable to connect to Google Scholar.");
+			searchPanel.enableNextSearch();
+		}
+	});
 }
 
 function initializeMixpanel(hostname) {
@@ -275,7 +280,7 @@ function initializeScript() {
 	document.getElementById("save-button").addEventListener("click", function(event){
 		event.preventDefault();
 		localStorage.setItem("knowledgeTree", knowledgeTree.serialize());
-		overlayerModule.displayInfo("Saved.");
+		overlayerModule.informUser("Your Knowledge Tree is saved.");
 		log("action", "save button clicked");
 	});
 
@@ -289,13 +294,11 @@ function initializeScript() {
 		knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 
-		overlayerModule.displayInfo("Resetted.");
+		overlayerModule.informUser("Your Knowledge Tree is resetted.");
 		log("action", "reset button clicked");
 	});
 
 	//implement built-in exit button (disable default one as well) to also log exit event.
-
-	overlayerModule.displayInfo("Welcome!");
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {

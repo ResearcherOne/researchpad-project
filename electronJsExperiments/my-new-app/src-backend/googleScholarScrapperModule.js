@@ -1,18 +1,21 @@
 const puppeteer = require('puppeteer');
 
-var isHeadless;
-var isDevtools;
+var g_isHeadless;
+var g_isDevtools;
 
 let searchGoogle = async (searchText, isHeadless, isDevtools) => {
-  const browser = await puppeteer.launch({headless : false, devtools: false});
+  const browser = await puppeteer.launch({headless : isHeadless, devtools: isDevtools});
   const page = await browser.newPage();
-  await page.goto('http://scholar.google.com/', {waitUntil: 'networkidle2'});
+  await page.goto('http://scholar.google.com/', {waitUntil: 'networkidle0'});
   await page.waitFor('input[type= "text"]');
   await page.keyboard.type(searchText);
-  await page.click('button[type="submit"]');
-
+  //page.click('button[type="submit"]');
   //await page.waitForNavigation({waitUntil: 'networkidle0'});
-  page.waitFor(10000);
+  await Promise.all([
+    page.click('button[type="submit"]'),
+    page.waitForNavigation({waitUntil: 'networkidle0'}),
+  ]);
+  //page.waitFor(1000);
 
   // Scrape
   const result = await page.evaluate(() => {
@@ -39,12 +42,12 @@ let searchGoogle = async (searchText, isHeadless, isDevtools) => {
 };
 
 function initializeModule(isHeadless, isDevtools) {
-  isHeadless = isHeadless;
-  isDevtools = isDevtools;
+  g_isHeadless = isHeadless;
+  g_isDevtools = isDevtools;
 }
 
 function searchGoogleScholar(searchText, callback) {
-	searchGoogle(searchText, isHeadless, isDevtools).then((resultObjectList) => {
+	searchGoogle(searchText, g_isHeadless, g_isDevtools).then((resultObjectList) => {
 		callback(null, resultObjectList);
 	}).catch(function(err) {
 		callback(err, null);

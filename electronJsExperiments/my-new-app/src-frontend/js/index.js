@@ -10,8 +10,11 @@ const listenResponsesTopic = "response-to-renderer";
 
 const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
+
 const upperPanelDivID = "overlay-controlset-upper-panel";
+
 const searchPanelDivID = "overlay-search-panel";
+const searchDivID = "search-results-div";
 
 var errorArray = [];
 var pushErrorTimeout = null;
@@ -177,6 +180,7 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 
 function createNodeRequestReceivedCallback(x, y) {
 	log("action", "emptyNodeDragged");
+	console.log("X: "+x+" Y: "+y);
 	overlayerModule.promptUser("Insert DOI", function(userInput){
 		createRootNodeFromDoi(userInput, x, y, function(newRootNodeID){
 			//console.log("Root node created: "+newRootNodeID);
@@ -191,7 +195,7 @@ function searchRequestReceivedCallback(userInput) {
 		if(result) {
 			console.log(result);
 			result.forEach(function(element){
-				searchPanel.addResultElement(element.title);
+				searchPanel.addResultElement(element.title); //Input element ID as well.
 			});
 			searchPanel.enableNextSearch();
 		} else {
@@ -219,6 +223,59 @@ function initializeMixpanel(hostname) {
 
 		"gender": "Male"                    // feel free to define your own properties
 	});
+	*/
+}
+
+function isIdExistInParentElements(elem, idToSearch){
+	var parentElement = elem.parentElement;
+	if(!parentElement)
+		return false;
+
+	if(parentElement.id == idToSearch) {
+		return true;
+	} else {
+		return isIdExistInParentElements(parentElement, idToSearch);
+	}
+}
+
+var isSearchElementDraggingStarted = false;
+var draggedSearchElement = null;
+function handleMouseDown(event) {
+	const isSearchElement = isIdExistInParentElements(event.target, searchDivID);
+		if(isSearchElement) {
+			isSearchElementDraggingStarted = true;
+			event.target.style.color = "yellow";
+			draggedSearchElement = event.target;
+			//animator.startElementDragAnim();
+		}
+}
+
+function handleMouseUp(event) {
+	if(isSearchElementDraggingStarted) {
+		const isTargetPointsKnowledgeTree = isIdExistInParentElements(event.target, konvaDivID);
+		if(isTargetPointsKnowledgeTree) {
+			draggedSearchElement.style.color = "green";
+			console.log("Mouse x: "+event.clientX+" Mouse y: "+event.clientY);
+
+			const pos = knowledgeTree.getAbsolutePositionOfGivenPos(event.clientX,event.clientY);
+			createRootNodeFromDoi("10.4203/ccp.111.17", pos.x, pos.y, function(newRootNodeID){
+					//console.log("Root node created: "+newRootNodeID);
+			});
+		} else {
+			draggedSearchElement.style.color = "";
+		}
+		
+	}
+	/*
+		if (isSearchElementDragStarted) {
+			isSearchElementDragStarted = false;
+			//searchPanel.setItemColor(itemDivID, "green");
+			//knowledgeTree.createNode(elementCenterX, elementCenterY,metadata);
+			animator.stopElementDragAnim();
+		} else {
+			ignore, it could be any kind of click on konvaDiv.
+		}
+
 	*/
 }
 
@@ -297,6 +354,9 @@ function initializeScript() {
 		overlayerModule.informUser("Your Knowledge Tree is resetted.");
 		log("action", "reset button clicked");
 	});
+
+	document.addEventListener("mousedown", handleMouseDown);
+	document.addEventListener("mouseup", handleMouseUp);
 
 	//implement built-in exit button (disable default one as well) to also log exit event.
 }

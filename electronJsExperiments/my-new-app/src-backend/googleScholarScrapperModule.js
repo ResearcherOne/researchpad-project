@@ -3,14 +3,15 @@ const puppeteer = require('puppeteer');
 var g_isHeadless;
 var g_isDevtools;
 
+var browser;
+
 let searchGoogle = async (searchText, isHeadless, isDevtools) => {
-  const browser = await puppeteer.launch({headless : isHeadless, devtools: isDevtools});
+  if(!browser) browser = await puppeteer.launch({headless : isHeadless, devtools: isDevtools});
   const page = await browser.newPage();
   await page.goto('http://scholar.google.com/', {waitUntil: 'networkidle0'});
   await page.waitFor('input[type= "text"]');
   await page.keyboard.type(searchText);
-  //page.click('button[type="submit"]');
-  //await page.waitForNavigation({waitUntil: 'networkidle0'});
+
   await Promise.all([
     page.click('button[type="submit"]'),
     page.waitForNavigation({waitUntil: 'networkidle0'}),
@@ -37,7 +38,8 @@ let searchGoogle = async (searchText, isHeadless, isDevtools) => {
 
     return data;
   });
-  browser.close();
+  //browser.close();
+  page.close();
   return result;
 };
 

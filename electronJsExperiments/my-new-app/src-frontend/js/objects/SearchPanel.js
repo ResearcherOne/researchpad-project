@@ -12,7 +12,6 @@ function SearchPanel(searchPanelDivId){
 
 	this.isSearchDisabled = false;
 
-
 	var searchRequestReceivedCallback;
 
 	var searchButtonPressedCallback = function() {
@@ -38,12 +37,12 @@ function SearchPanel(searchPanelDivId){
 	});
 
 	this.addResultElement = function(paperTitle) {
-		console.log("PAPER TITLE: "+paperTitle);
 		var newDiv = document.createElement("div");
+		//newDiv.id = hash(paperTitle)
 		var p = document.createElement("p");
 		p.textContent = paperTitle;
 		
-		p.className = "unselectable";
+		//p.className = "unselectable";
 		newDiv.appendChild(p);
 
 		this.resultsDiv.appendChild(newDiv);

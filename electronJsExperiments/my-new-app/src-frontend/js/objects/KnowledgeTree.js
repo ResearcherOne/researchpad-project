@@ -426,6 +426,15 @@ function KnowledgeTree(konvaDivID, width, height) {
 		this.rootNodeCount++;
 		return ID;
 	}
+	this.createRootNodeAtMousePos = function(metadata, radius) {
+		const x = this.getMouseAbsolutePosition().x;
+		const y = this.getMouseAbsolutePosition().y;
+
+		const ID = "root-"+metadata.DOI+getRandomInt(99999);
+		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback);
+		this.rootNodeCount++;
+		return ID;
+	}
 	this.addReferenceToRootNode = function(rootID, refMetadata, radius) {
 		const refID = "ref-"+refMetadata.DOI+getRandomInt(99999);
 		this.rootNodes[rootID].createReference(refID, refMetadata, radius);
@@ -456,6 +465,7 @@ function KnowledgeTree(konvaDivID, width, height) {
 		visualizerModule.moveCanvas(x, y);
 		this.emptyRootNode.setPositionOnCamera(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
 	}
+	/*
 
 	this.getMousePositionOnCamera = function() {
 		return {x: visualizerModule.getMousePosOnCanvas().x, y: visualizerModule.getMousePosOnCanvas().y};
@@ -466,10 +476,19 @@ function KnowledgeTree(konvaDivID, width, height) {
 		var absoluteMouseY = visualizerModule.getMousePosOnCanvas().y - visualizerModule.getCanvasPos().y;
 		return {x: absoluteMouseX, y: absoluteMouseY};
 	}
+	*/
+
+	this.getAbsolutePositionOfGivenPos = function(x, y) {
+		const cameraPos = this.getCameraPosition();
+		const absoluteMouseX = x - cameraPos.x;
+		const absoluteMouseY = y - cameraPos.y;
+		return {x: absoluteMouseX, y: absoluteMouseY};
+	}
 
 	this.getCameraPosition = function() {
 		return {x: visualizerModule.getCanvasPos().x, y: visualizerModule.getCanvasPos().y};
 	}
+
 	this.serialize = function() {
 		var serializedKnowledgeTree = {};
 		serializedKnowledgeTree.rootNodes = mapSerializeCallOnObj(this.rootNodes);

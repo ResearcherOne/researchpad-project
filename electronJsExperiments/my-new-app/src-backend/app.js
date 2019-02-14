@@ -13,7 +13,7 @@ const backendApi = {
 const listenRenderer = "listen-renderer";
 const responseRenderer = "response-to-renderer";
 
-const isHeadlessChrome = true;
+const isHeadlessChrome = false;
 const isDevtools = false;
 
 function initializeBackend() {
@@ -48,7 +48,7 @@ function initializeBackend() {
 			if(!err) {
 				response.send({"resultList": result});
 			} else {
-				console.log(err.msg);
+				console.log("Err:" + err.msg);
 				response.error("OOps, unable to fetch data from google scholar.");
 			}
 		});

@@ -209,9 +209,11 @@ var visualizerModule = (function () {
 		});
 		updateScene();
 	}
+	/* Delete with next release
 	var getMousePosOnCanvas = function(){
 		return {x: stage.getPointerPosition().x, y: stage.getPointerPosition().y};
 	}
+	*/
 	var getCanvasPos = function() {
 		return {x: stage.x(), y: stage.y()};
 	}
@@ -243,7 +245,7 @@ var visualizerModule = (function () {
 		getNodeRadiusById: getNodeRadiusById,
 
 		getCanvasPos: getCanvasPos,
-		getMousePosOnCanvas: getMousePosOnCanvas,
+		//getMousePosOnCanvas: getMousePosOnCanvas,
 		moveCanvas: moveCanvas,
 		setOpacity: setOpacity,
 		setPosition: setPosition,

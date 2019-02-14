@@ -462,21 +462,10 @@ function KnowledgeTree(konvaDivID, width, height) {
 		nodeCreateRequestCallback = callback;
 	}
 	this.moveCamera = function(x, y) {
+		overlayerModule.clearTitleOverlay();
 		visualizerModule.moveCanvas(x, y);
 		this.emptyRootNode.setPositionOnCamera(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
 	}
-	/*
-
-	this.getMousePositionOnCamera = function() {
-		return {x: visualizerModule.getMousePosOnCanvas().x, y: visualizerModule.getMousePosOnCanvas().y};
-	}
-
-	this.getMouseAbsolutePosition = function() {
-		var absoluteMouseX = visualizerModule.getMousePosOnCanvas().x - visualizerModule.getCanvasPos().x;
-		var absoluteMouseY = visualizerModule.getMousePosOnCanvas().y - visualizerModule.getCanvasPos().y;
-		return {x: absoluteMouseX, y: absoluteMouseY};
-	}
-	*/
 
 	this.getAbsolutePositionOfGivenPos = function(x, y) {
 		const cameraPos = this.getCameraPosition();

@@ -1,3 +1,15 @@
+/*
+	Core Metadata
+		Title
+		Authors
+	Ideal Extras
+		Year
+		Citedby Count
+		Citedby List
+		Reference Count
+		References List
+
+*/
 function Node(ID, metadata, radius){ //Abstract Class
 	this.ID = ID;
 	this.metadata = metadata;
@@ -296,6 +308,17 @@ function SiblingConnection(ID, firstNodeID, secondNodeID) {
 	}
 }
 
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
 function KnowledgeTree(konvaDivID, width, height) {
 	//Config & Private Functions
 	this.konvaDivID = konvaDivID;
@@ -421,7 +444,7 @@ function KnowledgeTree(konvaDivID, width, height) {
 		return this.rootNodes[ID].getTitle();
 	}
 	this.createRootNode = function (metadata, radius, x, y) {
-		const ID = "root-"+metadata.DOI+getRandomInt(99999);
+		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
 		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback);
 		this.rootNodeCount++;
 		return ID;
@@ -430,13 +453,13 @@ function KnowledgeTree(konvaDivID, width, height) {
 		const x = this.getMouseAbsolutePosition().x;
 		const y = this.getMouseAbsolutePosition().y;
 
-		const ID = "root-"+metadata.DOI+getRandomInt(99999);
+		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
 		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
 	this.addReferenceToRootNode = function(rootID, refMetadata, radius) {
-		const refID = "ref-"+refMetadata.DOI+getRandomInt(99999);
+		const refID = ("ref-"+refMetadata.title+getRandomInt(99999)).hashCode();
 		this.rootNodes[rootID].createReference(refID, refMetadata, radius);
 		return refID;
 	}

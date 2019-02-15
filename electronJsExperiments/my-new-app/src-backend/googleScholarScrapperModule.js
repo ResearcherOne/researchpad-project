@@ -48,6 +48,14 @@ function initializeModule(isHeadless, isDevtools) {
   g_isDevtools = isDevtools;
 }
 
+/*
+  resultObjectList = [
+    {
+      title: "paper title",
+      link: "url",
+    }
+  ]
+*/
 function searchGoogleScholar(searchText, callback) {
 	searchGoogle(searchText, g_isHeadless, g_isDevtools).then((resultObjectList) => {
 		callback(null, resultObjectList);

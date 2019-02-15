@@ -16,35 +16,6 @@ const upperPanelDivID = "overlay-controlset-upper-panel";
 const searchPanelDivID = "overlay-search-panel";
 const searchDivID = "search-results-div";
 
-var errorArray = [];
-var pushErrorTimeout = null;
-var pushErrorTimeoutSec = 5;
-
-function error(type, msg) {
-	msg = msg.replace(/\s+/g, '-').toLowerCase();
-	errorArray.push(type+"-"+msg);
-	if(pushErrorTimeout) {
-		clearTimeout(pushErrorTimeout);
-	}
-	pushErrorTimeout = setTimeout(function(){
-		console.log("error-bulk: "+JSON.stringify(errorArray));
-		mixpanel.track("error-bulk", {"errors":errorArray});
-		errorArray = [];
-	}, pushErrorTimeoutSec*1000);
-	
-}
-
-function log(type, msg, extraData) {
-	msg = msg.replace(/\s+/g, '-').toLowerCase();
-	console.log("system-log-"+type+": "+msg);
-	if(extraData) {
-		extraData.systemMessage = msg;
-		mixpanel.track(type+"-"+msg, extraData);
-	} else {
-		mixpanel.track(type+"-"+msg);
-	}
-}
-
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
 }
@@ -57,7 +28,7 @@ function getHostname(callback) {
 			callback(null, hostname);
 		} else {
 			//console.log("Error occured: "+err.msg);
-			error("error", "unable to get hostname");
+			loggerModule.error("error", "unable to get hostname");
 			callback(err, null);
 		}
 	});
@@ -70,7 +41,7 @@ function getMetadataWithDoi(doi, callback) {
 			var metadata = responseObj.metadata;
 			callback(null, metadata);
 		} else {
-			error("error", "unable to get metadataWithDoi");
+			loggerModule.error("error", "unable to get metadataWithDoi");
 			callback(err, null);
 		}
 	});
@@ -83,7 +54,7 @@ function searchGoogle(searchText, callback) {
 			var resultList = responseObj.resultList;
 			callback(null, resultList);
 		} else {
-			error("error", "unable to get data from google scholar.");
+			loggerModule.error("error", "unable to get data from google scholar.");
 			callback(err, null);
 		}
 	});
@@ -95,7 +66,7 @@ function getDoiListOfReferences(referenceList) {
 		if(referenceObj.DOI) {
 			doiList.push(referenceObj.DOI);
 		} else {
-			error("error", "No DOI found for given reference metadata.");
+			loggerModule.error("error", "No DOI found for given reference metadata.");
 		}
 	});
 	return doiList;
@@ -135,7 +106,7 @@ function nodeDragEndCallback(nodeType, nodeObj) {
 	} else {
 		//console.log("Unknown type: "+nodeType);
 	}
-	log("action", "nodeDragEnd", {"type": nodeType});
+	loggerModule.log("action", "nodeDragEnd", {"type": nodeType});
 }
 
 function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
@@ -143,7 +114,7 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 		if(!err) {
 			if(metadata.DOI) {
 				const rootNodeRadius = 30;
-				var rootNodeObjectID = knowledgeTree.createRootNode(metadata, 30, x, y);
+				var rootNodeObjectID = knowledgeTree.createRootNode(metadata, rootNodeRadius, x, y);
 				rootNodeCreatedCallback(rootNodeObjectID);
 				if(metadata.reference) {
 					var referenceList = metadata.reference;
@@ -160,42 +131,46 @@ function createRootNodeFromDoi(doi, x, y, rootNodeCreatedCallback){
 								if(!err && refMetadata.DOI) {
 									knowledgeTree.addReferenceToRootNode(rootNodeObjectID, refMetadata, leafNodeRadius);
 								} else {
-									error("error", "unable to fetch reference metadata");
+									loggerModule.error("error", "unable to fetch reference metadata");
 								} 
 							});
 					}, fetchIntervalMs);
 				} else {
-					error("error", "unable to find references");
+					loggerModule.error("error", "unable to find references");
 				}
 			} else {
-				error("error", "DOI does not exist in fetched metadata");
+				loggerModule.error("error", "DOI does not exist in fetched metadata");
 			}
 		} else {
-			error("error", "Error while fetching metadata");
+			loggerModule.error("error", "Error while fetching metadata");
 		}
 	});
-	log("action", "createRootNodeFromDoi", {"x": x, "y": y, "doi": doi});
+	loggerModule.log("action", "createRootNodeFromDoi", {"x": x, "y": y, "doi": doi});
 }
 
 
 function createNodeRequestReceivedCallback(x, y) {
-	log("action", "emptyNodeDragged");
+	loggerModule.log("action", "emptyNodeDragged");
 	console.log("X: "+x+" Y: "+y);
 	overlayerModule.promptUser("Insert DOI", function(userInput){
 		createRootNodeFromDoi(userInput, x, y, function(newRootNodeID){
 			//console.log("Root node created: "+newRootNodeID);
 		});
-		log("action", "usertInsertedDOI", {"userInput": userInput});
+		loggerModule.log("action", "usertInsertedDOI", {"userInput": userInput});
 	});
 }
 
+var lastGoogleSearchData;
 function searchRequestReceivedCallback(userInput) {
 	searchPanel.clearResults();
 	searchGoogle(userInput, function(err, result){
 		if(result) {
-			console.log(result);
+			lastGoogleSearchData = result;
+			var i = 0;
 			result.forEach(function(element){
-				searchPanel.addResultElement(element.title); //Input element ID as well.
+				console.log(JSON.stringify(element));
+				searchPanel.addResultElement(i, element.title); //Input element ID as well.
+				i++;
 			});
 			searchPanel.enableNextSearch();
 		} else {
@@ -204,26 +179,6 @@ function searchRequestReceivedCallback(userInput) {
 			searchPanel.enableNextSearch();
 		}
 	});
-}
-
-function initializeMixpanel(hostname) {
-	mixpanel.identify(hostname);
-	mixpanel.people.set({
-		"$hostname": hostname,    // only special properties need the $
-		"$last_login": new Date(),         // properties can be dates...
-	});
-	/*
-	mixpanel.people.set({
-		"$email": "jsmith@example.com",    // only special properties need the $
-
-		"$created": "2011-03-16 16:53:54",
-		"$last_login": new Date(),         // properties can be dates...
-
-		"credits": 150,                    // ...or numbers
-
-		"gender": "Male"                    // feel free to define your own properties
-	});
-	*/
 }
 
 function isIdExistInParentElements(elem, idToSearch){
@@ -258,9 +213,12 @@ function handleMouseUp(event) {
 			console.log("Mouse x: "+event.clientX+" Mouse y: "+event.clientY);
 
 			const pos = knowledgeTree.getAbsolutePositionOfGivenPos(event.clientX,event.clientY);
-			createRootNodeFromDoi("10.4203/ccp.111.17", pos.x, pos.y, function(newRootNodeID){
-					//console.log("Root node created: "+newRootNodeID);
-			});
+			
+			const googleSearchDataPosition = parseInt(draggedSearchElement.getAttribute("tagNo"));
+			var scholarSearchMetadata = lastGoogleSearchData[googleSearchDataPosition];
+
+			const rootNodeRadius = 30;
+			var rootNodeObjectID = knowledgeTree.createRootNode(scholarSearchMetadata, rootNodeRadius, pos.x, pos.y);
 		} else {
 			draggedSearchElement.style.color = "";
 		}
@@ -296,16 +254,16 @@ function initializeScript() {
 	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
 
 	getHostname(function(err, hostname){
-		initializeMixpanel(hostname);
-		log("action", "userlogin", {"username": hostname});
+		loggerModule.initialize(hostname);
+		loggerModule.log("action", "userlogin", {"username": hostname});
 	});
 	
 	const loadedKnowledgeTreeData = localStorage.getItem("knowledgeTree");
 	if(loadedKnowledgeTreeData) {
 		knowledgeTree.importSerializedData(loadedKnowledgeTreeData);
-		log("log", "knowledge tree loaded");
+		loggerModule.log("log", "knowledge tree loaded");
 	} else {
-		log("log", "no saved knowledge tree found");
+		loggerModule.log("log", "no saved knowledge tree found");
 	}
 	
 
@@ -318,19 +276,19 @@ function initializeScript() {
 		if (event.keyCode === LEFT) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(moveLength,0);
-			log("action", "keypressed", {"direction": "left"});
+			loggerModule.log("action", "keypressed", {"direction": "left"});
 		} else if (event.keyCode === RIGHT) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(-moveLength,0);
-			log("action", "keypressed", {"direction": "right"});
+			loggerModule.log("action", "keypressed", {"direction": "right"});
 		} else if (event.keyCode === UP) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,moveLength);
-			log("action", "keypressed", {"direction": "up"});
+			loggerModule.log("action", "keypressed", {"direction": "up"});
 		} else if (event.keyCode === DOWN) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,-moveLength);
-			log("action", "keypressed", {"direction": "down"});
+			loggerModule.log("action", "keypressed", {"direction": "down"});
 		}
 	});
 
@@ -338,7 +296,7 @@ function initializeScript() {
 		event.preventDefault();
 		localStorage.setItem("knowledgeTree", knowledgeTree.serialize());
 		overlayerModule.informUser("Your Knowledge Tree is saved.");
-		log("action", "save button clicked");
+		loggerModule.log("action", "save button clicked");
 	});
 
 	document.getElementById("reset-button").addEventListener("click", function(event){
@@ -352,7 +310,7 @@ function initializeScript() {
 		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 
 		overlayerModule.informUser("Your Knowledge Tree is resetted.");
-		log("action", "reset button clicked");
+		loggerModule.log("action", "reset button clicked");
 	});
 
 	document.addEventListener("mousedown", handleMouseDown);

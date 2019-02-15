@@ -36,10 +36,11 @@ function SearchPanel(searchPanelDivId){
 		}
 	});
 
-	this.addResultElement = function(paperTitle) {
+	this.addResultElement = function(tagNo, paperTitle) {
 		var newDiv = document.createElement("div");
-		//newDiv.id = hash(paperTitle)
+		newDiv.setAttribute("tagNo", tagNo);
 		var p = document.createElement("p");
+		p.setAttribute("tagNo", tagNo);
 		p.textContent = paperTitle;
 		
 		//p.className = "unselectable";

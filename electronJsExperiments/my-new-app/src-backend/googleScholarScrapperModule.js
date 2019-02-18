@@ -6,7 +6,7 @@ var g_isDevtools;
 var browser;
 
 let searchGoogle = async (searchText, isHeadless, isDevtools) => {
-  if(!browser) browser = await puppeteer.launch({headless : isHeadless, devtools: isDevtools});
+  if(!browser) browser = await puppeteer.launch({headless : isHeadless, devtools: isDevtools, dumpio: true});
   const page = await browser.newPage();
   await page.goto('http://scholar.google.com/', {waitUntil: 'networkidle0'});
   await page.waitFor('input[type= "text"]');
@@ -16,7 +16,10 @@ let searchGoogle = async (searchText, isHeadless, isDevtools) => {
     page.click('button[type="submit"]'),
     page.waitForNavigation({waitUntil: 'networkidle0'}),
   ]);
-  //page.waitFor(1000);
+
+  page.on("console", msg => {
+    console.log(msg.text());
+  });
 
   // Scrape
   const result = await page.evaluate(() => {
@@ -30,9 +33,26 @@ let searchGoogle = async (searchText, isHeadless, isDevtools) => {
       const title = headerTagForTitle.innerText;
       const paperLink = headerTagForTitle.childNodes[0].getAttribute("href");
 
+      var citedByCount = 0;
+      var citedByLink = "";
+      let extrasDiv = containerDiv.querySelectorAll('.gs_fl')[0];
+      let aTags = extrasDiv.querySelectorAll('a');
+      aTags.forEach(function(aTag){
+        var splittedInnerHtml = aTag.innerHTML.split(" ");
+        if(splittedInnerHtml[0] == "Cited") {
+          console.log("Found: "+aTag.innerHTML);
+          citedByCount = parseInt(splittedInnerHtml[2]);
+          citedByLink = aTag.getAttribute("href");
+        } else {
+          //not cited by aTag.
+        }
+      });
+
       data.push({
         title: title,
-        link: paperLink
+        link: paperLink,
+        citedByCount: citedByCount,
+        citedByLink: citedByLink
       });
     }
 

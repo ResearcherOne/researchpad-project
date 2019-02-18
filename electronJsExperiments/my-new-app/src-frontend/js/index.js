@@ -164,7 +164,7 @@ var lastGoogleSearchData;
 function searchRequestReceivedCallback(userInput) {
 	searchPanel.clearResults();
 	searchGoogle(userInput, function(err, result){
-		if(result) {
+		if(result && result.length > 0) {
 			lastGoogleSearchData = result;
 			var i = 0;
 			result.forEach(function(element){
@@ -172,6 +172,9 @@ function searchRequestReceivedCallback(userInput) {
 				searchPanel.addResultElement(i, element.title); //Input element ID as well.
 				i++;
 			});
+			searchPanel.enableNextSearch();
+		} else if (result && result.length == 0) {
+			overlayerModule.informUser("No result is found for that search.");
 			searchPanel.enableNextSearch();
 		} else {
 			console.log("Unable to connect to Google Scholar.");

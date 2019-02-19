@@ -7,19 +7,28 @@ var googleScholarModule = require(__dirname+'/googleScholarScrapperModule');
 const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 	getHostname: "/get-hostname",
-	searchGoogleScholar: "/search-google-scholar"
+	searchGoogleScholar: "/search-google-scholar",
+	getCitedByFromGoogleScholar: "/get-citedby-google-scholar"
 };
 
 const listenRenderer = "listen-renderer";
 const responseRenderer = "response-to-renderer";
 
-const isHeadlessChrome = false;
+const isHeadlessChrome = true;
 const isDevtools = false;
+
+var isScrapperReady = false;
 
 function initializeBackend() {
 	//console.log("Backend initialized.");
 
-	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools);
+	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(err, res){
+		if(res) {
+			isScrapperReady = true;
+		} else {
+			isScrapperReady = false;
+		}
+	});
 	ipcRestModule.initialize(listenRenderer, responseRenderer);
 
 	ipcRestModule.listen(backendApi.getCrossrefMetaDataByDoi, function(request, response){
@@ -42,16 +51,34 @@ function initializeBackend() {
 
 	ipcRestModule.listen(backendApi.searchGoogleScholar, function(request, response){
 		const searchText = request.searchText;
-		const isHeadless = false;
 
-		googleScholarModule.searchGoogleScholar(searchText, function(err, result){
-			if(!err) {
-				response.send({"resultList": result});
-			} else {
-				console.log("Err:" + err.msg);
-				response.error("OOps, unable to fetch data from google scholar.");
-			}
-		});
+		if(isScrapperReady) {
+			googleScholarModule.searchGoogleScholar(searchText, function(err, result){
+				if(!err) {
+					response.send({"resultList": result});
+				} else {
+					response.error("OOps, unable to fetch data from google scholar.");
+				}
+			});
+		} else {
+			response.error("Connection with Google Scholar is not ready yet.");
+		}
+	});
+
+	ipcRestModule.listen(backendApi.getCitedByFromGoogleScholar, function(request, response){
+		const citedByLink = request.citedByLink;
+
+		if(isScrapperReady) {
+			googleScholarModule.getCitedbyOfArticle(citedByLink, function(err, result){
+				if(!err) {
+					response.send({"resultList": result});
+				} else {
+					response.error("OOps, unable to fetch data from google scholar.");
+				}
+			});
+		} else {
+			response.error("Connection with Google Scholar is not ready yet.");
+		}
 	});
 }
 

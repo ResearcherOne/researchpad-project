@@ -466,6 +466,11 @@ function KnowledgeTree(konvaDivID, width, height) {
 	this.removeReferenceFromRootNode = function(rootID, refID) {
 		this.rootNodes[rootID].removeReference(refID);
 	}
+	this.addCitedbyToRootNode = function(rootID, citedByMetadata, radius) {
+		const refID = ("ref-"+citedByMetadata.title+getRandomInt(99999)).hashCode();
+		this.rootNodes[rootID].createCitedBy(refID, citedByMetadata, radius);
+		return refID;
+	}
 	this.setSiblingReference = function(rootID, siblingReferenceRootID) {
 		const connectionID = rootID + siblingReferenceRootID;
 		var connectionObj = new SiblingConnection(connectionID, rootID, siblingReferenceRootID);

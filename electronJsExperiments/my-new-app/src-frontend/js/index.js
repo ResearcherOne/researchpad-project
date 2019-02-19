@@ -2,7 +2,8 @@
 const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 	getHostname: "/get-hostname",
-	searchGoogleScholar: "/search-google-scholar"
+	searchGoogleScholar: "/search-google-scholar",
+	getCitedByFromGoogleScholar: "/get-citedby-google-scholar"
 };
 
 const sendRequestsTopic = "listen-renderer";
@@ -50,6 +51,19 @@ function getMetadataWithDoi(doi, callback) {
 function searchGoogle(searchText, callback) {
 	const requestObj = {"searchText": searchText};
 	request(backendApi.searchGoogleScholar, requestObj, function(err, responseObj){
+		if(!err) {
+			var resultList = responseObj.resultList;
+			callback(null, resultList);
+		} else {
+			loggerModule.error("error", "unable to get data from google scholar.");
+			callback(err, null);
+		}
+	});
+}
+
+function getCitedByOfArticle(citedByLink, callback) {
+	const requestObj = {"citedByLink": citedByLink};
+	request(backendApi.getCitedByFromGoogleScholar, requestObj, function(err, responseObj){
 		if(!err) {
 			var resultList = responseObj.resultList;
 			callback(null, resultList);
@@ -222,6 +236,19 @@ function handleMouseUp(event) {
 
 			const rootNodeRadius = 30;
 			var rootNodeObjectID = knowledgeTree.createRootNode(scholarSearchMetadata, rootNodeRadius, pos.x, pos.y);
+			
+			getCitedByOfArticle(scholarSearchMetadata.citedByLink, function(err, citedByList){
+				const leafNodeRadius = 15;
+				if(citedByList) {
+					console.log(citedByList);
+					citedByList.forEach(function(citedByMetadata){
+						knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByMetadata, leafNodeRadius);
+						//LEFT HERE
+					});
+				} else {
+					console.log("Err cited by fetch");
+				}
+			});
 		} else {
 			draggedSearchElement.style.color = "";
 		}

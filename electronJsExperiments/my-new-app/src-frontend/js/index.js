@@ -116,7 +116,38 @@ function nodeDragEndCallback(nodeType, nodeObj) {
 			knowledgeTree.setSiblingReference(rootID, newRootNodeID);
 		});
 	} else if (nodeType == "citedby") {
-		//console.log("Type of citedby node");
+		const x = nodeObj.getAbsolutePosition().x;
+		const y = nodeObj.getAbsolutePosition().y;
+		const citedByLink = nodeObj.getCitedByLink();
+		const ID = nodeObj.getID();
+		const rootNodeOfReferenceID = nodeObj.getRootNodeID();
+		const citedByNodeMetadata = nodeObj.getMetadata();
+
+		if(citedByLink) {
+			knowledgeTree.removeCitedbyFromRootNode(rootNodeOfReferenceID, ID);
+
+			const rootNodeRadius = 30;
+			var newRootNodeID = knowledgeTree.createRootNode(citedByNodeMetadata, rootNodeRadius, x, y);
+			knowledgeTree.setSiblingReference(rootNodeOfReferenceID, newRootNodeID);
+
+			getCitedByOfArticle(citedByLink, function(err, citedByList){
+				const leafNodeRadius = 15;
+				if(citedByList) {
+					citedByList.forEach(function(citedByMetadata){
+						knowledgeTree.addCitedbyToRootNode(newRootNodeID, citedByMetadata, leafNodeRadius);
+					});
+				} else {
+					overlayerModule.informUser("Unable to fetch citations data.");
+				}
+			});
+		} else {
+			knowledgeTree.removeCitedbyFromRootNode(rootNodeOfReferenceID, ID);
+
+			const rootNodeRadius = 30;
+			var newRootNodeID = knowledgeTree.createRootNode(citedByNodeMetadata, rootNodeRadius, x, y);
+			knowledgeTree.setSiblingReference(rootNodeOfReferenceID, newRootNodeID);
+		}
+
 	} else {
 		//console.log("Unknown type: "+nodeType);
 	}
@@ -213,6 +244,7 @@ function isIdExistInParentElements(elem, idToSearch){
 var isSearchElementDraggingStarted = false;
 var draggedSearchElement = null;
 function handleMouseDown(event) {
+	document.getElementById("body").style.cursor = "move";
 	const isSearchElement = isIdExistInParentElements(event.target, searchDivID);
 		if(isSearchElement) {
 			isSearchElementDraggingStarted = true;
@@ -223,7 +255,9 @@ function handleMouseDown(event) {
 }
 
 function handleMouseUp(event) {
+	document.getElementById("body").style.cursor = "default";
 	if(isSearchElementDraggingStarted) {
+		isSearchElementDraggingStarted = false;
 		const isTargetPointsKnowledgeTree = isIdExistInParentElements(event.target, konvaDivID);
 		if(isTargetPointsKnowledgeTree) {
 			draggedSearchElement.style.color = "green";

@@ -123,10 +123,10 @@ function initializeModule(isHeadless, isDevtools, callback) {
 /*
   resultObjectList = [
     {
-      title: title,
-      link: paperLink,
-      citedByCount: citedByCount,
-      citedByLink: citedByLink
+      "title":"A component-based programming model for autonomic applications",
+      "link":"https://ieeexplore.ieee.org/abstract/document/1301341/",
+      "citedByCount":198,
+      "citedByLink":"/scholar?cites=6711554808924456386&as_sdt=805&sciodt=0,3&hl=en"
     }
   ]
 */
@@ -137,7 +137,16 @@ function searchGoogleScholar(searchText, callback) {
 		callback(err, null);
 	});
 }
-
+/*
+  resultObjectList = [
+    {
+      "title":"A component-based programming model for autonomic applications",
+      "link":"https://ieeexplore.ieee.org/abstract/document/1301341/",
+      "citedByCount":198,
+      "citedByLink":"/scholar?cites=6711554808924456386&as_sdt=805&sciodt=0,3&hl=en"
+    }
+  ]
+*/
 function getCitedbyOfArticle(citedByLink, callback){
   scrapCitedByPage("http://scholar.google.com"+citedByLink).then( (resultObjectList) => {
     callback(null, resultObjectList);

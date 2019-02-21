@@ -36,15 +36,23 @@ function SearchPanel(searchPanelDivId){
 		}
 	});
 
-	this.addResultElement = function(tagNo, paperTitle) {
+	this.addResultElement = function(tagNo, paperTitle, citationCount, year) {
 		var newDiv = document.createElement("div");
 		newDiv.setAttribute("tagNo", tagNo);
 		var p = document.createElement("p");
 		p.setAttribute("tagNo", tagNo);
 		p.textContent = paperTitle;
-		
 		//p.className = "unselectable";
 		newDiv.appendChild(p);
+
+		var citationAndYearDiv = document.createElement("div");
+		citationAndYearDiv.setAttribute("tagNo", tagNo);
+		var p2 = document.createElement("p");
+		p2.setAttribute("tagNo", tagNo);
+		p2.textContent = "Citation: "+citationCount+" Year: "+year;
+		citationAndYearDiv.appendChild(p2);
+
+		newDiv.appendChild(citationAndYearDiv);
 
 		this.resultsDiv.appendChild(newDiv);
 	}
@@ -61,5 +69,12 @@ function SearchPanel(searchPanelDivId){
 
 	this.setSearchRequestReceivedCallback = function(callback) {
 		searchRequestReceivedCallback = callback;
+	}
+
+	this.setColorOfSearchResultElement = function(tagNo, color) {
+		var elements = this.resultsDiv.querySelectorAll('[tagNo="'+tagNo+'"]');
+		elements.forEach(function(element){
+			element.style.color = color;
+		});
 	}
 }

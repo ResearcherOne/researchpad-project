@@ -214,7 +214,7 @@ function searchRequestReceivedCallback(userInput) {
 			var i = 0;
 			result.forEach(function(element){
 				console.log(JSON.stringify(element));
-				searchPanel.addResultElement(i, element.title); //Input element ID as well.
+				searchPanel.addResultElement(i, element.title, element.citedByCount, element.year); //Input element ID as well.
 				i++;
 			});
 			searchPanel.enableNextSearch();
@@ -242,15 +242,14 @@ function isIdExistInParentElements(elem, idToSearch){
 }
 
 var isSearchElementDraggingStarted = false;
-var draggedSearchElement = null;
+var draggedSearchElementTagNo = null;
 function handleMouseDown(event) {
 	document.getElementById("body").style.cursor = "move";
 	const isSearchElement = isIdExistInParentElements(event.target, searchDivID);
 		if(isSearchElement) {
 			isSearchElementDraggingStarted = true;
-			event.target.style.color = "yellow";
-			draggedSearchElement = event.target;
-			//animator.startElementDragAnim();
+			draggedSearchElementTagNo = event.target.getAttribute("tagNo")
+			searchPanel.setColorOfSearchResultElement(draggedSearchElementTagNo, "yellow");
 		}
 }
 
@@ -260,12 +259,12 @@ function handleMouseUp(event) {
 		isSearchElementDraggingStarted = false;
 		const isTargetPointsKnowledgeTree = isIdExistInParentElements(event.target, konvaDivID);
 		if(isTargetPointsKnowledgeTree) {
-			draggedSearchElement.style.color = "green";
+			searchPanel.setColorOfSearchResultElement(draggedSearchElementTagNo, "green");
 			console.log("Mouse x: "+event.clientX+" Mouse y: "+event.clientY);
 
 			const pos = knowledgeTree.getAbsolutePositionOfGivenPos(event.clientX,event.clientY);
 			
-			const googleSearchDataPosition = parseInt(draggedSearchElement.getAttribute("tagNo"));
+			const googleSearchDataPosition = parseInt(draggedSearchElementTagNo);
 			var scholarSearchMetadata = lastGoogleSearchData[googleSearchDataPosition];
 
 			const rootNodeRadius = 30;
@@ -277,14 +276,13 @@ function handleMouseUp(event) {
 					console.log(citedByList);
 					citedByList.forEach(function(citedByMetadata){
 						knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByMetadata, leafNodeRadius);
-						//LEFT HERE
 					});
 				} else {
 					console.log("Err cited by fetch");
 				}
 			});
 		} else {
-			draggedSearchElement.style.color = "";
+			searchPanel.setColorOfSearchResultElement(draggedSearchElementTagNo, "");
 		}
 		
 	}

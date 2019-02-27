@@ -11,6 +11,7 @@ const listenResponsesTopic = "response-to-renderer";
 
 const konvaDivID = "konva-div";
 const overlayDivID = "overlay-div";
+const abstractDivID = "overlay-abstract-div";
 
 const upperPanelDivID = "overlay-controlset-upper-panel";
 
@@ -205,6 +206,33 @@ function createNodeRequestReceivedCallback(x, y) {
 	});
 }
 
+
+function offset(el) {
+	var rect = el.getBoundingClientRect(),
+	scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+	scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+	return { top: rect.top + scrollTop, left: rect.left + scrollLeft }
+}
+
+function searchResultMouseEnterCallback(e) {
+	const target = e.target;
+	var rect = offset(target);
+
+
+	const targetTagNo = parseInt(target.getAttribute("tagNo"));
+	const abstractText = lastGoogleSearchData[targetTagNo].abstract;
+	console.log("Abstract: "+abstractText);
+	const x = rect.left;
+	const y = rect.top + (target.offsetHeight/2);
+	overlayerModule.drawAbstractOverlay(x, y, abstractText);
+	console.log("mouse enter");
+}
+
+function searchResultMouseLeaveCallback(e) {
+	overlayerModule.clearAbstractOverlay();
+	console.log("mouse leave");
+}
+
 var lastGoogleSearchData;
 function searchRequestReceivedCallback(userInput) {
 	searchPanel.clearResults();
@@ -214,7 +242,7 @@ function searchRequestReceivedCallback(userInput) {
 			var i = 0;
 			result.forEach(function(element){
 				console.log(JSON.stringify(element));
-				searchPanel.addResultElement(i, element.title, element.citedByCount, element.year); //Input element ID as well.
+				searchPanel.addResultElement(i, element.title, element.citedByCount, element.year, element.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback); //Input element ID as well.
 				i++;
 			});
 			searchPanel.enableNextSearch();
@@ -286,17 +314,6 @@ function handleMouseUp(event) {
 		}
 		
 	}
-	/*
-		if (isSearchElementDragStarted) {
-			isSearchElementDragStarted = false;
-			//searchPanel.setItemColor(itemDivID, "green");
-			//knowledgeTree.createNode(elementCenterX, elementCenterY,metadata);
-			animator.stopElementDragAnim();
-		} else {
-			ignore, it could be any kind of click on konvaDiv.
-		}
-
-	*/
 }
 
 var knowledgeTree = null;
@@ -304,7 +321,7 @@ var searchPanel = null;
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-	overlayerModule.initializeModule(overlayDivID, upperPanelDivID);
+	overlayerModule.initializeModule(overlayDivID, upperPanelDivID, abstractDivID);
 
 	knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
 

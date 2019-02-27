@@ -36,23 +36,25 @@ function SearchPanel(searchPanelDivId){
 		}
 	});
 
-	this.addResultElement = function(tagNo, paperTitle, citationCount, year) {
+	this.addResultElement = function(tagNo, paperTitle, citationCount, year, abstract, mouseEnterCallback, mouseLeaveCallback) {
 		var newDiv = document.createElement("div");
 		newDiv.setAttribute("tagNo", tagNo);
 		var p = document.createElement("p");
 		p.setAttribute("tagNo", tagNo);
 		p.textContent = paperTitle;
-		//p.className = "unselectable";
 		newDiv.appendChild(p);
 
 		var citationAndYearDiv = document.createElement("div");
 		citationAndYearDiv.setAttribute("tagNo", tagNo);
 		var p2 = document.createElement("p");
 		p2.setAttribute("tagNo", tagNo);
-		p2.textContent = "Citation: "+citationCount+" Year: "+year;
+		p2.textContent = "Citation: "+citationCount+" Year: "+year//+" \nAbstract: "+abstract;
 		citationAndYearDiv.appendChild(p2);
 
 		newDiv.appendChild(citationAndYearDiv);
+
+		newDiv.addEventListener("mouseenter", mouseEnterCallback);
+		newDiv.addEventListener("mouseleave", mouseLeaveCallback);
 
 		this.resultsDiv.appendChild(newDiv);
 	}

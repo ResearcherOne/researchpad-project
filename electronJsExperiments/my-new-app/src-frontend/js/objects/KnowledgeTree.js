@@ -124,7 +124,7 @@ function KnowledgeTree(konvaDivID, width, height) {
 		for (var serializedRootNodeID in serializedRootNodes){
 			var rootNodeData = JSON.parse(serializedRootNodes[serializedRootNodeID]);
 			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.metadata, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback);
-			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.referenceCount);
+			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.citedByNodes, rootNodeData.referenceCount, rootNodeData.citedByCount);
 			
 			reconstructedRootNodes[serializedRootNodeID].siblingIDs = rootNodeData.siblingIDs;
 			reconstructedRootNodes[serializedRootNodeID].siblingCount = rootNodeData.siblingCount;

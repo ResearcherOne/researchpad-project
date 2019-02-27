@@ -2,6 +2,9 @@ var overlayerModule = (function () {
 	var divId;
 	var titleId;
 
+	var abstractDivId;
+	var abstractTextId;
+
 	var upperPanelId;
 	var infoDivId;
 
@@ -21,9 +24,13 @@ var overlayerModule = (function () {
 		}
 	}
 
-	var initializeModule = function(overlayDivId, upperPanelDivId) {
+	var initializeModule = function(overlayDivId, upperPanelDivId, abstractDivIdInput) {
 		divId = overlayDivId;
 		titleId = divId + "-text";
+
+		abstractDivId = abstractDivIdInput;
+		abstractTextId = abstractDivId + "-text";
+		console.log("abstractDivId: "+abstractDivId);
 
 		upperPanelId = upperPanelDivId;
 		infoDivId = upperPanelId + "-info-div";
@@ -41,6 +48,17 @@ var overlayerModule = (function () {
 	    document.getElementById(divId).style.left = x+"px"; //x
 	    document.getElementById(divId).style.top = (y-offsetHeight)+"px"; //y
 	    document.getElementById(titleId).innerHTML = text;
+	}
+
+	var drawAbstractOverlay = function(x, y, text) {
+		document.getElementById(abstractDivId).style.display = "block";
+
+		var offsetWidth = document.getElementById(abstractDivId).offsetWidth;
+		var offsetHeight = document.getElementById(abstractDivId).offsetHeight;
+
+	    document.getElementById(abstractDivId).style.left = (x-offsetWidth-20)+"px"; //x
+	    document.getElementById(abstractDivId).style.top = (y - (offsetHeight/2))+"px"; //y
+	    document.getElementById(abstractTextId).innerHTML = "<b>Abstract</b> <br>"+text;
 	}
 
 	var promptUser = function(text, callback) {
@@ -84,10 +102,16 @@ var overlayerModule = (function () {
 		document.getElementById(divId).style.display = "none";
 	}
 
+	var clearAbstractOverlay = function() {
+		document.getElementById(abstractDivId).style.display = "none";
+	}
+
 	return {
 		initializeModule: initializeModule,
 		drawTitleOverlay: drawTitleOverlay,
+		drawAbstractOverlay: drawAbstractOverlay,
 		clearTitleOverlay: clearTitleOverlay,
+		clearAbstractOverlay: clearAbstractOverlay,
 		promptUser: promptUser,
 		informUser: informUser
 	}

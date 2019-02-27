@@ -53,6 +53,31 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 				text-align: center;
 			}
 
+			#overlay-abstract-div{
+				position: fixed;
+				display: none;
+				width: 35vw;
+				height: 30vh;
+				top: 50px;
+				left: 50px;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0,0,0,0.95);
+				z-index: 3;
+				border-radius: 5px;
+			}
+
+			#overlay-abstract-div-text{
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				font-size: 20px;
+				color: white;
+				transform: translate(-50%,-50%);
+				-ms-transform: translate(-50%,-50%);
+				text-align: center;
+			}
+
 			#overlay-controlset-upper-panel {
 				position: fixed;
 				display: block;
@@ -198,7 +223,10 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 	<body id="body">
 		<div id="knowledge-tree-div">
 			<div id="overlay-div" class ="unselectable">
-				 <div class="unselectable" id="overlay-div-text"></div>
+				<div class="unselectable" id="overlay-div-text"></div>
+			</div>
+			<div id="overlay-abstract-div" class ="unselectable">
+				<div class="unselectable" id="overlay-abstract-div-text"></div>
 			</div>
 			<div id="overlay-controlset-upper-panel" class ="unselectable">
 				<button id="save-button" type="button">SAVE</button>

@@ -152,14 +152,23 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		return JSON.stringify(serializedNodeObj);
 	}
 
-	this.importSerializedReferences = function(serializedReferences, refCount) {
+	this.importSerializedReferences = function(serializedReferences, serializedCitedbyNodes, refCount, citedbyCount) {
 		var reconstructedReferences = {}
 		for (var referenceNodeID in serializedReferences){
-			var referenceNodeData = JSON.parse(serializedReferences[referenceNodeID]);
-			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, referenceNodeData.ID, referenceNodeData.metadata, referenceNodeData.radius, referenceNodeData.referencePosition, dragstartCallback, dragendCallback);
+			var leafNodeData = JSON.parse(serializedReferences[referenceNodeID]);
+			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback);
 		}
 		this.referenceCount = refCount;
 		this.references = reconstructedReferences;
+
+		var reconstructedCitedbyNodes = {}
+		for (var referenceNodeID in serializedCitedbyNodes){
+			var leafNodeData = JSON.parse(serializedCitedbyNodes[referenceNodeID]);
+			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback);
+		}
+		this.citedByCount = citedbyCount;
+		this.references = reconstructedCitedbyNodes;
+
 	}
 
 	RootNode.prototype = Object.create(Node.prototype);

@@ -25,11 +25,12 @@ String.prototype.hashCode = function() {
   return hash;
 };
 
-function KnowledgeTree(konvaDivID, width, height) {
+function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	//Config & Private Functions
 	this.konvaDivID = konvaDivID;
 	this.width = width;
 	this.height = height;
+	this.nodeConnectionsConfig = nodeConnectionsConfig;
 
 	this.rootNodes = {};
 	this.rootNodeCount = 0;
@@ -142,7 +143,7 @@ function KnowledgeTree(konvaDivID, width, height) {
 	}
 
 	//Initialization
-	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height);
+	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height, this.nodeConnectionsConfig);
 	this.emptyRootNode = new DummyNode(emptyRootNodeConfig.ID, emptyRootNodeConfig.radius, emptyRootNodeConfig.x, emptyRootNodeConfig.y, emptyRootNodeDragStart, emptyRootNodeEnd);
 	this.emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
 	//Public Functions

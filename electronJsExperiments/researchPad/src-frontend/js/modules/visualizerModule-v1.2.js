@@ -2,6 +2,15 @@ var visualizerModule = (function () {
 	var stage;
 	var layer;
 
+	var nodeConnectionsConfig = {
+		citedByAbsoluteStartDegree: 280,
+		citedByAbsoluteEndDegree: 80,
+		referenceAbsoluteStartDegree: 120,
+		referenceAbsoluteEndDegree: 240,
+		connectionLength: 50,
+		maxConnectionPerLayer: 10
+	};
+
 	var updateScene = function() {
 		stage.batchDraw();
 	}
@@ -50,7 +59,7 @@ var visualizerModule = (function () {
 
 
   //Public Functions
-	var initializeModule = function(konvaDivID, w, h) {
+	var initializeModule = function(konvaDivID, w, h, newConnectionsConfig) {
 		stage = new Konva.Stage({
 			container: konvaDivID,
 			width: w,
@@ -59,6 +68,8 @@ var visualizerModule = (function () {
 
 		layer = new Konva.Layer();
 		stage.add(layer);
+
+		nodeConnectionsConfig = newConnectionsConfig
 	};
 
 	var createRootNode = function(radius, x, y, rootId, isDraggable, mouseOverCallback, mouseOutCallback, rootNodeObject, dragstartCallback, dragendCallback) {
@@ -120,17 +131,17 @@ var visualizerModule = (function () {
 	}
 
 	var createReferenceNode = function(rootNode, referenceNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback) {
-		const maxNodeCountPerLayer = 10;
+		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
 		const layerIndex = Math.floor(referenceNumber/maxNodeCountPerLayer);
 
-		const absoluteStartDegree = 120;
-		const absoluteEndDegree = 240;
+		const absoluteStartDegree = nodeConnectionsConfig.referenceAbsoluteStartDegree;
+		const absoluteEndDegree = nodeConnectionsConfig.referenceAbsoluteEndDegree;
 
 		const degreePerNode = (absoluteEndDegree - absoluteStartDegree) / maxNodeCountPerLayer;
 		const nodeIndex = referenceNumber % maxNodeCountPerLayer;
 
 		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
-		const connectionUnitLength = 40;
+		const connectionUnitLength = nodeConnectionsConfig.connectionLength;
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
 		const isDraggable = true;
@@ -138,17 +149,17 @@ var visualizerModule = (function () {
 	}
 
 	var createCitedByNode = function(rootNode, citedByNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback) {
-		const maxNodeCountPerLayer = 10;
+		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
 		const layerIndex = Math.floor(citedByNumber/maxNodeCountPerLayer);
 
-		const absoluteStartDegree = 300;
-		const absoluteEndDegree = 60;
+		const absoluteStartDegree = nodeConnectionsConfig.citedByAbsoluteStartDegree;
+		const absoluteEndDegree = nodeConnectionsConfig.citedByAbsoluteEndDegree;
 
 		const degreePerNode = ((360 - absoluteStartDegree) + absoluteEndDegree) / maxNodeCountPerLayer;
 		const nodeIndex = citedByNumber % maxNodeCountPerLayer;
 
 		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
-		const connectionUnitLength = 40;
+		const connectionUnitLength = nodeConnectionsConfig.connectionLength;
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
 		const isDraggable = true;

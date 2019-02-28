@@ -22,7 +22,7 @@ const createWindow = () => {
   mainWindow.loadURL(`file://${__dirname}/src-frontend/index.html`);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

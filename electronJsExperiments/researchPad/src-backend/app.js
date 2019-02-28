@@ -25,8 +25,10 @@ function initializeBackend() {
 	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(err, res){
 		if(res) {
 			isScrapperReady = true;
+			console.log("Scrapper Ready");
 		} else {
 			isScrapperReady = false;
+			console.log("Unable to initialize scrapper: "+err);
 		}
 	});
 	ipcRestModule.initialize(listenRenderer, responseRenderer);

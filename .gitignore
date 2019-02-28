@@ -1,4 +1,5 @@
 node_modules/
 out/*
 !out/.gitkeep
-my-new-app-linux-x64/*
+build/*
+!build/.gitkeep

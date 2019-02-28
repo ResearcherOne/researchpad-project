@@ -1,13 +1,13 @@
 {
-  "name": "my-new-app",
-  "productName": "my-new-app",
+  "name": "ResearchPad",
+  "productName": "ResearchPad",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js",
-    "build": "electron-packager . my-new-app --overwrite",
-    "package": "asar pack my-new-app-linux-x64/resources/app out/app.asar"
+    "build": "electron-packager . researchPad --overwrite --platform=linux,win32",
+    "package": "asar pack build/researchPad-linux-x64/resources/app out/app.asar"
   },
   "keywords": [],
   "author": "researcher1",

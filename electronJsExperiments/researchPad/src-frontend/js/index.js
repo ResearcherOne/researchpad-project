@@ -18,6 +18,15 @@ const upperPanelDivID = "overlay-controlset-upper-panel";
 const searchPanelDivID = "overlay-search-panel";
 const searchDivID = "search-results-div";
 
+const nodeConnectionsConfig = {
+	citedByAbsoluteStartDegree: 280,
+	citedByAbsoluteEndDegree: 90,
+	referenceAbsoluteStartDegree: 120,
+	referenceAbsoluteEndDegree: 240,
+	connectionLength: 50,
+	maxConnectionPerLayer: 10
+};
+
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
 }
@@ -323,7 +332,7 @@ function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
 	overlayerModule.initializeModule(overlayDivID, upperPanelDivID, abstractDivID);
 
-	knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
+	knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200, nodeConnectionsConfig);
 
 	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 	knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);

@@ -7,6 +7,8 @@ Electron-Forge
 	#Installing new npm package
 		npm install your-desired-npm-package --save
 #Building vanilla electronjs
+	sudo apt-get install wine -y 
+	
 	cd researchpad-project/electronJsExperiments/my-new-app
 	mkdir out
 	touch ./out/.gitkeep

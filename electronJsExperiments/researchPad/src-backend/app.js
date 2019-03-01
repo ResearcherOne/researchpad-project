@@ -8,26 +8,28 @@ const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 	getHostname: "/get-hostname",
 	searchGoogleScholar: "/search-google-scholar",
-	getCitedByFromGoogleScholar: "/get-citedby-google-scholar"
+	getCitedByFromGoogleScholar: "/get-citedby-google-scholar",
+	isChromiumReady: "/get-chromium-status"
 };
 
 const listenRenderer = "listen-renderer";
 const responseRenderer = "response-to-renderer";
 
-const isHeadlessChrome = true;
-const isDevtools = false;
+const isHeadlessChrome = false;
+const isDevtools = true;
 
-var isScrapperReady = false;
+var isChromiumReady = false;
 
 function initializeBackend() {
-	//console.log("Backend initialized.");
+	console.log("Dirname: "+__dirname);
+	console.log("Backend initialized");
 
 	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(err, res){
 		if(res) {
-			isScrapperReady = true;
+			isChromiumReady = true;
 			console.log("Scrapper Ready");
 		} else {
-			isScrapperReady = false;
+			isChromiumReady = false;
 			console.log("Unable to initialize scrapper: "+err);
 		}
 	});
@@ -54,7 +56,7 @@ function initializeBackend() {
 	ipcRestModule.listen(backendApi.searchGoogleScholar, function(request, response){
 		const searchText = request.searchText;
 
-		if(isScrapperReady) {
+		if(isChromiumReady) {
 			googleScholarModule.searchGoogleScholar(searchText, function(err, result){
 				if(!err) {
 					response.send({"resultList": result});
@@ -70,7 +72,7 @@ function initializeBackend() {
 	ipcRestModule.listen(backendApi.getCitedByFromGoogleScholar, function(request, response){
 		const citedByLink = request.citedByLink;
 
-		if(isScrapperReady) {
+		if(isChromiumReady) {
 			googleScholarModule.getCitedbyOfArticle(citedByLink, function(err, result){
 				if(!err) {
 					response.send({"resultList": result});
@@ -81,6 +83,10 @@ function initializeBackend() {
 		} else {
 			response.error("Connection with Google Scholar is not ready yet.");
 		}
+	});
+
+	ipcRestModule.listen(backendApi.isChromiumReady, function(request, response){
+		response.send({"chorimumStatus": isChromiumReady})
 	});
 }
 

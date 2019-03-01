@@ -3,7 +3,8 @@ const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 	getHostname: "/get-hostname",
 	searchGoogleScholar: "/search-google-scholar",
-	getCitedByFromGoogleScholar: "/get-citedby-google-scholar"
+	getCitedByFromGoogleScholar: "/get-citedby-google-scholar",
+	isChromiumReady: "/get-chromium-status"
 };
 
 const sendRequestsTopic = "listen-renderer";
@@ -29,6 +30,19 @@ const nodeConnectionsConfig = {
 
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
+}
+
+function getChromiumStatus(callback) {
+	const requestObj = {};
+	request(backendApi.isChromiumReady, requestObj, function(err, responseObj){
+		if(!err) {
+			var status = responseObj.chorimumStatus;
+			callback(null, status);
+		} else {
+			loggerModule.error("error", "unable to get chromiumStatus");
+			callback(err, null);
+		}
+	});
 }
 
 function getHostname(callback) {
@@ -403,6 +417,12 @@ function initializeScript() {
 
 	document.addEventListener("mousedown", handleMouseDown);
 	document.addEventListener("mouseup", handleMouseUp);
+
+	setInterval(function(){
+		getChromiumStatus(function(err, res){
+			console.log("Is chromium initialized: "+res);
+		});
+	}, 5000);
 
 	//implement built-in exit button (disable default one as well) to also log exit event.
 }

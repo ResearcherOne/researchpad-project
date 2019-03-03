@@ -13,8 +13,8 @@ let mainWindow;
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1600,
-    height: 1000,
+    width: 1280,
+    height: 720,
     resizable: false
   });
 
@@ -22,7 +22,7 @@ const createWindow = () => {
   mainWindow.loadURL(`file://${__dirname}/src-frontend/index.html`);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

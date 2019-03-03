@@ -6,7 +6,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron main.js",
-    "build": "electron-packager . researchPad --overwrite --platform=linux,win32",
+    "build": "electron-packager . researchPad --overwrite --platform=win32",
     "package": "asar pack build/researchPad-linux-x64/resources/app out/app.asar"
   },
   "keywords": [],

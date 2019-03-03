@@ -15,8 +15,8 @@ const backendApi = {
 const listenRenderer = "listen-renderer";
 const responseRenderer = "response-to-renderer";
 
-const isHeadlessChrome = false;
-const isDevtools = true;
+const isHeadlessChrome = true;
+const isDevtools = false;
 
 var isChromiumReady = false;
 

@@ -32,11 +32,12 @@ let scrapGoogleScholarPageCodeToRunOnChromium = () => {
     let extrasDiv = containerDiv.querySelectorAll('.gs_fl')[0];
     let aTags = extrasDiv.querySelectorAll('a');
     aTags.forEach(function(aTag){
-      var splittedInnerHtml = aTag.innerHTML.split(" ");
-      if(splittedInnerHtml[0] == "Cited") {
-        console.log("Found: "+aTag.innerHTML);
+      var hrefText = aTag.getAttribute("href");
+      const isCitedByHref = (hrefText.search("/scholar\\?cites") !== -1);
+      if(isCitedByHref) {
+        var splittedInnerHtml = aTag.innerHTML.split(" ");
         citedByCount = parseInt(splittedInnerHtml[2]);
-        citedByLink = aTag.getAttribute("href");
+        citedByLink = hrefText;
       } else {
         //not cited by aTag.
       }

@@ -167,7 +167,7 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback);
 		}
 		this.citedByCount = citedbyCount;
-		this.references = reconstructedCitedbyNodes;
+		this.citedByNodes = reconstructedCitedbyNodes;
 
 	}
 

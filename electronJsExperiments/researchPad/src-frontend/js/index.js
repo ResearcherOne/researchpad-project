@@ -339,6 +339,45 @@ function handleMouseUp(event) {
 	}
 }
 
+function nodeMouseOverCallback(nodeType, nodeObj) {
+	if(nodeType == "root") {
+		var nodeCenter = nodeObj.getPositionOnCamera();
+		var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
+		 
+		var rootNodeTitle = nodeObj.getTitle();
+		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), rootNodeTitle);
+
+		nodeObj.showLeafNodes();
+	} else if (nodeType == "ref") {
+		console.log("Type of reference node");
+	} else if (nodeType == "citedby") {
+		if(!nodeObj.isHiddenNode()) {
+			var nodeCenter = nodeObj.getPositionOnCamera();
+			var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
+			
+			var title = nodeObj.getTitle();
+			overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title);
+		}
+	} else {
+		console.log("Unknown type name YO: "+nodeType);
+	}
+}
+
+function nodeMouseOutCallback(nodeType, nodeObj) {
+	if(nodeType == "root") {
+		overlayerModule.clearTitleOverlay();
+		nodeObj.hideLeafNodes();
+	} else if (nodeType == "ref") {
+		console.log("Type of reference node");
+	} else if (nodeType == "citedby") {
+		if(!nodeObj.isHiddenNode()) {
+			overlayerModule.clearTitleOverlay();
+		}
+	} else {
+		console.log("Unknown type name: "+nodeType);
+	}
+}
+
 var knowledgeTree = null;
 var searchPanel = null;
 
@@ -351,6 +390,8 @@ function initializeScript() {
 	knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 	knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
+	knowledgeTree.setNodeMouseOverCallback(nodeMouseOverCallback);
+	knowledgeTree.setNodeMouseOutCallback(nodeMouseOutCallback);
 
 	searchPanel = new SearchPanel(searchPanelDivID);
 	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
@@ -378,18 +419,22 @@ function initializeScript() {
 		if (event.keyCode === LEFT) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(moveLength,0);
+			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "left"});
 		} else if (event.keyCode === RIGHT) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(-moveLength,0);
+			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "right"});
 		} else if (event.keyCode === UP) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,moveLength);
+			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "up"});
 		} else if (event.keyCode === DOWN) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,-moveLength);
+			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "down"});
 		}
 	});
@@ -423,7 +468,6 @@ function initializeScript() {
 			console.log("Is chromium initialized: "+res);
 		});
 	}, 5000);
-
 	//implement built-in exit button (disable default one as well) to also log exit event.
 }
 

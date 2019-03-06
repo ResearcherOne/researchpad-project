@@ -257,10 +257,12 @@ var visualizerModule = (function () {
 		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
 		connectVisualObjectsByID: connectVisualObjectsByID,		
+		updateCanvas: updateScene,
 
 		removeVisualObject: removeVisualObject,
 		destroy: destroy,
 		moveObject: moveObject,
 		setPositionOnCamera: setPositionOnCamera
+
 	}
 })();

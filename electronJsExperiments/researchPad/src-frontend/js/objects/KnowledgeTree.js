@@ -53,6 +53,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 
 	var nodeCreateRequestCallback = null;
 
+	var mouseOverCallback = null;
+	var mouseOutCallback = null;
+
 	var emptyRootNodeDragStart = function(emptyRootNode) {
 		emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
 	}
@@ -69,17 +72,12 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	var nodeDragStartCallback = function(nodeObj) {
 		if(dragStartCallback) {
 			if(nodeObj.constructor.name == "RootNode") {
-				console.log("Type of rootnode");
 				dragStartCallback("root", nodeObj);
 			} else if (nodeObj.constructor.name == "ReferenceNode") {
-				console.log("Type of reference node");
 				dragStartCallback("ref", nodeObj);
 			} else if (nodeObj.constructor.name == "CitedByNode") {
-				console.log("Type of citedby node");
 				dragStartCallback("citedby", nodeObj);
 			} else {
-				console.log("Unknown type.");
-				console.log(nodeObj.constructor.name);
 				dragStartCallback("unknown", nodeObj);
 			}
 		} else {
@@ -90,18 +88,47 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	var nodeDragEndCallback = function(nodeObj) {
 		if(dragEndCallback) {
 			if(nodeObj.constructor.name == "RootNode") {
-				console.log("Type of rootnode");
 				dragEndCallback("root", nodeObj);
 			} else if (nodeObj.constructor.name == "ReferenceNode") {
-				console.log("Type of reference node");
 				dragEndCallback("ref", nodeObj);
 			} else if (nodeObj.constructor.name == "CitedByNode") {
-				console.log("Type of citedby node");
 				dragEndCallback("citedby", nodeObj);
 			} else {
-				console.log("Unknown type.");
-				console.log(nodeObj.constructor.name);
 				dragEndCallback("unknown", nodeObj);
+			}
+		} else {
+			//callback not set.
+		}
+	}
+
+	var nodeMouseOverCallback = function(nodeObj) {
+		if(mouseOverCallback) {
+			if(nodeObj.constructor.name == "RootNode") {
+				mouseOverCallback("root", nodeObj);
+			} else if (nodeObj.constructor.name == "ReferenceNode") {
+				mouseOverCallback("ref", nodeObj);
+			} else if (nodeObj.constructor.name == "CitedByNode") {
+				mouseOverCallback("citedby", nodeObj);
+			} else {
+				console.log("HEYHEY");
+				mouseOverCallback("unknown", nodeObj);
+				console.log("YOYO");
+			}
+		} else {
+			//callback not set.
+		}
+
+	}
+	var nodeMouseOutCallback = function(nodeObj) {
+		if(mouseOutCallback) {
+			if(nodeObj.constructor.name == "RootNode") {
+				mouseOutCallback("root", nodeObj);
+			} else if (nodeObj.constructor.name == "ReferenceNode") {
+				mouseOutCallback("ref", nodeObj);
+			} else if (nodeObj.constructor.name == "CitedByNode") {
+				mouseOutCallback("citedby", nodeObj);
+			} else {
+				mouseOutCallback("unknown", nodeObj);
 			}
 		} else {
 			//callback not set.
@@ -124,11 +151,12 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 		var reconstructedRootNodes = {}
 		for (var serializedRootNodeID in serializedRootNodes){
 			var rootNodeData = JSON.parse(serializedRootNodes[serializedRootNodeID]);
-			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.metadata, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback);
+			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.metadata, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback);
 			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.citedByNodes, rootNodeData.referenceCount, rootNodeData.citedByCount);
 			
 			reconstructedRootNodes[serializedRootNodeID].siblingIDs = rootNodeData.siblingIDs;
 			reconstructedRootNodes[serializedRootNodeID].siblingCount = rootNodeData.siblingCount;
+
 		}
 		return reconstructedRootNodes;	
 	}
@@ -152,7 +180,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	}
 	this.createRootNode = function (metadata, radius, x, y) {
 		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback);
+		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
@@ -161,7 +189,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 		const y = this.getMouseAbsolutePosition().y;
 
 		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback);
+		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
@@ -199,8 +227,13 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	this.setNodeCreateRequestCallback = function(callback) {
 		nodeCreateRequestCallback = callback;
 	}
+	this.setNodeMouseOverCallback = function(callback) {
+		mouseOverCallback = callback;
+	}
+	this.setNodeMouseOutCallback = function(callback) {
+		mouseOutCallback = callback;
+	}
 	this.moveCamera = function(x, y) {
-		overlayerModule.clearTitleOverlay();
 		visualizerModule.moveCanvas(x, y);
 		this.emptyRootNode.setPositionOnCamera(emptyRootNodeConfig.x, emptyRootNodeConfig.y);
 	}
@@ -236,5 +269,17 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	}
 	this.destroy = function() {
 		visualizerModule.destroy();
+	}
+	this.showLeafNodes = function(){
+		for (var rootNodeID in this.rootNodes){
+			this.rootNodes[rootNodeID].showLeafNodes();
+		}
+		visualizerModule.updateCanvas();
+	}
+	this.hideLeafNodes = function(){
+		for (var rootNodeID in this.rootNodes){
+			this.rootNodes[rootNodeID].hideLeafNodes();
+		}
+		visualizerModule.updateCanvas();
 	}
 }

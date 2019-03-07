@@ -295,7 +295,7 @@ function isIdExistInParentElements(elem, idToSearch){
 var isSearchElementDraggingStarted = false;
 var draggedSearchElementTagNo = null;
 function handleMouseDown(event) {
-	document.getElementById("body").style.cursor = "move";
+	//document.getElementById("body").style.cursor = "move";
 	const isSearchElement = isIdExistInParentElements(event.target, searchDivID);
 		if(isSearchElement) {
 			isSearchElementDraggingStarted = true;
@@ -305,7 +305,7 @@ function handleMouseDown(event) {
 }
 
 function handleMouseUp(event) {
-	document.getElementById("body").style.cursor = "default";
+	//document.getElementById("body").style.cursor = "default";
 	if(isSearchElementDraggingStarted) {
 		isSearchElementDraggingStarted = false;
 		const isTargetPointsKnowledgeTree = isIdExistInParentElements(event.target, konvaDivID);
@@ -341,6 +341,7 @@ function handleMouseUp(event) {
 
 function nodeMouseOverCallback(nodeType, nodeObj) {
 	if(nodeType == "root") {
+		document.body.style.cursor = 'pointer';
 		var nodeCenter = nodeObj.getPositionOnCamera();
 		var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
 		 
@@ -352,6 +353,7 @@ function nodeMouseOverCallback(nodeType, nodeObj) {
 		console.log("Type of reference node");
 	} else if (nodeType == "citedby") {
 		if(!nodeObj.isHiddenNode()) {
+			document.body.style.cursor = 'pointer';
 			var nodeCenter = nodeObj.getPositionOnCamera();
 			var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
 			
@@ -359,22 +361,50 @@ function nodeMouseOverCallback(nodeType, nodeObj) {
 			overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title);
 		}
 	} else {
-		console.log("Unknown type name YO: "+nodeType);
+		console.log("Unknown type name: "+nodeType);
 	}
 }
 
 function nodeMouseOutCallback(nodeType, nodeObj) {
 	if(nodeType == "root") {
-		overlayerModule.clearTitleOverlay();
-		nodeObj.hideLeafNodes();
+		document.body.style.cursor = 'default';
+		if(knowledgeTree.isSelectedRootNode(nodeObj)){
+			overlayerModule.clearTitleOverlay();
+		} else {
+			nodeObj.hideLeafNodes();
+			overlayerModule.clearTitleOverlay();
+		}
 	} else if (nodeType == "ref") {
 		console.log("Type of reference node");
 	} else if (nodeType == "citedby") {
 		if(!nodeObj.isHiddenNode()) {
+			document.body.style.cursor = 'default';
 			overlayerModule.clearTitleOverlay();
 		}
 	} else {
 		console.log("Unknown type name: "+nodeType);
+	}
+}
+
+function nodeClickedCallback(nodeType, nodeObj) {
+	console.log("click")
+	if(nodeType == "root") {
+		if(knowledgeTree.isSelectedRootNode(nodeObj)) {
+			knowledgeTree.deselectRootNode(nodeObj);
+			nodeObj.hideLeafNodes();
+			console.log("deselected root node");
+		} else {
+			knowledgeTree.selectRootNode(nodeObj);
+			nodeObj.showLeafNodes();
+			console.log("selected root node");
+		}
+		console.log("Clicked: Type of Rootnode");
+	} else if (nodeType == "ref") {
+		console.log("Clicked:  Type of reference node");
+	} else if (nodeType == "citedby") {
+		console.log("Clicked: Type of citedby");
+	} else {
+		console.log("Clicked: Unknown type name: "+nodeType);
 	}
 }
 
@@ -392,6 +422,7 @@ function initializeScript() {
 	knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 	knowledgeTree.setNodeMouseOverCallback(nodeMouseOverCallback);
 	knowledgeTree.setNodeMouseOutCallback(nodeMouseOutCallback);
+	knowledgeTree.setNodeClickedCallback(nodeClickedCallback);
 
 	searchPanel = new SearchPanel(searchPanelDivID);
 	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
@@ -463,11 +494,13 @@ function initializeScript() {
 	document.addEventListener("mousedown", handleMouseDown);
 	document.addEventListener("mouseup", handleMouseUp);
 
+	/*
 	setInterval(function(){
 		getChromiumStatus(function(err, res){
 			console.log("Is chromium initialized: "+res);
 		});
 	}, 5000);
+	*/
 	//implement built-in exit button (disable default one as well) to also log exit event.
 }
 

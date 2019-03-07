@@ -28,7 +28,6 @@ function Node(ID, metadata, radius){ //Abstract Class
 	}
 
 	this.getPositionOnCamera = function() {
-		console.log("HEY HEY THIS IS WEIRD")
 		var cameraPos = visualizerModule.getCanvasPos();
 		var nodePos = visualizerModule.getNodeCenterById(this.ID);
 		var nodeOnCameraPos = {x: cameraPos.x+nodePos.x, y: cameraPos.y+nodePos.y};

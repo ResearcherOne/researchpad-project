@@ -1,4 +1,4 @@
-function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback) {
+function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
 	Node.call(this, ID, metadata, radius);
 
 	this.references = {};
@@ -26,7 +26,7 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 	}
 
 	const isDraggable = false;
-	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback, clickedCallback);
 
 	this.createReference = function(ID, metadata, radius) {
 		const referencePosition = this.referenceCount;
@@ -116,7 +116,11 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		for (var referenceNodeID in this.references){
 			this.references[referenceNodeID].show();
 		}
-	}
+    }
+    
+    this.changeStrokeColor = function(color) {
+        visualizerModule.setStrokeColor(this.visualObject, color);
+    }
 
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 

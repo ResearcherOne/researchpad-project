@@ -72,7 +72,7 @@ var visualizerModule = (function () {
 		nodeConnectionsConfig = newConnectionsConfig
 	};
 
-	var createRootNode = function(radius, x, y, rootId, isDraggable, mouseOverCallback, mouseOutCallback, rootNodeObject, dragstartCallback, dragendCallback) {
+	var createRootNode = function(radius, x, y, rootId, isDraggable, mouseOverCallback, mouseOutCallback, rootNodeObject, dragstartCallback, dragendCallback, clickedCallback) {
 		var circle = new Konva.Circle({
 			x: x,
 			y: y,
@@ -95,6 +95,9 @@ var visualizerModule = (function () {
 		});
 		circle.on('dragend', function () {
 			dragendCallback(rootNodeObject);
+		});
+		circle.on('click', function(evt) {
+			clickedCallback(rootNodeObject);
 		});
 
 		layer.add(circle);
@@ -213,6 +216,11 @@ var visualizerModule = (function () {
 		visualObject.opacity(opacity);
 		updateScene();
 	}
+
+	var setStrokeColor = function(visualObject, color) {
+		visualObject.stroke(color);
+	}
+
 	var moveCanvas = function(x, y) {
 		stage.move({
 			x: x,
@@ -254,6 +262,7 @@ var visualizerModule = (function () {
 		getCanvasPos: getCanvasPos,
 		moveCanvas: moveCanvas,
 		setOpacity: setOpacity,
+		setStrokeColor: setStrokeColor,
 		setPosition: setPosition,
 		changeFillColorOfVisualObject: changeFillColorOfVisualObject,
 		connectVisualObjectsByID: connectVisualObjectsByID,		

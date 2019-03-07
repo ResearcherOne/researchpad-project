@@ -56,6 +56,10 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	var mouseOverCallback = null;
 	var mouseOutCallback = null;
 
+	var clickedCallback = null;
+
+	var selectedNodes = {};
+
 	var emptyRootNodeDragStart = function(emptyRootNode) {
 		emptyRootNode.setOpacity(emptyRootNodeConfig.opacity);
 	}
@@ -135,6 +139,22 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 		}
 	}
 
+	var nodeClickedCallback = function(nodeObj) {
+		if(clickedCallback) {
+			if(nodeObj.constructor.name == "RootNode") {
+				clickedCallback("root", nodeObj);
+			} else if (nodeObj.constructor.name == "ReferenceNode") {
+				clickedCallback("ref", nodeObj);
+			} else if (nodeObj.constructor.name == "CitedByNode") {
+				clickedCallback("citedby", nodeObj);
+			} else {
+				clickedCallback("unknown", nodeObj);
+			}
+		} else {
+			//callback not set.
+		}
+	}
+
 	var getRandomInt = function(max) {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
@@ -151,7 +171,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 		var reconstructedRootNodes = {}
 		for (var serializedRootNodeID in serializedRootNodes){
 			var rootNodeData = JSON.parse(serializedRootNodes[serializedRootNodeID]);
-			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.metadata, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback);
+			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.metadata, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.citedByNodes, rootNodeData.referenceCount, rootNodeData.citedByCount);
 			
 			reconstructedRootNodes[serializedRootNodeID].siblingIDs = rootNodeData.siblingIDs;
@@ -180,7 +200,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	}
 	this.createRootNode = function (metadata, radius, x, y) {
 		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback);
+		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
@@ -189,7 +209,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 		const y = this.getMouseAbsolutePosition().y;
 
 		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback);
+		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
@@ -232,6 +252,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	}
 	this.setNodeMouseOutCallback = function(callback) {
 		mouseOutCallback = callback;
+	}
+	this.setNodeClickedCallback = function(callback) {
+		clickedCallback = callback;
 	}
 	this.moveCamera = function(x, y) {
 		visualizerModule.moveCanvas(x, y);
@@ -281,5 +304,27 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 			this.rootNodes[rootNodeID].hideLeafNodes();
 		}
 		visualizerModule.updateCanvas();
+	}
+	this.selectRootNode = function(nodeObj) {
+		const ID = nodeObj.getID();
+		if(!selectedNodes[ID]) {
+			selectedNodes[ID] = nodeObj;
+			nodeObj.changeStrokeColor("dimgray");
+		}
+	}
+	this.deselectRootNode = function(nodeObj) {
+		const ID = nodeObj.getID();
+		if(selectedNodes[ID]) {
+			delete selectedNodes[ID];
+			nodeObj.changeStrokeColor("black");
+		}
+	}
+	this.isSelectedRootNode = function(nodeObj) {
+		const ID = nodeObj.getID();
+		if(selectedNodes[ID]) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

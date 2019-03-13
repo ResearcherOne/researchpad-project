@@ -18,17 +18,25 @@ let scrapGoogleScholarPageCodeToRunOnChromium = () => {
   }
 
   var extractAuthorsFromGoogleScholarAuthorAndYearDiv = function(text) {
-    return text.split(" ")[0];
+    const authors = text.split("-")[0];
+    if(authors) {
+      var rawAuthorList = authors.split(",");
+      var authorList = [];
+      rawAuthorList.forEach(function(element){
+        const filteredElement = element.replace(/[^\w\s]/gi, '').trim();
+        if(filteredElement.length > 0) authorList.push(filteredElement);
+      });
+      return authorList;
+    }
+    return text.split("-")[0];
   }
 
   var extractJournalFromGoogleScholarAuthorAndYearDiv = function(text) {
-    var splittedTextList = text.split(" - ");
-    const listLength = splittedTextList.length;
-    const yearTextIndex = listLength-2;
-    const yearTextLength = splittedTextList[yearTextIndex].length;
-
-    const journal = splittedTextList[yearTextIndex].substr(0, yearTextLength - 4);
-    return journal;
+    var splittedTextList = text.split("-");
+    if(splittedTextList[1])
+      return splittedTextList[1];
+    else
+      return splittedTextList[0];
   }
 
   let data = [];

@@ -58,7 +58,7 @@ var overlayerModule = (function () {
 
 	    document.getElementById(abstractDivId).style.left = (x-offsetWidth-20)+"px"; //x
 	    document.getElementById(abstractDivId).style.top = (y - (offsetHeight/2))+"px"; //y
-	    document.getElementById(abstractTextId).innerHTML = "<b>Abstract</b> <br>"+abstract+"<br><b>Journal & Authors</b><br>"+journal+"<br>"+authors;
+	    document.getElementById(abstractTextId).innerHTML = "<b>Abstract</b><br>"+abstract+"<br><br><b>Journal</b><br>"+journal+"<br><br><b>Authors</b><br>"+authors;
 	}
 
 	var promptUser = function(text, callback) {

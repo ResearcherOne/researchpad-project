@@ -248,7 +248,17 @@ function searchResultMouseEnterCallback(e) {
 	const journal = lastGoogleSearchData[targetTagNo].journal;
 	const x = rect.left;
 	const y = rect.top + (target.offsetHeight/2);
-	overlayerModule.drawAbstractOverlay(x, y, abstractText, journal, authors);
+
+	var authorText = "";
+	authors.forEach(function(author, i){
+		if(i != (authors.length-1))
+			authorText += author + ", ";
+		else
+			authorText += author;
+	});
+	
+	overlayerModule.drawAbstractOverlay(x, y, abstractText, journal, authorText);
+	
 }
 
 function searchResultMouseLeaveCallback(e) {

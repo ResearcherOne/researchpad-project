@@ -50,7 +50,7 @@ var overlayerModule = (function () {
 	    document.getElementById(titleId).innerHTML = text;
 	}
 
-	var drawAbstractOverlay = function(x, y, text) {
+	var drawAbstractOverlay = function(x, y, abstract, journal, authors) {
 		document.getElementById(abstractDivId).style.display = "block";
 
 		var offsetWidth = document.getElementById(abstractDivId).offsetWidth;
@@ -58,7 +58,7 @@ var overlayerModule = (function () {
 
 	    document.getElementById(abstractDivId).style.left = (x-offsetWidth-20)+"px"; //x
 	    document.getElementById(abstractDivId).style.top = (y - (offsetHeight/2))+"px"; //y
-	    document.getElementById(abstractTextId).innerHTML = "<b>Abstract</b> <br>"+text;
+	    document.getElementById(abstractTextId).innerHTML = "<b>Abstract</b> <br>"+abstract+"<br><b>Journal & Authors</b><br>"+journal+"<br>"+authors;
 	}
 
 	var promptUser = function(text, callback) {

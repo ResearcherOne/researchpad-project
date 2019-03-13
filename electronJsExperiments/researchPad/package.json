@@ -42,7 +42,7 @@
   "dependencies": {
     "crossref": "^1.2.1",
     "electron-squirrel-startup": "^1.0.0",
-    "puppeteer": "^1.12.2"
+    "puppeteer": "^1.13.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.30",

@@ -244,16 +244,15 @@ function searchResultMouseEnterCallback(e) {
 
 	const targetTagNo = parseInt(target.getAttribute("tagNo"));
 	const abstractText = lastGoogleSearchData[targetTagNo].abstract;
-	console.log("Abstract: "+abstractText);
+	const authors = lastGoogleSearchData[targetTagNo].authors;
+	const journal = lastGoogleSearchData[targetTagNo].journal;
 	const x = rect.left;
 	const y = rect.top + (target.offsetHeight/2);
-	overlayerModule.drawAbstractOverlay(x, y, abstractText);
-	console.log("mouse enter");
+	overlayerModule.drawAbstractOverlay(x, y, abstractText, journal, authors);
 }
 
 function searchResultMouseLeaveCallback(e) {
 	overlayerModule.clearAbstractOverlay();
-	console.log("mouse leave");
 }
 
 var lastGoogleSearchData;
@@ -264,7 +263,6 @@ function searchRequestReceivedCallback(userInput) {
 			lastGoogleSearchData = result;
 			var i = 0;
 			result.forEach(function(element){
-				console.log(JSON.stringify(element));
 				searchPanel.addResultElement(i, element.title, element.citedByCount, element.year, element.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback); //Input element ID as well.
 				i++;
 			});

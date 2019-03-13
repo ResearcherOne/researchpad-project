@@ -3,6 +3,7 @@ var os = require("os");
 var ipcRestModule = require(__dirname+'/ipcRestModule');
 var crossrefModule = require(__dirname+'/crossrefModule');
 var googleScholarModule = require(__dirname+'/googleScholarScrapperModule');
+var dataCleanerModule = require(__dirname+'/dataCleanerModule');
 
 const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
@@ -59,6 +60,7 @@ function initializeBackend() {
 		if(isChromiumReady) {
 			googleScholarModule.searchGoogleScholar(searchText, function(err, result){
 				if(!err) {
+					dataCleanerModule.cleanGoogleResultList(result);
 					response.send({"resultList": result});
 				} else {
 					response.error("OOps, unable to fetch data from google scholar.");

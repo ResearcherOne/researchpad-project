@@ -28,6 +28,8 @@ const nodeConnectionsConfig = {
 	maxConnectionPerLayer: 10
 };
 
+const LEAF_NODE_HIDE_DURATION_SEC = 3;
+
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
 }
@@ -352,11 +354,16 @@ function nodeMouseOverCallback(nodeType, nodeObj) {
 		document.body.style.cursor = 'pointer';
 		var nodeCenter = nodeObj.getPositionOnCamera();
 		var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
-		 
-		var rootNodeTitle = nodeObj.getTitle();
-		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), rootNodeTitle);
 
-		nodeObj.showLeafNodes();
+		const title = nodeObj.getTitle() || "No title";
+		const authors = nodeObj.getAuthors() || "No author";
+		const year = nodeObj.getYear() || "No year";
+		const journal = nodeObj.getJournal() || "No journal";
+		const citationCount = nodeObj.getCitationCount() || "No citation.";
+
+		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title, authors, year, journal, citationCount);
+
+		knowledgeTree.showLeafNodes(nodeObj.getID());
 	} else if (nodeType == "ref") {
 		console.log("Type of reference node");
 	} else if (nodeType == "citedby") {
@@ -365,8 +372,16 @@ function nodeMouseOverCallback(nodeType, nodeObj) {
 			var nodeCenter = nodeObj.getPositionOnCamera();
 			var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
 			
-			var title = nodeObj.getTitle();
-			overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title);
+			const title = nodeObj.getTitle() || "No title";
+			const authors = nodeObj.getAuthors() || "No author";
+			const year = nodeObj.getYear() || "No year";
+			const journal = nodeObj.getJournal() || "No journal";
+			const citationCount = nodeObj.getCitationCount() || "No citation.";
+		
+			overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title, authors, year, journal, citationCount);
+			
+			const rootNodeID = nodeObj.getRootNodeID();
+			knowledgeTree.showLeafNodes(rootNodeID);
 		}
 	} else {
 		console.log("Unknown type name: "+nodeType);
@@ -379,7 +394,7 @@ function nodeMouseOutCallback(nodeType, nodeObj) {
 		if(knowledgeTree.isSelectedRootNode(nodeObj)){
 			overlayerModule.clearTitleOverlay();
 		} else {
-			nodeObj.hideLeafNodes();
+			knowledgeTree.hideLeafNodes(nodeObj.getID(), LEAF_NODE_HIDE_DURATION_SEC);
 			overlayerModule.clearTitleOverlay();
 		}
 	} else if (nodeType == "ref") {
@@ -388,6 +403,9 @@ function nodeMouseOutCallback(nodeType, nodeObj) {
 		if(!nodeObj.isHiddenNode()) {
 			document.body.style.cursor = 'default';
 			overlayerModule.clearTitleOverlay();
+
+			const rootNodeId = nodeObj.getRootNodeID();
+			knowledgeTree.hideLeafNodes(rootNodeId, LEAF_NODE_HIDE_DURATION_SEC);
 		}
 	} else {
 		console.log("Unknown type name: "+nodeType);

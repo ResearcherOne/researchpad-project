@@ -39,15 +39,16 @@ var overlayerModule = (function () {
 		divHeightVh = document.getElementById(divId).style.height;
 	}
 
-	var drawTitleOverlay = function(x, y, text) {
+	var drawTitleOverlay = function(x, y, title, authors, year, journal, citationCount) {
 		document.getElementById(divId).style.display = "block";
 
 		var offsetHeight = document.getElementById(divId).offsetHeight;
 		var offsetWidth = document.getElementById(divId).offsetWidth;
 
-	    document.getElementById(divId).style.left = x+"px"; //x
+	    document.getElementById(divId).style.left = x+"px"; //x.
 	    document.getElementById(divId).style.top = (y-offsetHeight)+"px"; //y
-	    document.getElementById(titleId).innerHTML = text;
+	    //document.getElementById(titleId).innerHTML = title+"<br><br>"+"Authors: "+authors+"<br>"+"Year: "+year+"<br>"+"Journal: "+journal+"<br>"+"Citation: "+citationCount;
+		document.getElementById(titleId).innerHTML = title+"<br><br>"+"Citation: "+citationCount+" Year: "+year;
 	}
 
 	var drawAbstractOverlay = function(x, y, abstract, journal, authors) {

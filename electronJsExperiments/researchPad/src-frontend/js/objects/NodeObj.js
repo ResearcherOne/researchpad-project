@@ -19,6 +19,22 @@ function Node(ID, metadata, radius){ //Abstract Class
 		return this.metadata.title;
 	}
 
+	this.getAuthors = function() {
+		return this.metadata.authors;
+	}
+
+	this.getYear = function() {
+		return this.metadata.year;
+	}
+
+	this.getJournal = function() {
+		return this.metadata.journal;
+	}
+
+	this.getCitationCount = function() {
+		return this.metadata.citedByCount;
+	}
+
 	this.getCitedByLink = function() {
 		return this.metadata.citedByLink;
 	}

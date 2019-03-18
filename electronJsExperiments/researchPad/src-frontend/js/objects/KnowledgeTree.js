@@ -293,16 +293,12 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig) {
 	this.destroy = function() {
 		visualizerModule.destroy();
 	}
-	this.showLeafNodes = function(){
-		for (var rootNodeID in this.rootNodes){
-			this.rootNodes[rootNodeID].showLeafNodes();
-		}
+	this.showLeafNodes = function(rootNodeID){
+		this.rootNodes[rootNodeID].showLeafNodes();
 		visualizerModule.updateCanvas();
 	}
-	this.hideLeafNodes = function(){
-		for (var rootNodeID in this.rootNodes){
-			this.rootNodes[rootNodeID].hideLeafNodes();
-		}
+	this.hideLeafNodes = function(rootNodeID, hideDurationSec){
+		this.rootNodes[rootNodeID].hideLeafNodes(hideDurationSec);
 		visualizerModule.updateCanvas();
 	}
 	this.selectRootNode = function(nodeObj) {

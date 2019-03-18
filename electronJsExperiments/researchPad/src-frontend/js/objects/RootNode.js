@@ -10,6 +10,8 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 	this.siblingIDs = {};
 	this.siblingCount = 0;
 
+	this.hideLeafNodesTimer = null;
+
 	var mouseOver = function(rootNodeObject) {
 		if(mouseOverCallback) mouseOverCallback(rootNodeObject);
 	}
@@ -100,27 +102,50 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		this.citedByNodes = reconstructedCitedbyNodes;
 	}
 
-	this.hideLeafNodes = function() {
+	this.hideLeafNodes = function(durationSec) {
+		console.log("hide triggerred.");
+		/*
 		for (var citationNodeID in this.citedByNodes){
 			this.citedByNodes[citationNodeID].hide();
 		}
 		for (var referenceNodeID in this.references){
 			this.references[referenceNodeID].hide();
 		}
+		*/
+		if(!this.hideLeafNodesTimer) {
+			this.hideLeafNodesTimer = setTimeout(function(rootNodeObj){
+				for (var citationNodeID in rootNodeObj.citedByNodes){
+					rootNodeObj.citedByNodes[citationNodeID].hide();
+				}
+				for (var referenceNodeID in rootNodeObj.references){
+					rootNodeObj.references[referenceNodeID].hide();
+				}
+
+				rootNodeObj.hideLeafNodesTimer = null;
+			}, durationSec * 1000, this);
+		} else {
+			clearTimeout(this.hideLeafNodesTimer);
+			this.hideLeafNodesTimer = setTimeout(function(rootNodeObj){
+				rootNodeObj.hideLeafNodes();
+				rootNodeObj.hideLeafNodesTimer = null;
+			}, durationSec * 1000, this);
+		}
 	}
 
 	this.showLeafNodes = function() {
+		clearTimeout(this.hideLeafNodesTimer);
+		this.hideLeafNodesTimer = null;
 		for (var citationNodeID in this.citedByNodes){
 			this.citedByNodes[citationNodeID].show();
 		}
 		for (var referenceNodeID in this.references){
 			this.references[referenceNodeID].show();
 		}
-    }
+	}
     
     this.changeStrokeColor = function(color) {
         visualizerModule.setStrokeColor(this.visualObject, color);
-    }
+	}
 
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 

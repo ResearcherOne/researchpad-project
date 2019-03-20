@@ -19,6 +19,9 @@ const upperPanelDivID = "overlay-controlset-upper-panel";
 const searchPanelDivID = "overlay-search-panel";
 const searchDivID = "search-results-div";
 
+const baseDivId = "knowledge-tree-div";
+const nodeDetailsClassName = "node-details-div";
+
 const nodeConnectionsConfig = {
 	citedByAbsoluteStartDegree: 280,
 	citedByAbsoluteEndDegree: 90,
@@ -436,6 +439,7 @@ function nodeClickedCallback(nodeType, nodeObj) {
 
 var knowledgeTree = null;
 var searchPanel = null;
+var nodeDetailsStaticOverlayer = null;
 
 function initializeScript() {
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
@@ -452,6 +456,10 @@ function initializeScript() {
 
 	searchPanel = new SearchPanel(searchPanelDivID);
 	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
+
+	nodeDetailsStaticOverlayer = new NodeDetailsStaticOverlayer(baseDivId, nodeDetailsClassName);
+	nodeDetailsStaticOverlayer.setDetails("World's most awesome paper.", "2019", "999999");
+	nodeDetailsStaticOverlayer.show(100, 100);
 
 	getHostname(function(err, hostname){
 		loggerModule.initialize(hostname);
@@ -476,21 +484,25 @@ function initializeScript() {
 		if (event.keyCode === LEFT) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(moveLength,0);
+			nodeDetailsStaticOverlayer.updatePosition(moveLength, 0);
 			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "left"});
 		} else if (event.keyCode === RIGHT) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(-moveLength,0);
+			nodeDetailsStaticOverlayer.updatePosition(-moveLength, 0);
 			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "right"});
 		} else if (event.keyCode === UP) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,moveLength);
+			nodeDetailsStaticOverlayer.updatePosition(0, moveLength);
 			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "up"});
 		} else if (event.keyCode === DOWN) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,-moveLength);
+			nodeDetailsStaticOverlayer.updatePosition(0, -moveLength);
 			overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "down"});
 		}

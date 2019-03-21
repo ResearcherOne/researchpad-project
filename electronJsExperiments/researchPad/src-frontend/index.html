@@ -235,11 +235,11 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 				animation: spin 2s linear infinite;
 			}
 
-			.node-details-div {
+			.node-essential-div {
 				position: fixed;
 				display: none;
-				width: 30vw;
-				height: 40vh;
+				width: 35vw;
+				height: 25vh;
 				top: 50px;
 				left: 50px;
 				right: 0;
@@ -247,6 +247,37 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 				background-color: rgba(0,0,0,0.75);
 				z-index: 3;
 				border-radius: 5px;
+
+				justify-content: center;
+				align-items: center; 
+			}
+
+			.node-essential-div div {
+				text-align: center;
+				align-self: center;
+			}
+
+			.node-essential-div div p {
+				font-size: 18px;
+				color: white;
+				text-align: center;
+			}
+
+			.node-extra-upper-div {
+				position: fixed;
+				display: none;
+				width: 35vw;
+				height: 10vh;
+				top: 50px;
+				left: 50px;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0,0,0,0.75);
+				z-index: 3;
+				border-radius: 5px;
+
+				justify-content: center;
+				align-items: center; 
 			}
 
 			@keyframes spin {

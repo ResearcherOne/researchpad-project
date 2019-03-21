@@ -20,7 +20,8 @@ const searchPanelDivID = "overlay-search-panel";
 const searchDivID = "search-results-div";
 
 const baseDivId = "knowledge-tree-div";
-const nodeDetailsClassName = "node-details-div";
+const nodeEssentialClassName = "node-essential-div";
+const nodeExtraUpperClassName = "node-extra-upper-div";
 
 const nodeConnectionsConfig = {
 	citedByAbsoluteStartDegree: 280,
@@ -353,65 +354,79 @@ function handleMouseUp(event) {
 }
 
 function nodeMouseOverCallback(nodeType, nodeObj) {
-	if(nodeType == "root") {
-		document.body.style.cursor = 'pointer';
-		var nodeCenter = nodeObj.getPositionOnCamera();
-		var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
-
-		const title = nodeObj.getTitle() || "No title";
-		const authors = nodeObj.getAuthors() || "No author";
-		const year = nodeObj.getYear() || "No year";
-		const journal = nodeObj.getJournal() || "No journal";
-		const citationCount = nodeObj.getCitationCount() || "No citation.";
-
-		overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title, authors, year, journal, citationCount);
-
-		knowledgeTree.showLeafNodes(nodeObj.getID());
-	} else if (nodeType == "ref") {
-		console.log("Type of reference node");
-	} else if (nodeType == "citedby") {
-		if(!nodeObj.isHiddenNode()) {
+	if(nodeDetailsStaticOverlayer.isExtraContentBeingDisplayed()) {
+		console.log("EXTRA CONTENT BEING DISPLAYED. YOU CAN NOT TAKE A LOOK AT ANOTHER NODE.");
+	} else {
+		if(nodeType == "root") {
 			document.body.style.cursor = 'pointer';
 			var nodeCenter = nodeObj.getPositionOnCamera();
 			var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
-			
+	
 			const title = nodeObj.getTitle() || "No title";
 			const authors = nodeObj.getAuthors() || "No author";
 			const year = nodeObj.getYear() || "No year";
 			const journal = nodeObj.getJournal() || "No journal";
 			const citationCount = nodeObj.getCitationCount() || "No citation.";
-		
-			overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title, authors, year, journal, citationCount);
+	
+			//overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title, authors, year, journal, citationCount);
+			nodeDetailsStaticOverlayer.setContent(title, year, citationCount);
+			nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius));
+	
+			knowledgeTree.showLeafNodes(nodeObj.getID());
+		} else if (nodeType == "ref") {
+			console.log("Type of reference node");
+		} else if (nodeType == "citedby") {
+			if(!nodeObj.isHiddenNode()) {
+				document.body.style.cursor = 'pointer';
+				var nodeCenter = nodeObj.getPositionOnCamera();
+				var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
+				
+				const title = nodeObj.getTitle() || "No title";
+				const authors = nodeObj.getAuthors() || "No author";
+				const year = nodeObj.getYear() || "No year";
+				const journal = nodeObj.getJournal() || "No journal";
+				const citationCount = nodeObj.getCitationCount() || "No citation.";
 			
-			const rootNodeID = nodeObj.getRootNodeID();
-			knowledgeTree.showLeafNodes(rootNodeID);
+				//overlayerModule.drawTitleOverlay((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius), title, authors, year, journal, citationCount);
+				nodeDetailsStaticOverlayer.setContent(title, year, citationCount);
+				nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius));
+	
+				const rootNodeID = nodeObj.getRootNodeID();
+				knowledgeTree.showLeafNodes(rootNodeID);
+			}
+		} else {
+			console.log("Unknown type name: "+nodeType);
 		}
-	} else {
-		console.log("Unknown type name: "+nodeType);
 	}
 }
 
 function nodeMouseOutCallback(nodeType, nodeObj) {
-	if(nodeType == "root") {
-		document.body.style.cursor = 'default';
-		if(knowledgeTree.isSelectedRootNode(nodeObj)){
-			overlayerModule.clearTitleOverlay();
-		} else {
-			knowledgeTree.hideLeafNodes(nodeObj.getID(), LEAF_NODE_HIDE_DURATION_SEC);
-			overlayerModule.clearTitleOverlay();
-		}
-	} else if (nodeType == "ref") {
-		console.log("Type of reference node");
-	} else if (nodeType == "citedby") {
-		if(!nodeObj.isHiddenNode()) {
-			document.body.style.cursor = 'default';
-			overlayerModule.clearTitleOverlay();
-
-			const rootNodeId = nodeObj.getRootNodeID();
-			knowledgeTree.hideLeafNodes(rootNodeId, LEAF_NODE_HIDE_DURATION_SEC);
-		}
+	if(nodeDetailsStaticOverlayer.isExtraContentBeingDisplayed()) {
+		console.log("EXTRA CONTENT BEING DISPLAYED. YOU CAN NOT TAKE A LOOK AT ANOTHER NODE.");
 	} else {
-		console.log("Unknown type name: "+nodeType);
+		if(nodeType == "root") {
+			document.body.style.cursor = 'default';
+			if(knowledgeTree.isSelectedRootNode(nodeObj)){
+				//overlayerModule.clearTitleOverlay();
+			} else {
+				knowledgeTree.hideLeafNodes(nodeObj.getID(), LEAF_NODE_HIDE_DURATION_SEC);
+				//overlayerModule.clearTitleOverlay();
+				nodeDetailsStaticOverlayer.hideEssential();
+			}
+		} else if (nodeType == "ref") {
+			console.log("Type of reference node");
+		} else if (nodeType == "citedby") {
+			if(!nodeObj.isHiddenNode()) {
+				document.body.style.cursor = 'default';
+				//overlayerModule.clearTitleOverlay();
+				nodeDetailsStaticOverlayer.hideEssential();
+	
+				const rootNodeId = nodeObj.getRootNodeID();
+				knowledgeTree.hideLeafNodes(rootNodeId, LEAF_NODE_HIDE_DURATION_SEC);
+			}
+		} else {
+			console.log("Unknown type name: "+nodeType);
+		}
 	}
 }
 
@@ -421,10 +436,12 @@ function nodeClickedCallback(nodeType, nodeObj) {
 		if(knowledgeTree.isSelectedRootNode(nodeObj)) {
 			knowledgeTree.deselectRootNode(nodeObj);
 			nodeObj.hideLeafNodes();
+			nodeDetailsStaticOverlayer.hideExtraContent();
 			console.log("deselected root node");
 		} else {
 			knowledgeTree.selectRootNode(nodeObj);
 			nodeObj.showLeafNodes();
+			nodeDetailsStaticOverlayer.showExtraContent();
 			console.log("selected root node");
 		}
 		console.log("Clicked: Type of Rootnode");
@@ -457,9 +474,7 @@ function initializeScript() {
 	searchPanel = new SearchPanel(searchPanelDivID);
 	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
 
-	nodeDetailsStaticOverlayer = new NodeDetailsStaticOverlayer(baseDivId, nodeDetailsClassName);
-	nodeDetailsStaticOverlayer.setDetails("World's most awesome paper.", "2019", "999999");
-	nodeDetailsStaticOverlayer.show(100, 100);
+	nodeDetailsStaticOverlayer = new NodeDetailsStaticOverlayer(baseDivId, nodeEssentialClassName, nodeExtraUpperClassName);
 
 	getHostname(function(err, hostname){
 		loggerModule.initialize(hostname);
@@ -485,25 +500,25 @@ function initializeScript() {
 			event.preventDefault();
 			knowledgeTree.moveCamera(moveLength,0);
 			nodeDetailsStaticOverlayer.updatePosition(moveLength, 0);
-			overlayerModule.clearTitleOverlay();
+			//overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "left"});
 		} else if (event.keyCode === RIGHT) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(-moveLength,0);
 			nodeDetailsStaticOverlayer.updatePosition(-moveLength, 0);
-			overlayerModule.clearTitleOverlay();
+			//overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "right"});
 		} else if (event.keyCode === UP) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,moveLength);
 			nodeDetailsStaticOverlayer.updatePosition(0, moveLength);
-			overlayerModule.clearTitleOverlay();
+			//overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "up"});
 		} else if (event.keyCode === DOWN) {
 			event.preventDefault();
 			knowledgeTree.moveCamera(0,-moveLength);
 			nodeDetailsStaticOverlayer.updatePosition(0, -moveLength);
-			overlayerModule.clearTitleOverlay();
+			//overlayerModule.clearTitleOverlay();
 			loggerModule.log("action", "keypressed", {"direction": "down"});
 		}
 	});

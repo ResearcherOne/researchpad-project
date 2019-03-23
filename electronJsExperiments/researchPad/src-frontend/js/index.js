@@ -22,6 +22,7 @@ const searchDivID = "search-results-div";
 const baseDivId = "knowledge-tree-div";
 const nodeEssentialClassName = "node-essential-div";
 const nodeExtraUpperClassName = "node-extra-upper-div";
+const nodeExtraLowerClassName = "node-extra-lower-div";
 
 const nodeConnectionsConfig = {
 	citedByAbsoluteStartDegree: 280,
@@ -358,13 +359,15 @@ function showEssentialContentForNode(nodeObj) {
 	var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
 
 	const title = nodeObj.getTitle() || "No title";
-	const authors = nodeObj.getAuthors() || "No author";
 	const year = nodeObj.getYear() || "No year";
-	const journal = nodeObj.getJournal() || "No journal";
 	const citationCount = nodeObj.getCitationCount() || "No citation.";
+	const abstract = nodeObj.getAbstract() || "No abstract";
+	const journal = nodeObj.getJournal() || "No journal";
+	const authors = nodeObj.getAuthors() || "No author";
+	const link = nodeObj.getLink() || "";
 
-	nodeDetailsStaticOverlayer.setContent(title, year, citationCount);
-	nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+nodeRadius), (nodeCenter.y-nodeRadius));
+	nodeDetailsStaticOverlayer.setContent(title, year, citationCount, abstract, journal, authors, link);
+	nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+(nodeRadius*1.5)), (nodeCenter.y-nodeRadius));
 }
 
 function nodeMouseOverCallback(nodeType, nodeObj) {
@@ -461,6 +464,10 @@ function mapClickedCallback(objName) {
 	}
 }
 
+function viewWebButtonClicked(link) {
+	window.open(link);
+}
+
 var knowledgeTree = null;
 var searchPanel = null;
 var nodeDetailsStaticOverlayer = null;
@@ -481,7 +488,8 @@ function initializeScript() {
 	searchPanel = new SearchPanel(searchPanelDivID);
 	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
 
-	nodeDetailsStaticOverlayer = new NodeDetailsStaticOverlayer(baseDivId, nodeEssentialClassName, nodeExtraUpperClassName);
+	nodeDetailsStaticOverlayer = new NodeDetailsStaticOverlayer(baseDivId, nodeEssentialClassName, nodeExtraUpperClassName, nodeExtraLowerClassName);
+	nodeDetailsStaticOverlayer.setViewButtonPressedCallback(viewWebButtonClicked);
 
 	getHostname(function(err, hostname){
 		loggerModule.initialize(hostname);

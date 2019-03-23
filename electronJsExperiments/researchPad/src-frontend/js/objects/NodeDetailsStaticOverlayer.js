@@ -1,9 +1,12 @@
-function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpperDivClassName){
+function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpperDivClassName, nodeExtraLowerClassName){
     const nodeDivDarkenerClassName = "node-div-darkener";
+    const nodeDivAvailableBackgroundColor = "rgba(255,255,255,0.05)";
+    const nodeDivNotAvailableBackgroundColor = "rgba(0,0,0,0)";
 
     this.baseDivId = baseDivId; //knowledge-tree-div
     this.nodeDetailsDivClassName = nodeDetailsDivClassName;
     this.extraUpperDivClassName = extraUpperDivClassName;
+    this.extraLowerDivClassName = nodeExtraLowerClassName;
 
     this.essentialDiv =  document.createElement("div");
     this.essentialDiv.setAttribute('class', this.nodeDetailsDivClassName);
@@ -12,29 +15,56 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
     this.essentialDiv.appendChild(this.essentialContentDiv);
 
     this.extraUpperDiv =  document.createElement("div");
-    console.log("CLASSNAME: "+this.extraUpperDivClassName);
     this.extraUpperDiv.setAttribute('class', this.extraUpperDivClassName);
     this.extraUpperDiv.classList.add(nodeDivDarkenerClassName);
 
+    this.extraUpperDivViewDiv =  document.createElement("div");
+    this.extraUpperDivViewDivP =  document.createElement("p");
+    this.extraUpperDivViewDivP.innerHTML = "View";
+    this.extraUpperDivViewDiv.appendChild(this.extraUpperDivViewDivP);
+    this.extraUpperDiv.appendChild(this.extraUpperDivViewDiv);
+
+    this.extraUpperDivPdfDiv =  document.createElement("div");
+    this.extraUpperDivPdfDivP =  document.createElement("p");
+    this.extraUpperDivPdfDivP.innerHTML = "PDF";
+    this.extraUpperDivPdfDiv.appendChild(this.extraUpperDivPdfDivP);
+    this.extraUpperDiv.appendChild(this.extraUpperDivPdfDiv);
+
+    this.extraLowerDiv =  document.createElement("div");
+    this.extraLowerDiv.setAttribute('class', this.extraLowerDivClassName);
+    this.extraLowerDiv.classList.add(nodeDivDarkenerClassName);
+
     document.getElementById(this.baseDivId).appendChild(this.essentialDiv);
     document.getElementById(this.baseDivId).appendChild(this.extraUpperDiv);
+    document.getElementById(this.baseDivId).appendChild(this.extraLowerDiv);
 
     var lastX = 0;
     var lastY = 0;
     
     var lastUpperDivX = 0;
     var lastUpperDivY = 0;
+
+    var lastLowerDivX = 0;
+    var lastLowerDivY = 0;
     
     var nodeDetails = {
-        title: "No title",
-        year: "1999",
-        citationCount: "500"
     }
 
-    this.setContent = function(title, year, citationCount) {
+    var viewDivClickedCallback = null;
+
+    this.extraUpperDivViewDiv.addEventListener("click", function(){
+        if(viewDivClickedCallback && nodeDetails.link) viewDivClickedCallback(nodeDetails.link);
+    });
+
+    this.setContent = function(title, year, citationCount, abstract, journal, authors, link) {
         nodeDetails.title = title;
         nodeDetails.year = year;
         nodeDetails.citationCount = citationCount;
+        nodeDetails.abstract = abstract;
+        nodeDetails.journal = journal;
+        nodeDetails.authors = authors;
+        nodeDetails.link = link;
+        nodeDetails.isPdfAvailable = false;
     }
 
     this.showEssential = function(x, y) {
@@ -54,7 +84,6 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
     }
 
     this.showExtraContent = function() {
-        console.log("SHOW EXTRA CONTENT")
         const essentialX = lastX;
         const essentialY = lastY;
 
@@ -66,16 +95,43 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
 
         this.extraUpperDiv.style.left = upperDivX+"px"; //x.
         this.extraUpperDiv.style.top = upperDivY+"px"; //y
-        this.extraUpperDiv.innerHTML = "<p> YO YO YO </p>"
+
+        if(nodeDetails.link) {
+            this.extraUpperDivViewDiv.style.backgroundColor = nodeDivAvailableBackgroundColor;
+        } else {
+            this.extraUpperDivViewDiv.style.backgroundColor = nodeDivNotAvailableBackgroundColor;
+        }
+
+        if(nodeDetails.isPdfAvailable) {
+            this.extraUpperDivPdfDiv.style.backgroundColor = nodeDivAvailableBackgroundColor;
+        } else {
+            this.extraUpperDivPdfDiv.style.backgroundColor = nodeDivNotAvailableBackgroundColor;
+        }
 
         lastUpperDivX = upperDivX;
         lastUpperDivY = upperDivY;
+
+        this.extraLowerDiv.style.display = "flex";
+        var offsetHeightEssentialDiv = this.essentialDiv.offsetHeight;
+        const lowerDivX = essentialX;
+        const lowerDivY = essentialY + offsetHeightEssentialDiv + essentialDivGap;
+
+        this.extraLowerDiv.style.left = lowerDivX+"px"; //x.
+        this.extraLowerDiv.style.top = lowerDivY+"px"; //y
+        this.extraLowerDiv.innerHTML = "<div><p><b>Abstract</b><br>"+nodeDetails.abstract+"</p></div>"+
+            "<div><p><b>Journal</b><br>"+nodeDetails.journal+"</p></div>"+
+            "<div><p><b>Authors</b><br>"+nodeDetails.authors+"</p></div>";
+
+        lastLowerDivX = lowerDivX;
+        lastLowerDivY = lowerDivY;
 
         this.essentialDiv.classList.add(nodeDivDarkenerClassName);
     }
 
     this.hideExtraContent = function() {
         this.extraUpperDiv.style.display = "none";
+        this.extraLowerDiv.style.display = "none";
+
         this.essentialDiv.classList.remove(nodeDivDarkenerClassName);
     }
     
@@ -105,5 +161,22 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
         
         lastUpperDivX = newUpperDivX;
         lastUpperDivY = newUpperDivY;
+
+        const newLowerDivX = dx+lastLowerDivX;
+        const newLowerDivY = dy+lastLowerDivY;
+        
+        this.extraLowerDiv.style.left = newLowerDivX+"px"; //x.
+        this.extraLowerDiv.style.top = newLowerDivY+"px"; //y
+        
+        lastLowerDivX = newLowerDivX;
+        lastLowerDivY = newLowerDivY;
+    }
+
+    this.setViewButtonPressedCallback = function(callback) {
+        viewDivClickedCallback = callback;
+    }
+
+    this.setPdfButtonPressedCallback = function(callback) {
+
     }
 }

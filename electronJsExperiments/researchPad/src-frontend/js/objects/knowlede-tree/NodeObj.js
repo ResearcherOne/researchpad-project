@@ -31,8 +31,16 @@ function Node(ID, metadata, radius){ //Abstract Class
 		return this.metadata.journal;
 	}
 
+	this.getAbstract = function() {
+		return this.metadata.abstract;
+	}
+
 	this.getCitationCount = function() {
 		return this.metadata.citedByCount;
+	}
+
+	this.getLink = function() {
+		return this.metadata.link;
 	}
 
 	this.getCitedByLink = function() {

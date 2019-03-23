@@ -1,4 +1,6 @@
 function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpperDivClassName){
+    const nodeDivDarkenerClassName = "node-div-darkener";
+
     this.baseDivId = baseDivId; //knowledge-tree-div
     this.nodeDetailsDivClassName = nodeDetailsDivClassName;
     this.extraUpperDivClassName = extraUpperDivClassName;
@@ -12,12 +14,16 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
     this.extraUpperDiv =  document.createElement("div");
     console.log("CLASSNAME: "+this.extraUpperDivClassName);
     this.extraUpperDiv.setAttribute('class', this.extraUpperDivClassName);
+    this.extraUpperDiv.classList.add(nodeDivDarkenerClassName);
 
     document.getElementById(this.baseDivId).appendChild(this.essentialDiv);
     document.getElementById(this.baseDivId).appendChild(this.extraUpperDiv);
 
     var lastX = 0;
     var lastY = 0;
+    
+    var lastUpperDivX = 0;
+    var lastUpperDivY = 0;
     
     var nodeDetails = {
         title: "No title",
@@ -61,10 +67,16 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
         this.extraUpperDiv.style.left = upperDivX+"px"; //x.
         this.extraUpperDiv.style.top = upperDivY+"px"; //y
         this.extraUpperDiv.innerHTML = "<p> YO YO YO </p>"
+
+        lastUpperDivX = upperDivX;
+        lastUpperDivY = upperDivY;
+
+        this.essentialDiv.classList.add(nodeDivDarkenerClassName);
     }
 
     this.hideExtraContent = function() {
         this.extraUpperDiv.style.display = "none";
+        this.essentialDiv.classList.remove(nodeDivDarkenerClassName);
     }
     
     this.hideEssential = function() {
@@ -84,5 +96,14 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
         
         lastX = newX;
         lastY = newY;
+
+        const newUpperDivX = dx+lastUpperDivX;
+        const newUpperDivY = dy+lastUpperDivY;
+        
+        this.extraUpperDiv.style.left = newUpperDivX+"px"; //x.
+        this.extraUpperDiv.style.top = newUpperDivY+"px"; //y
+        
+        lastUpperDivX = newUpperDivX;
+        lastUpperDivY = newUpperDivY;
     }
 }

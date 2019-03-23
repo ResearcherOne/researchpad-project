@@ -59,7 +59,7 @@ var visualizerModule = (function () {
 
 
   //Public Functions
-	var initializeModule = function(konvaDivID, w, h, newConnectionsConfig) {
+	var initializeModule = function(konvaDivID, w, h, newConnectionsConfig, stageClickedCallback) {
 		stage = new Konva.Stage({
 			container: konvaDivID,
 			width: w,
@@ -68,6 +68,11 @@ var visualizerModule = (function () {
 
 		layer = new Konva.Layer();
 		stage.add(layer);
+
+		stage.on('click', function(evt) {
+			var shape = evt.target;
+			stageClickedCallback(evt.target.className);
+		});
 
 		nodeConnectionsConfig = newConnectionsConfig
 	};

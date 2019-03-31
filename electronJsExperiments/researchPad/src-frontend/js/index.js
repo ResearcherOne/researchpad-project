@@ -250,9 +250,9 @@ function searchResultMouseEnterCallback(e) {
 
 
 	const targetTagNo = parseInt(target.getAttribute("tagNo"));
-	const abstractText = lastGoogleSearchData[targetTagNo].abstract;
-	const authors = lastGoogleSearchData[targetTagNo].authors;
-	const journal = lastGoogleSearchData[targetTagNo].journal;
+	const abstractText = lastGoogleSearchData[targetTagNo].abstract || "No Abstract";
+	const authors = lastGoogleSearchData[targetTagNo].authors || [];
+	const journal = lastGoogleSearchData[targetTagNo].journal || "No Journal";
 	const x = rect.left;
 	const y = rect.top + (target.offsetHeight/2);
 
@@ -280,7 +280,11 @@ function searchRequestReceivedCallback(userInput) {
 			lastGoogleSearchData = result;
 			var i = 0;
 			result.forEach(function(element){
-				searchPanel.addResultElement(i, element.title, element.citedByCount, element.year, element.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback); //Input element ID as well.
+				const title = element.title || "No title";
+				const year = element.year || "?";
+				const citationCount = element.citedByCount || "?";
+				const abstract = element.abstract || "No abstract";
+				searchPanel.addResultElement(i, title, citationCount, year, abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback); //Input element ID as well.
 				i++;
 			});
 			searchPanel.enableNextSearch();

@@ -11,7 +11,7 @@
 
 */
 
-function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback) { //nodeMouseOverCallback, nodeMouseOutCallback
+function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) { //nodeMouseOverCallback, nodeMouseOutCallback
 	Node.call(this, ID, metadata, radius);
 
 	this.rootNodeID = rootNodeID;
@@ -28,7 +28,7 @@ function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, refere
 		return this.rootNodeID;
 	}
 
-	this.visualObject = visualizerModule.createCitedByNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createCitedByNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback, clickedCallback);
 
 	this.serialize = function() {
 		var serializedObj = {};

@@ -89,4 +89,8 @@ function Node(ID, metadata, radius){ //Abstract Class
 	this.isHiddenNode = function() {
 		return this.isHidden;
 	}
+
+	this.changeStrokeColor = function(color) {
+        visualizerModule.setStrokeColor(this.visualObject, color);
+	}
 }

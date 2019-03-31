@@ -12,6 +12,8 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 
 	this.hideLeafNodesTimer = null;
 
+	this.clickedCallback = clickedCallback;
+
 	var mouseOver = function(rootNodeObject) {
 		if(mouseOverCallback) mouseOverCallback(rootNodeObject);
 	}
@@ -28,17 +30,17 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 	}
 
 	const isDraggable = false;
-	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback, clickedCallback);
+	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback, this.clickedCallback);
 
 	this.createReference = function(ID, metadata, radius) {
 		const referencePosition = this.referenceCount;
-		this.references[ID] = new ReferenceNode(this.ID, this.visualObject, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut);
+		this.references[ID] = new ReferenceNode(this.ID, this.visualObject, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 		this.references[ID].hide();
 		this.referenceCount++;
 	}
 	this.createCitedBy = function(ID, metadata, radius) {
 		const citedByPosition = this.citedByCount;
-		this.citedByNodes[ID] = new CitedByNode(this.ID, this.visualObject, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback, mouseOver, mouseOut);
+		this.citedByNodes[ID] = new CitedByNode(this.ID, this.visualObject, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 		this.citedByNodes[ID].hide();
 		this.citedByCount++;
 	}
@@ -86,7 +88,7 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		var reconstructedReferences = {}
 		for (var referenceNodeID in serializedReferences){
 			var leafNodeData = JSON.parse(serializedReferences[referenceNodeID]);
-			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut);
+			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 			reconstructedReferences[referenceNodeID].hide();
 		}
 		this.referenceCount = refCount;
@@ -95,7 +97,7 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		var reconstructedCitedbyNodes = {}
 		for (var referenceNodeID in serializedCitedbyNodes){
 			var leafNodeData = JSON.parse(serializedCitedbyNodes[referenceNodeID]);
-			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut);
+			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 			reconstructedCitedbyNodes[referenceNodeID].hide();
 		}
 		this.citedByCount = citedbyCount;
@@ -103,7 +105,6 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 	}
 
 	this.hideLeafNodes = function(durationSec) {
-		console.log("hide triggerred.");
 		/*
 		for (var citationNodeID in this.citedByNodes){
 			this.citedByNodes[citationNodeID].hide();
@@ -141,10 +142,6 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		for (var referenceNodeID in this.references){
 			this.references[referenceNodeID].show();
 		}
-	}
-    
-    this.changeStrokeColor = function(color) {
-        visualizerModule.setStrokeColor(this.visualObject, color);
 	}
 
 	RootNode.prototype = Object.create(Node.prototype);

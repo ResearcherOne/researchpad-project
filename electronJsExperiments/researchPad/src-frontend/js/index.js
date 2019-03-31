@@ -33,7 +33,7 @@ const nodeConnectionsConfig = {
 	maxConnectionPerLayer: 10
 };
 
-const LEAF_NODE_HIDE_DURATION_SEC = 3;
+const LEAF_NODE_HIDE_DURATION_SEC = 1.5;
 
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
@@ -396,12 +396,11 @@ function nodeMouseOverCallback(nodeType, nodeObj) {
 
 function nodeMouseOutCallback(nodeType, nodeObj) {
 	if(nodeDetailsStaticOverlayer.isExtraContentBeingDisplayed()) {
-		console.log("EXTRA CONTENT BEING DISPLAYED. YOU CAN NOT TAKE A LOOK AT ANOTHER NODE.");
+		//pass
 	} else {
 		if(nodeType == "root") {
 			document.body.style.cursor = 'default';
-			if(knowledgeTree.isSelectedRootNode(nodeObj)){
-			} else {
+			if(!knowledgeTree.isSelectedNode(nodeObj)){
 				knowledgeTree.hideLeafNodes(nodeObj.getID(), LEAF_NODE_HIDE_DURATION_SEC);
 				nodeDetailsStaticOverlayer.hideEssential();
 			}
@@ -421,45 +420,64 @@ function nodeMouseOutCallback(nodeType, nodeObj) {
 	}
 }
 
-var selectedRootNode = null;
-
-function deselectRootNode(nodeObj) {
-	knowledgeTree.deselectRootNode(nodeObj);
-	nodeObj.hideLeafNodes();
+function deselectNode(nodeType, nodeObj) {
+	
+	knowledgeTree.clearSelectedNode();
 	nodeDetailsStaticOverlayer.hideExtraContent();
-	console.log("deselected root node");
+
+	if(nodeType == "root") {
+		const ID = nodeObj.getID();
+		const hideDelaySec = 0;
+		knowledgeTree.hideLeafNodes(ID, hideDelaySec);
+		console.log("deselected root node");
+	} else if (nodeType == "citedby") {
+		console.log("deselected citedby");
+	}
 }
 
 function nodeClickedCallback(nodeType, nodeObj) {
-	console.log("click")
 	if(nodeType == "root") {
-		if(knowledgeTree.isSelectedRootNode(nodeObj)) {
-			deselectRootNode(nodeObj);
-			selectedRootNode = null;
+		if(knowledgeTree.isSelectedNode(nodeObj)) {
+			deselectNode(nodeType, nodeObj);
 		} else {
-			if(selectedRootNode) {
-				deselectRootNode(selectedRootNode);
+			if(knowledgeTree.isSelectedNodeExists()) {
+				knowledgeTree.clearSelectedNode();
 			}
-			selectedRootNode = nodeObj;
-			knowledgeTree.selectRootNode(nodeObj);
-			nodeObj.showLeafNodes();
+
+			const nodeObjID = nodeObj.getID();
+			knowledgeTree.selectNode(nodeObj);
+			knowledgeTree.showLeafNodes(nodeObjID);
 			showEssentialContentForNode(nodeObj);
-			nodeDetailsStaticOverlayer.showExtraContent();
+			const isUpperContentShown = true;
+			nodeDetailsStaticOverlayer.showExtraContent(isUpperContentShown);
 			console.log("selected root node");
 		}
 	} else if (nodeType == "ref") {
 		console.log("Clicked:  Type of reference node");
 	} else if (nodeType == "citedby") {
 		console.log("Clicked: Type of citedby");
+		if(knowledgeTree.isSelectedNode(nodeObj)) {
+			deselectNode(nodeType, nodeObj);
+		} else {
+			if(knowledgeTree.isSelectedNodeExists()) {
+				knowledgeTree.clearSelectedNode();
+			}
+			knowledgeTree.selectNode(nodeObj);
+			showEssentialContentForNode(nodeObj);
+			const isUpperContentShown = false;
+			nodeDetailsStaticOverlayer.showExtraContent(isUpperContentShown);
+			console.log("selected citedby node");
+		}
 	} else {
 		console.log("Clicked: Unknown type name: "+nodeType);
 	}
 }
 
 function mapClickedCallback(objName) {
-	console.log("OBJ NAME: "+objName);
-	if(objName !== "node" && selectedRootNode) {
-		deselectRootNode(selectedRootNode);
+	if(objName !== "node" && knowledgeTree.isSelectedNodeExists()) {
+		const selectedNode = knowledgeTree.getSelectedNode();
+		const nodeType = knowledgeTree.getNodeType(selectedNode);
+		deselectNode(nodeType, selectedNode);
 		nodeDetailsStaticOverlayer.hideEssential();
 	}
 }

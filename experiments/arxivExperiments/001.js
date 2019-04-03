@@ -124,7 +124,7 @@ var search_query = {
 
 
 async function searchWithoutCallback(searchQuery){
-    let results = await search(search_query, function(err, results) {
+    let results = search(search_query, function(err, results) {
     });
     return results;
 }

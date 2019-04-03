@@ -1,22 +1,11 @@
-const arxiv = require ("arxiv");
+const arxiv = require ("./001");
 
 var search_query = {
     title: 'pen',
 };
 
-async function seeResults(search_query) {
 
-    var results = await arxiv.search(search_query, async function (err, results) {
-        console.log('Found ' + results.items.length + ' results out of ' + results.total);
-        if (results.items.length > 0) {
-            return results;
-        } else {
-            return 'Found ' + results.items.length + ' results out of ' + results.total
-        }
-    })
-    return results;
-}
-
-
-var results = seeResults(search_query).then(console.log("penis"));
-
+var theResults;
+var result = arxiv.search(search_query, function(err, results) {
+  console.log("Birkan")
+}).then((value)=>{theResults=value.items}).then(console.log(theResults));

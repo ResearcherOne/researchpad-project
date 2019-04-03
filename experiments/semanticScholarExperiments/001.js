@@ -23,7 +23,7 @@ function createUrlWithSemanticAuthor(id){
         +"?include_unknown_references=true";
 }
 
-function getResults(url){
+async function  getResults(url){
     let options;
     options = createOptions(url)
     request(options)
@@ -43,11 +43,8 @@ function createOptions(url){
         uri: url,
         json: true
     }
-
-
 }
 
 
 
-getResults("https://api.semanticscholar.org/v1/paper/10.1038/nrn3241")
-    .then((value)=>{console.log(value)});
+getResults("https://api.semanticscholar.org/v1/paper/10.1038/nrn3241").then((value)=>{console.log(value)});

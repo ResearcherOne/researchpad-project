@@ -46,16 +46,11 @@ let scrape = async (url) => {
         for (let element of elements){
             arxivIdDiv = element.getElementById("/arxivId").children[1].assignedSlot                  ;
             authorsDiv = element.getElementById("/authors");
-            authors = getAuthors(authorsDiv)
             citationVelocityDiv = element.getElementById("/citationVelocity").innerText;
             citationsDiv = element.getElementById("/citations");
-            citations = getDivResults(div);
             influentialCitationCountDiv = element.getElementById("/influentialCitationCount").innerText;
-
             paperID = element.getElementById("/paperId").innerText;
-
             referencesDiv = element.getElementById("/references");
-            references = getDivResults(referencesDiv);
             title = element.getElementById("/title").children[1].innerText;
             topicsDiv = element.getElementById("/topics");
             urlDiv = element.getElementById("/url");
@@ -74,9 +69,3 @@ let scrape = async (url) => {
     return result;
 };
 
-
-function getDivResults(div){
-    return div.getElementsByClassName("treeRow objectRow hasChildren opened selected");
-}
-
-funtion

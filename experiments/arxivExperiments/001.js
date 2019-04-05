@@ -153,13 +153,15 @@ function getPublishingDate(resultItem){
     return resultItem[2];
 }
 
+function getTitle(resultItem){
+    return resultItem[3];
+}
+
 function getSummary(resultItem){
     return resultItem[4];
 }
 
-function getTitle(resultItem){
-    return resultItem[3];
-}
+
 
 
 

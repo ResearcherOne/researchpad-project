@@ -21,12 +21,10 @@ function createUrlWithSemanticAuthor(id){
         +"?include_unknown_references=true";
 }
 
-
 async function createResults(url){
     semanticPage = await fetch(url)
         .then(res => res.json())
         .catch(err => { throw err });
-    console.log(semanticPage);
     return semanticPage;
 }
 

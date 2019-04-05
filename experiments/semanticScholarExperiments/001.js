@@ -1,5 +1,5 @@
-const request = require('request-promise');
-
+const rp = require('request-promise');
+const puppeteer = require('puppeteer')
 
 function createUrlWithSemanticPaper(id){
     return "http://api.semanticscholar.org/v1/paper/"+id
@@ -23,19 +23,6 @@ function createUrlWithSemanticAuthor(id){
         +"?include_unknown_references=true";
 }
 
-async function  getResults(url){
-    let options;
-    options = createOptions(url)
-    request(options)
-        .then(function (response) {
-            return response;
-            // Request was successful, use the response object at will
-        })
-        .catch(function (err) {
-            return err;
-            // Something bad happened, handle the error
-        })
-}
 
 function createOptions(url){
     return {
@@ -45,6 +32,39 @@ function createOptions(url){
     }
 }
 
+let scrape = async (url) => {
+    const browser = await puppeteer.launch({headless : false, devtools: true});
+    const page = await browser.newPage();
+    await page.goto(url, {waitUntil: 'networkidle2'});
 
+    await page.waitForNavigation({waitUntil: 'networkidle0'});
 
-getResults("https://api.semanticscholar.org/v1/paper/10.1038/nrn3241").then((value)=>{console.log(value)});
+    // Scrape
+    const result = await page.evaluate(() => {
+        let data = [];
+        let elements = document.querySelectorAll(document.querySelectorAll(".treeTable > tbody:nth-child(2)"));
+        for (let element of elements){
+            arxivIdDiv = element.getElementById("/arxivId");
+            authorsDiv = element.getElementById("/id");
+            citationVelocityDiv = element.getElementById("/citationVelocity");
+            citationsDiv = element.getElementById("/citations");
+            influentialCitationCountDiv = element.getElementById("/influentialCitationCount");
+            paperID = element.getElementById("/paperId").innerText;
+            referencesDiv = element.getElementById("/references");
+            titleDiv = element.getElementById("/title");
+            topicsDiv = element.getElementById("/topics");
+            urlDiv = element.getElementById("/url");
+            venueDiv = element.getElementById("/venue");
+            year = element.getElementById("/year");
+            data.push({
+                title: title,
+                link: paperLink
+            });
+        }
+
+        return data;
+    });
+    browser.close();
+    return result;
+};
+

@@ -44,18 +44,24 @@ let scrape = async (url) => {
         let data = [];
         let elements = document.querySelectorAll(document.querySelectorAll(".treeTable > tbody:nth-child(2)"));
         for (let element of elements){
-            arxivIdDiv = element.getElementById("/arxivId");
-            authorsDiv = element.getElementById("/id");
-            citationVelocityDiv = element.getElementById("/citationVelocity");
+            arxivIdDiv = element.getElementById("/arxivId").children[1].assignedSlot                  ;
+            authorsDiv = element.getElementById("/authors");
+            authors = getAuthors(authorsDiv)
+            citationVelocityDiv = element.getElementById("/citationVelocity").innerText;
             citationsDiv = element.getElementById("/citations");
-            influentialCitationCountDiv = element.getElementById("/influentialCitationCount");
+            citations = getDivResults(div);
+            influentialCitationCountDiv = element.getElementById("/influentialCitationCount").innerText;
+
             paperID = element.getElementById("/paperId").innerText;
+
             referencesDiv = element.getElementById("/references");
-            titleDiv = element.getElementById("/title");
+            references = getDivResults(referencesDiv);
+            title = element.getElementById("/title").children[1].innerText;
             topicsDiv = element.getElementById("/topics");
             urlDiv = element.getElementById("/url");
             venueDiv = element.getElementById("/venue");
             year = element.getElementById("/year");
+
             data.push({
                 title: title,
                 link: paperLink
@@ -68,3 +74,9 @@ let scrape = async (url) => {
     return result;
 };
 
+
+function getDivResults(div){
+    return div.getElementsByClassName("treeRow objectRow hasChildren opened selected");
+}
+
+funtion

@@ -1,5 +1,4 @@
 const rp = require('request-promise');
-const puppeteer = require('puppeteer')
 
 function createUrlWithSemanticPaper(id){
     return "http://api.semanticscholar.org/v1/paper/"+id
@@ -32,39 +31,10 @@ function createOptions(url){
     }
 }
 
-let scrape = async (url) => {
-    const browser = await puppeteer.launch({headless : false, devtools: true});
-    const page = await browser.newPage();
-    await page.goto(url, {waitUntil: 'networkidle2'});
 
-    await page.waitForNavigation({waitUntil: 'networkidle0'});
+rp(options).then(function(response){
 
-    // Scrape
-    const result = await page.evaluate(() => {
-        let data = [];
-        let elements = document.querySelectorAll(document.querySelectorAll(".treeTable > tbody:nth-child(2)"));
-        for (let element of elements){
-            arxivIdDiv = element.getElementById("/arxivId").children[1].assignedSlot                  ;
-            authorsDiv = element.getElementById("/authors");
-            citationVelocityDiv = element.getElementById("/citationVelocity").innerText;
-            citationsDiv = element.getElementById("/citations");
-            influentialCitationCountDiv = element.getElementById("/influentialCitationCount").innerText;
-            paperID = element.getElementById("/paperId").innerText;
-            referencesDiv = element.getElementById("/references");
-            title = element.getElementById("/title").children[1].innerText;
-            topicsDiv = element.getElementById("/topics");
-            urlDiv = element.getElementById("/url");
-            venueDiv = element.getElementById("/venue");
-            year = element.getElementById("/year");
+}).catch(function(err){
 
-            data.push({
-                title: title,
-            });
-        }
-
-        return data;
-    });
-    browser.close();
-    return result;
-};
+})
 

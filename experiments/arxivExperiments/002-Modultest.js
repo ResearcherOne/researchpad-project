@@ -7,11 +7,10 @@ var search_query = {
 
 var theResults;
 var result;
-result = function (){ arxiv.search(search_query, function (err, results) {
-    console.log('Found ' + results.items.length + ' results out of ' + results.total);
-    console.log(results.items[0].title);
-    console.log(results.items[0].authors[0].name);
-    theResults = results;
-})};
 
-result().then(console.log(theResults));
+result = arxiv.searchWithoutCallback(search_query)
+
+const delayMs = 10000;
+setTimeout(function(){
+    console.log("Here are our precious results after 10 seconds: "+JSON.stringify(result.items));
+}, delayMs);

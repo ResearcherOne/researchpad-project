@@ -15,5 +15,5 @@ arxiv.search(search_query, function (err, results) {
 
 const delayMs = 10000;
 setTimeout(function(){
-  console.log("Here are our precious results after 10 seconds: "+JSON.stringify(globalResults));
+  console.log("Here are our precious results after 10 seconds: "+JSON.stringify(globalResults.items));
 }, delayMs);

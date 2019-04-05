@@ -110,8 +110,15 @@ async function search (query, cb) {
 };
 
 module.exports = {
-    searchWithoutCallback: searchWithoutCallback,
-    search : search
+    search : search,
+    createResultItems : createResultItems,
+    getAuthors: getAuthors,
+    getCategories : getCategories,
+    getID : getID,
+    getLastUpdatedDate : getLastUpdatedDate,
+    getPublishingDate : getPublishingDate,
+    getSummary : getSummary,
+    getTitle : getTitle,
 };
 
 
@@ -122,10 +129,42 @@ var search_query = {
     author: 'William Chan'
 };
 
-
-async function searchWithoutCallback(searchQuery){
-    let results = search(search_query, function(err, results) {
-    });
-    return results;
+function createResultItems(searchResult){
+    return searchResult.items;
 }
+
+function getAuthors(resultItem){
+    return resultItem[5];
+}
+
+function getCategories(resultItem){
+    return resultItem[6];
+}
+
+function getID(resultItem){
+    return resultItem[0];
+}
+
+function getLastUpdatedDate(resultItem){
+    return resultItem[1];
+}
+
+function getPublishingDate(resultItem){
+    return resultItem[2];
+}
+
+function getSummary(resultItem){
+    return resultItem[4];
+}
+
+function getTitle(resultItem){
+    return resultItem[3];
+}
+
+
+
+
+
+
+
 

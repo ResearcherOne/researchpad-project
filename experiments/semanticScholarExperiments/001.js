@@ -108,6 +108,42 @@ function getInfluentialCitations(semanticResults){
     return influentialCitations;
 }
 
+function getReferenceArxivId(reference){
+    return reference.arxivId;
+}
+
+function getReferenceAuthors(reference){
+    return reference.authors;
+}
+
+
+function getReferenceDOI(reference){
+    return reference.doi;
+}
+
+
+function getReferenceSemanticPaperId(reference){
+    return reference.paperId;
+}
+
+
+function getReferenceTitle(reference){
+    return reference.title;
+}
+
+
+function getReferenceUrl(reference){
+    return reference.url;
+}
+
+function getReferenceVenue(reference){
+    return reference.venue;
+}
+
+function getReferenceArxivId(reference){
+    return reference.year;
+}
+
 function isThisReferenceInfluential(reference){
     return reference.isInfluential;
 }
@@ -132,6 +168,16 @@ module.exports = {  getArxivId : getArxivId,
                     getVenue: getVenue,
                     getYear : getYear,
                     isThisCitationInfluential : isThisCitationInfluential,
-                    isThisReferenceInfluential : isThisReferenceInfluential}
+                    isThisReferenceInfluential : isThisReferenceInfluential,
+                    getReferenceArxivId : getReferenceArxivId,
+                    getReferenceAuthors : getReferenceAuthors,
+                    getReferenceDOI : getReferenceDOI,
+                    getReferenceSemanticPaperId : getReferenceSemanticPaperId,
+                    getReferenceTitle : getReferenceTitle,
+                    getReferenceUrl : getReferenceUrl,
+                    getReferenceVenue : getReferenceVenue,
+                    getReferenceYear : getReferenceYear
+}
+
 
 

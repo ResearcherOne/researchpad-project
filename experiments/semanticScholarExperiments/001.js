@@ -1,4 +1,5 @@
 const rp = require('request-promise');
+const fetch = require('node-fetch')
 
 function createUrlWithSemanticPaper(id){
     return "http://api.semanticscholar.org/v1/paper/"+id
@@ -31,10 +32,13 @@ function createOptions(url){
     }
 }
 
+let url = "http://api.semanticscholar.org/v1/paper/10.1038/nrn3241"
+let options = createOptions("http://api.semanticscholar.org/v1/paper/10.1038/nrn3241")
 
-rp(options).then(function(response){
-
-}).catch(function(err){
-
-})
+semanticPage = fetch(url)
+                    .then(res => res.json())
+                    .then((out) => {
+                        console.log('Checkout this JSON! ', out);
+                    })
+                    .catch(err => { throw err });
 

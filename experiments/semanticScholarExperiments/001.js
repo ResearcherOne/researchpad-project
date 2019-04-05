@@ -30,31 +30,31 @@ async function createResults(url){
     return semanticPage;
 }
 
-function getArxivId(semanticResult){
+function getArxivId(semanticResults){
     return semanticResult.arxivId;
 }
 
-function getAuthors(semanticResult){
+function getAuthors(semanticResults){
     return semanticResult.authors;
 }
 
-function getCitationVelocity(semanticResult){
+function getCitationVelocity(semanticResults){
     return semanticResult.citationVelocity;
 }
 
-function getCitations(semanticResult){
+function getCitations(semanticResults){
     return semanticResult.citations;
 }
 
-function getDOI(semanticResult){
+function getDOI(semanticResults){
     return semanticResult.doi;
 }
 
-function getInfluentialCitationCount(semanticResult){
+function getInfluentialCitationCount(semanticResults){
     return semanticResult.influentialCitationCount;
 }
 
-function getSemanticPaperId(semanticResult){
+function getSemanticPaperId(semanticResults){
     return semanticResult.paperId;
 }
 
@@ -62,27 +62,27 @@ function getReferences(semanticResults){
     return semanticResult.references;
 }
 
-function getTitle(semanticResult){
+function getTitle(semanticResults){
     return semanticResult.title;
 }
 
-function getTopics(semanticResult){
+function getTopics(semanticResults){
     return semanticResult.topics;
 }
 
-function getUrl(semanticResult){
+function getUrl(semanticResults){
     return semanticResult.url;
 }
 
-function getVenue(semanticResult){
+function getVenue(semanticResults){
     return semanticResult.venue;
 }
 
-function getYear(semanticResult){
+function getYear(semanticResults){
     return semanticResult.year;
 }
 
-function getInfluentialReferences(semanticResult){
+function getInfluentialReferences(semanticResults){
     references = semanticResult.references;
 
     influentialReferences = []
@@ -95,7 +95,7 @@ function getInfluentialReferences(semanticResult){
     return influentialReferences;
 }
 
-function getInfluentialCitations(semanticResult){
+function getInfluentialCitations(semanticResults){
     citations = semanticResult.citations;
 
     influentialCitations = []
@@ -133,3 +133,5 @@ module.exports = {  getArxivId : getArxivId,
                     getYear : getYear,
                     isThisCitationInfluential : isThisCitationInfluential,
                     isThisReferenceInfluential : isThisReferenceInfluential}
+
+

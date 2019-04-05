@@ -140,7 +140,7 @@ function getReferenceVenue(reference){
     return reference.venue;
 }
 
-function getReferenceArxivId(reference){
+function getReferenceYear(reference){
     return reference.year;
 }
 

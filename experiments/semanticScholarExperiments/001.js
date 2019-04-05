@@ -54,7 +54,7 @@ function getInfluentialCitationCount(semanticResult){
     return semanticResult.influentialCitationCount;
 }
 
-function geSemanticPaperId(semanticResult){
+function getSemanticPaperId(semanticResult){
     return semanticResult.paperId;
 }
 
@@ -80,10 +80,6 @@ function getVenue(semanticResult){
 
 function getYear(semanticResult){
     return semanticResult.year;
-}
-
-function isThisReferenceInfluential(reference){
-    return reference.isInfluential;
 }
 
 function getInfluentialReferences(semanticResult){
@@ -112,6 +108,28 @@ function getInfluentialCitations(semanticResult){
     return influentialCitations;
 }
 
-module.exports = {
-
+function isThisReferenceInfluential(reference){
+    return reference.isInfluential;
 }
+
+function isThisCitationInfluential(citation){
+    return citation.isInfluential;
+}
+
+module.exports = {  getArxivId : getArxivId,
+                    getAuthors : getAuthors,
+                    getTitle   : getTitle,
+                    getCitations : getCitations,
+                    getCitationVelocity : getCitationVelocity,
+                    getDOI : getDOI,
+                    getInfluentialCitationCount: getInfluentialCitationCount,
+                    getInfluentialCitations : getInfluentialCitations,
+                    getInfluentialReferences: getInfluentialReferences,
+                    getReferences: getReferences,
+                    getSemanticPaperId : getSemanticPaperId,
+                    getTopics: getTopics,
+                    getUrl: getUrl,
+                    getVenue: getVenue,
+                    getYear : getYear,
+                    isThisCitationInfluential : isThisCitationInfluential,
+                    isThisReferenceInfluential : isThisReferenceInfluential}

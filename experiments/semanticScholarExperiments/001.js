@@ -59,7 +59,6 @@ let scrape = async (url) => {
 
             data.push({
                 title: title,
-                link: paperLink
             });
         }
 

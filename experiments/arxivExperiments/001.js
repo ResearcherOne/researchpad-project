@@ -2,8 +2,10 @@
 var coerceEntry, coerceQuery, coerceQueryKey, coerceQueryValue, key_map, makeUrl, request, search, unique, xml2js;
 
 request = require('request');
-
 xml2js = require('xml2js');
+const filesaver = require("file-saver");
+const fetch = require("node-fetch")
+
 
 makeUrl = function(query, max_results, sort_by) {
     if (max_results == null) {
@@ -157,7 +159,12 @@ function createPDFDownloadLink(arxivID) {
     return "https://arxiv.org/pdf/"+arxivID;
 }
 
-
+async function downloadArxivPDFWith(arxivID,fileName) {
+    let url = await createPDFDownloadLink(arxivID);
+    let res = await fetch(url);
+    let blob = await res.blob();
+    saveAs(blob, fileName);
+}
 
 
 

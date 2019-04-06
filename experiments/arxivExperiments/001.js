@@ -131,14 +131,6 @@ function createResultItems(searchResult){
     return searchResult.items;
 }
 
-function getAuthors(resultItem){
-    return resultItem[5];
-}
-
-function getCategories(resultItem){
-    return resultItem[6];
-}
-
 function getID(resultItem){
     return resultItem[0];
 }
@@ -157,6 +149,14 @@ function getTitle(resultItem){
 
 function getSummary(resultItem){
     return resultItem[4];
+}
+
+function getAuthors(resultItem){
+    return resultItem[5];
+}
+
+function getCategories(resultItem){
+    return resultItem[6];
 }
 
 function createPDFDownloadLink(arxivID) {

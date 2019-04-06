@@ -8,9 +8,7 @@ var search_query = {
 var theResults;
 var result;
 
-result = arxiv.searchWithoutCallback(search_query)
+result = arxiv.search(search_query, function (err, results) {
+    theResults = results;
+});
 
-const delayMs = 10000;
-setTimeout(function(){
-    console.log("Here are our precious results after 10 seconds: "+JSON.stringify(result.items));
-}, delayMs);

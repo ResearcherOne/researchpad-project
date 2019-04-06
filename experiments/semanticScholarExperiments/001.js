@@ -215,7 +215,7 @@ module.exports = {  getArxivId : getArxivId,
                     getReferenceYear : getReferenceYear,
 
                     getCitationsAndReferencesOfArxivPaper : getCitationsAndReferencesOfArxivPaper,
-                    getStringifiedCitationsAndReferencesOfArxivPaper : getStringifiedCitationsAndReferencesOfArxivPaper
+                    getStringifiedCitationsAndReferencesOfArxivPaper : getStringifiedCitationsAndReferencesOfArxivPaper,
 
                     getSemanticScholarDataWithAuthorID : getSemanticScholarDataWithAuthorID,
                     getSemanticScholarDataWithPaperID : getSemanticScholarDataWithPaperID

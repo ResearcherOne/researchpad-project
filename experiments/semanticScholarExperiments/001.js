@@ -12,12 +12,12 @@ function createUrlWithDOI(doi){
 }
 
 function createUrlWithArxiv(id){
-    return "http://api.semanticscholar.org/v1/paper/"+id
+    return "http://api.semanticscholar.org/v1/paper/arXiv:"+id
         +"?include_unknown_references=true";
 }
 
 function createUrlWithSemanticAuthor(id){
-    return "http://api.semanticscholar.org/v1/paper/"+id
+    return "http://api.semanticscholar.org/v1/author/"+id
         +"?include_unknown_references=true";
 }
 
@@ -41,47 +41,69 @@ function getCitationVelocity(semanticResults){
 }
 
 function getCitations(semanticResults){
-    return semanticResult.citations;
+    return semanticResults.citations;
+}
+
+function getCitationsAndReferencesOfArxivPaper(arxivId){
+    url = createUrlWithArxiv(arxivId);
+    citationsAndReferences = [];
+    results = createResults(url).then((res) =>{
+        let citations = getCitations(res);
+        let references = getReferences(res);
+        citationsAndReferences.push({citations,references});
+    });
+    return citationsAndReferences;
+}
+
+function getStringifiedCitationsAndReferencesOfArxivPaper(arxivId){
+    url = createUrlWithArxiv(arxivId);
+    citationsAndReferences = [];
+    results = createResults(url).then((res) =>{
+        citations = JSON.stringify(getCitations(res));
+        references = JSON.stringify(getReferences(res));
+        citationsAndReferences.push({citations,references});
+    });
+    return citationsAndReferences;
 }
 
 function getDOI(semanticResults){
-    return semanticResult.doi;
+    return semanticResults.doi;
 }
 
 function getInfluentialCitationCount(semanticResults){
-    return semanticResult.influentialCitationCount;
+    return semanticResults.influentialCitationCount;
 }
 
 function getSemanticPaperId(semanticResults){
-    return semanticResult.paperId;
+    return semanticResults.paperId;
 }
 
 function getReferences(semanticResults){
-    return semanticResult.references;
+    return semanticResults.references;
 }
 
 function getTitle(semanticResults){
-    return semanticResult.title;
+    return semanticResults.title;
 }
 
 function getTopics(semanticResults){
-    return semanticResult.topics;
+    return semanticResults.topics;
 }
 
 function getUrl(semanticResults){
-    return semanticResult.url;
+    return semanticResults.url;
 }
 
 function getVenue(semanticResults){
-    return semanticResult.venue;
+    return semanticResults.venue;
 }
 
 function getYear(semanticResults){
-    return semanticResult.year;
+    return semanticResults.year;
 }
 
 function getInfluentialReferences(semanticResults){
-    references = semanticResult.references;
+    references = semanticResults.references;
 
     influentialReferences = []
     for (let reference in references){
@@ -94,7 +116,7 @@ function getInfluentialReferences(semanticResults){
 }
 
 function getInfluentialCitations(semanticResults){
-    citations = semanticResult.citations;
+    citations = semanticResults.citations;
 
     influentialCitations = []
     for (let citation in citations){
@@ -107,7 +129,10 @@ function getInfluentialCitations(semanticResults){
 }
 
 function getReferenceArxivId(reference){
-    return reference.arxivId;
+    return referenc
+getCitationsAndReferencesOfArxivPaper("1701.01821");
+
+e.arxivId;
 }
 
 function getReferenceAuthors(reference){
@@ -150,6 +175,19 @@ function isThisCitationInfluential(citation){
     return citation.isInfluential;
 }
 
+async function getSemanticScholarDataWithPaperID(semanticScholarPaperID){
+    let url = createUrlWithSemanticPaper(semanticScholarPaperID);
+    let results = await createResults(url);
+    return results;
+}
+
+async function getSemanticScholarDataWithAuthorID(semanticScholarAuthorID){
+    let url = createUrlWithSemanticAuthor(semanticScholarAuthorID);
+    let results = await createResults(url);
+    return results;
+}
+
+
 module.exports = {  getArxivId : getArxivId,
                     getAuthors : getAuthors,
                     getTitle   : getTitle,
@@ -174,8 +212,15 @@ module.exports = {  getArxivId : getArxivId,
                     getReferenceTitle : getReferenceTitle,
                     getReferenceUrl : getReferenceUrl,
                     getReferenceVenue : getReferenceVenue,
-                    getReferenceYear : getReferenceYear
+                    getReferenceYear : getReferenceYear,
+
+                    getCitationsAndReferencesOfArxivPaper : getCitationsAndReferencesOfArxivPaper,
+                    getStringifiedCitationsAndReferencesOfArxivPaper : getStringifiedCitationsAndReferencesOfArxivPaper
+
+                    getSemanticScholarDataWithAuthorID : getSemanticScholarDataWithAuthorID,
+                    getSemanticScholarDataWithPaperID : getSemanticScholarDataWithPaperID
 }
+
 
 
 

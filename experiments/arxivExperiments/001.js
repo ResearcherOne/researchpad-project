@@ -121,14 +121,6 @@ module.exports = {
     getTitle : getTitle,
 };
 
-
-
-//testing code
-var search_query = {
-    title: 'RNN',
-    author: 'William Chan'
-};
-
 function createResultItems(searchResult){
     return searchResult.items;
 }
@@ -161,8 +153,9 @@ function getSummary(resultItem){
     return resultItem[4];
 }
 
-
-
+function createPDFDownloadLink(arxivID) {
+    return "https://arxiv.org/pdf/"+arxivID;
+}
 
 
 

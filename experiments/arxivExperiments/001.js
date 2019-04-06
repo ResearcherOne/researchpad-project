@@ -171,5 +171,5 @@ async function downloadArxivPDFWith(arxivID,saveFolderPath,fileName) {
     });
 }
 
-downloadArxivPDFWith("1904.02161", "/home/pc","mahmutTuncer")
+//Sample download : downloadArxivPDFWith("1904.02161", "/home/pc","mahmutTuncer")
 

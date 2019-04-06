@@ -116,15 +116,7 @@ async function search (query, cb) {
 
 module.exports = {
     search : search,
-    createResultItems : createResultItems,
-    getAuthors: getAuthors,
-    getCategories : getCategories,
-    getID : getID,
-    getLastUpdatedDate : getLastUpdatedDate,
-    getPublishingDate : getPublishingDate,
-    getSummary : getSummary,
-    getTitle : getTitle,
-    downloadArxivPDFWith : downloadArxivPDFWith
+    downloadArxivPDF : downloadArxivPDF
 };
 
 function createResultItems(searchResult){
@@ -163,7 +155,7 @@ function createPDFDownloadLink(arxivID) {
     return "https://arxiv.org/pdf/"+arxivID;
 }
 
-async function downloadArxivPDFWith(arxivID,saveFolderPath,fileName) {
+async function downloadArxivPDF(arxivID,saveFolderPath,fileName) {
     let url = await createPDFDownloadLink(arxivID);
     let filePath = saveFolderPath+"/"+fileName+".pdf"
     download(url).then(data => {

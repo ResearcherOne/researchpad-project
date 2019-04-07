@@ -32,10 +32,10 @@ function getCitations(semanticResults){
     return semanticResults.citations;
 }
 
-function getCitationsAndReferencesOfArxivPaper(arxivId){
+async function getCitationsAndReferencesOfArxivPaper(arxivId){
     url = createUrlWithArxiv(arxivId);
     citationsAndReferences = [];
-    results = createResults(url).then((res) =>{
+    results = await createResults(url).then((res) =>{
         let citations = getCitations(res);
         let references = getReferences(res);
         citationsAndReferences.push({citations,references});
@@ -49,10 +49,10 @@ function getReferences(semanticResults){
 }
 
 
-function getStringifiedCitationsAndReferencesOfArxivPaper(arxivId){
+async function getStringifiedCitationsAndReferencesOfArxivPaper(arxivId){
     url = createUrlWithArxiv(arxivId);
     citationsAndReferences = [];
-    results = createResults(url).then((res) =>{
+    results = await createResults(url).then((res) =>{
         citations = JSON.stringify(getCitations(res));
         references = JSON.stringify(getReferences(res));
         citationsAndReferences.push({citations,references});
@@ -89,6 +89,9 @@ module.exports = {
                     getSemanticScholarDataWithPaperID : getSemanticScholarDataWithPaperID,
                     getSemanticScholarDataWithDOI : getSemanticScholarDataWithDOI
 };
+
+
+
 
 
 /* Bir gün bu fonksiyonlar lazım olacak

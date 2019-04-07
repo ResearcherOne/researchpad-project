@@ -9,6 +9,7 @@ const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 	getHostname: "/get-hostname",
 	searchGoogleScholar: "/search-google-scholar",
+	searchArxiv: "/search-arxiv",
 	getCitedByFromGoogleScholar: "/get-citedby-google-scholar",
 	isChromiumReady: "/get-chromium-status"
 };
@@ -69,6 +70,21 @@ function initializeBackend() {
 		} else {
 			response.error("Connection with Google Scholar is not ready yet.");
 		}
+	});
+
+	ipcRestModule.listen(backendApi.searchArxiv, function(request, response){
+		const searchText = request.searchText;
+		const resultList = ''
+	
+		arxivModule.search(searchText, function(err, result){
+			if(!err) {
+				//dataCleanerModule.cleanGoogleResultList(result);
+				response.send({"resultList": result});
+			} else {
+				response.error("OOps, unable to fetch data from arxiv.");
+			}
+		});
+
 	});
 
 	ipcRestModule.listen(backendApi.getCitedByFromGoogleScholar, function(request, response){

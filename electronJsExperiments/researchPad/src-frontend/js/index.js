@@ -250,9 +250,11 @@ function searchResultMouseEnterCallback(e) {
 
 
 	const targetTagNo = parseInt(target.getAttribute("tagNo"));
-	const abstractText = lastGoogleSearchData[targetTagNo].abstract || "No Abstract";
-	const authors = lastGoogleSearchData[targetTagNo].authors || [];
-	const journal = lastGoogleSearchData[targetTagNo].journal || "No Journal";
+	const googleScholarAcademicData = lastAcademicSearchDataList[targetTagNo].getSearchBarExtraGoogle();
+
+	const abstractText = googleScholarAcademicData.abstract;
+	const authors = googleScholarAcademicData.authors;
+	const journal = googleScholarAcademicData.journal;
 	const x = rect.left;
 	const y = rect.top + (target.offsetHeight/2);
 
@@ -272,19 +274,18 @@ function searchResultMouseLeaveCallback(e) {
 	overlayerModule.clearAbstractOverlay();
 }
 
-var lastGoogleSearchData;
+var lastAcademicSearchDataList = [];
 function searchRequestReceivedCallback(userInput) {
 	searchPanel.clearResults();
 	searchGoogle(userInput, function(err, result){
 		if(result && result.length > 0) {
-			lastGoogleSearchData = result;
+			lastAcademicSearchDataList = [];
 			var i = 0;
 			result.forEach(function(element){
-				const title = element.title || "No title";
-				const year = element.year || "?";
-				const citationCount = element.citedByCount || "?";
-				const abstract = element.abstract || "No abstract";
-				searchPanel.addResultElement(i, title, citationCount, year, abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback); //Input element ID as well.
+				const academicDataEntry = new AcademicData(element);
+				lastAcademicSearchDataList[i] = academicDataEntry;
+				const googleEssential = academicDataEntry.getSearchBarEssentialGoogle();
+				searchPanel.addResultElement(i, googleEssential.title, googleEssential.citationCount, googleEssential.year, googleEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback); //Input element ID as well.
 				i++;
 			});
 			searchPanel.enableNextSearch();
@@ -335,7 +336,7 @@ function handleMouseUp(event) {
 			const pos = knowledgeTree.getAbsolutePositionOfGivenPos(event.clientX,event.clientY);
 			
 			const googleSearchDataPosition = parseInt(draggedSearchElementTagNo);
-			var scholarSearchMetadata = lastGoogleSearchData[googleSearchDataPosition];
+			var scholarSearchMetadata = lastAcademicSearchDataList[googleSearchDataPosition].getFullMetadata();
 
 			const rootNodeRadius = 30;
 			var rootNodeObjectID = knowledgeTree.createRootNode(scholarSearchMetadata, rootNodeRadius, pos.x, pos.y);
@@ -584,13 +585,6 @@ function initializeScript() {
 	document.addEventListener("mousedown", handleMouseDown);
 	document.addEventListener("mouseup", handleMouseUp);
 
-	/*
-	setInterval(function(){
-		getChromiumStatus(function(err, res){
-			console.log("Is chromium initialized: "+res);
-		});
-	}, 5000);
-	*/
 	//implement built-in exit button (disable default one as well) to also log exit event.
 }
 

@@ -91,7 +91,7 @@ module.exports = {
 };
 
 
-/* Bir gün bu fonksiyonlar lazım
+/* Bir gün bu fonksiyonlar lazım olacak
 
 function getArxivId(semanticResults){
     return semanticResult.arxivId;

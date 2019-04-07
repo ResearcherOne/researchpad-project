@@ -9,7 +9,32 @@ const fs = require('fs');
 const download = require('download');
 
 
+function searchQueryCreator(query){
+    return { q: query}
+}
 
+function advancedSearchQueryCreator(author,title,category,id){
+    query = {};
+
+    if(author){
+        query['author'] = author
+    }
+
+    if(title){
+        query['title'] = title
+    }
+
+    if(category){
+        query['category'] = author
+    }
+
+    if(id){
+        query['id'] = id
+    }
+
+
+    return query
+}
 makeUrl = function(query, max_results, sort_by) {
     if (max_results == null) {
         max_results = 10;
@@ -24,7 +49,8 @@ key_map = {
     author: 'au',
     q: 'all',
     title: 'ti',
-    category: 'cat'
+    category: 'cat',
+    id : 'id'
 };
 
 coerceQueryKey = function(key) {
@@ -114,10 +140,6 @@ async function search (query, cb) {
     });
 };
 
-module.exports = {
-    search : search,
-    downloadArxivPDF : downloadArxivPDF
-};
 
 function createResultItems(searchResult){
     return searchResult.items;
@@ -162,6 +184,18 @@ async function downloadArxivPDF(arxivID,saveFolderPath,fileName) {
         fs.writeFileSync(filePath, data);
     });
 }
+
+
+
+module.exports = {
+    search : search,
+    downloadArxivPDF : downloadArxivPDF,
+    searchQueryCreator : searchQueryCreator,
+    advancedSearchQueryCreator : advancedSearchQueryCreator
+};
+
+
+
 
 //Sample download : downloadArxivPDFWith("1904.02161", "/home/pc","mahmutTuncer")
 

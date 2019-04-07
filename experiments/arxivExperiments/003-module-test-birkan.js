@@ -1,8 +1,6 @@
-const arxiv = require ("./001");
+const arxiv = require ("./ArxivModule");
 
-var search_query = {
-    title: 'pen',
-};
+var search_query = arxiv.advancedSearchQueryCreator('jackson')
 
 var globalResults = null;
 

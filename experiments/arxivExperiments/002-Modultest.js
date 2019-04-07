@@ -1,4 +1,4 @@
-const arxiv = require ("./001");
+const arxiv = require ("./ArxivModule");
 
 var search_query = {
     title: 'pen',

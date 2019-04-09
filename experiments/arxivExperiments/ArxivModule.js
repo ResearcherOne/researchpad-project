@@ -13,28 +13,6 @@ function searchQueryCreator(query){
     return { q: query}
 }
 
-function advancedSearchQueryCreator(author,title,category,id){
-    query = {};
-
-    if(author){
-        query['author'] = author
-    }
-
-    if(title){
-        query['title'] = title
-    }
-
-    if(category){
-        query['category'] = author
-    }
-
-    if(id){
-        query['id'] = id
-    }
-
-
-    return query
-}
 makeUrl = function(query, max_results, sort_by) {
     if (max_results == null) {
         max_results = 10;
@@ -120,8 +98,12 @@ coerceEntry = function(entry) {
     };
 };
 
+
+
+
 async function search (query, cb) {
-    return request.get(makeUrl(coerceQuery(query)), function(err, resp, data) {
+    let search_query = await searchQueryCreator(query);
+    return request.get(makeUrl(coerceQuery(search_query)), function(err, resp, data) {
         return  xml2js.parseString(data, function(err, parsed) {
             var items, ref, ref1, total;
             if (err != null) {
@@ -190,8 +172,6 @@ async function downloadArxivPDF(arxivID,saveFolderPath,fileName) {
 module.exports = {
     search : search,
     downloadArxivPDF : downloadArxivPDF,
-    searchQueryCreator : searchQueryCreator,
-    advancedSearchQueryCreator : advancedSearchQueryCreator
 };
 
 

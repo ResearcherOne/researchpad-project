@@ -1,9 +1,7 @@
 const arxiv = require ("./ArxivModule");
 
-var search_query = {
-    title: 'pen',
-};
 
+search_query = "neural networks"
 
 var theResults;
 var result;

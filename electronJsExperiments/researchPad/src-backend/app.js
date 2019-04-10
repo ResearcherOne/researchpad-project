@@ -4,6 +4,7 @@ var ipcRestModule = require(__dirname+'/ipcRestModule');
 var crossrefModule = require(__dirname+'/crossrefModule');
 var googleScholarModule = require(__dirname+'/googleScholarScrapperModule');
 var dataCleanerModule = require(__dirname+'/dataCleanerModule');
+var arxivModule = require(__dirname+'/arxivModule');
 
 const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
@@ -74,12 +75,11 @@ function initializeBackend() {
 
 	ipcRestModule.listen(backendApi.searchArxiv, function(request, response){
 		const searchText = request.searchText;
-		const resultList = ''
 	
 		arxivModule.search(searchText, function(err, result){
 			if(!err) {
 				//dataCleanerModule.cleanGoogleResultList(result);
-				response.send({"resultList": result});
+				response.send({"resultList": result.items});
 			} else {
 				response.error("OOps, unable to fetch data from arxiv.");
 			}

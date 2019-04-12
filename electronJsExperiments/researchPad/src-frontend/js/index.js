@@ -21,6 +21,8 @@
 	const searchPanelDivID = "overlay-search-panel";
 	const searchDivID = "search-results-div";
 
+	const trashBinDivID = "overlay-trashbin-mouse-area";
+
 	const baseDivId = "knowledge-tree-div";
 	const nodeEssentialClassName = "node-essential-div";
 	const nodeExtraUpperClassName = "node-extra-upper-div";
@@ -479,6 +481,7 @@
 //Initialization
 	var knowledgeTree = null;
 	var searchPanel = null;
+	var trashBin = null;
 	var nodeDetailsStaticOverlayer = null;
 
 	function initializeScript() {
@@ -495,6 +498,9 @@
 
 		searchPanel = new SearchPanel(searchPanelDivID);
 		searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
+
+		// Add trash bin object
+		trashBin = new TrashBin(trashBinDivID);
 
 		nodeDetailsStaticOverlayer = new NodeDetailsStaticOverlayer(baseDivId, nodeEssentialClassName, nodeExtraUpperClassName, nodeExtraLowerClassName);
 		nodeDetailsStaticOverlayer.setViewButtonPressedCallback(viewWebButtonClicked);

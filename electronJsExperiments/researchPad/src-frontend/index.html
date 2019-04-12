@@ -103,7 +103,8 @@
 		<script src="./js/objects/knowlede-tree/ReferenceNode.js"></script>
 		<script src="./js/objects/knowlede-tree/CitedByNode.js"></script>
 		<script src="./js/objects/knowlede-tree/KnowledgeTree.js"></script>
-		<script src="./js/view/SearchPanel.js"></script>
+		<script src="./js/view/SearchPanel.js"/></script>
+		<script src="./js/view/TrashBin.js"></script>
 		<script src="./js/objects/AcademicData.js"></script>
 		<script src="./js/view/NodeDetailsStaticOverlayer.js"></script>
 		<script src="./js/index.js"></script>
@@ -206,13 +207,12 @@
 
 			#overlay-trashbin-mouse-area {
 				position: fixed;
-				top: 40vh;
-				left: -5.2vw;
-				padding: 2% 2% 2% 0;
+				width: 90px;
+				top: 40%;
+				left: -62px;
+				padding: 3% 3% 3% 0;
 				z-index: 2;
-				
 				transition: left 0.2s;
-				animation: slide-out 0.2s 1;
 			}
 
 			#overlay-trashbin-mouse-area:hover {
@@ -223,21 +223,20 @@
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 10% 10% 10% 10%;
-				background-color: rgba(0, 0, 0, 0.75);
+				padding: 10% 5% 10% 5%;
+				background-color: rgba(0, 0, 0);
+				opacity: 0.50;
 				border-radius: 0 10px 10px 0;
-				box-sizing: border-box;
 				cursor: pointer;
 			}
 
 			#trash-panel-slide img {
-				width: auto;
-				height: 8vh;
-				margin-right: 0;
+				width: 90%;
 				opacity: 0.75;
 			}
 
 			#trash-panel-slide span {
+				font-size: 15pt;
 				font-weight: bold;
 				color: white;
 			}
@@ -460,12 +459,6 @@
 				}
 				100% {
 					transform: rotate(360deg);
-				}
-			}
-
-			@keyframes slide-in {
-				100% {
-					left: -5.2vw;
 				}
 			}
 		</style>

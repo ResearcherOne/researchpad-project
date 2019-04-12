@@ -5,6 +5,7 @@
 		searchGoogleScholar: "/search-google-scholar",
 		searchArxiv: "/search-arxiv",
 		getCitedByFromGoogleScholar: "/get-citedby-google-scholar",
+		getSemanticScholarData: "/get-semantic-scholar",
 		isChromiumReady: "/get-chromium-status"
 	};
 
@@ -36,10 +37,16 @@
 
 	const LEAF_NODE_HIDE_DURATION_SEC = 1.5;
 
+	const AVAILABLE_SEARCH_PLATFORMS = {
+		GOOGLE: "google",
+		ARXIV: "arxiv"
+	};
+	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
 //Backend Communication
 	function request(apiUrl, requestObj, callback) {
 		ipcRestRenderer.request(apiUrl, requestObj, callback);
 	}
+	/*
 	function getChromiumStatus(callback) {
 		const requestObj = {};
 		request(backendApi.isChromiumReady, requestObj, function(err, responseObj){
@@ -52,6 +59,7 @@
 			}
 		});
 	}
+	*/
 	function getHostname(callback) {
 		const requestObj = {};
 		request(backendApi.getHostname, requestObj, function(err, responseObj){
@@ -68,9 +76,9 @@
 	function performSearch(searchPlatform, searchText, callback) {
 		const requestObj = {"searchText": searchText};
 		var api;
-		if(searchPlatform == "google") {
+		if(searchPlatform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
 			api = backendApi.searchGoogleScholar;
-		} else if (searchPlatform == "arxiv") {
+		} else if (searchPlatform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
 			api = backendApi.searchArxiv;
 		} else {
 			loggerModule.error("error", "unknown search platform requested.");
@@ -80,6 +88,18 @@
 			if(!err) {
 				var resultList = responseObj.resultList;
 				callback(null, resultList);
+			} else {
+				loggerModule.error("error", "unable to get data from google scholar.");
+				callback(err, null);
+			}
+		});
+	}
+	function fetchRootNodeDetails(paperId, callback) {
+		const requestObj = {"paperId": paperId};
+		request(backendApi.getSemanticScholarData, requestObj, function(err, responseObj){
+			if(!err) {
+				var result = responseObj.result;
+				callback(null, result);
 			} else {
 				loggerModule.error("error", "unable to get data from google scholar.");
 				callback(err, null);
@@ -154,9 +174,47 @@
 		const journal = nodeObj.getJournal() || "No journal";
 		const authors = nodeObj.getAuthors() || "No author";
 		const link = nodeObj.getLink() || "";
+		console.log("LINK: "+link);
 		
 		nodeDetailsStaticOverlayer.setContent(title, year, citationCount, abstract, journal, authors, link);
 		nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+(nodeRadius*1.5)), (nodeCenter.y-nodeRadius));
+	}
+
+	function displaySearchBarExtra(x, y, elementTagNo) {
+		const maxAbstractTextChar = 200;
+		const maxAuthorCount = 5;
+
+		var searchBarExtraData;
+		if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
+			searchBarExtraData = lastAcademicSearchDataList[elementTagNo].getSearchBarExtraGoogle();
+		} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
+			searchBarExtraData = lastAcademicSearchDataList[elementTagNo].getSearchBarExtraArxiv(); 
+		} else {
+			searchBarExtraData = {
+				abstractText: "Unavailable",
+				authors: [],
+				journal: "unavailable"
+			}
+			loggerModule.log("error", "Unknown search platform from searchbar extra display call.");
+		}
+	
+		const abstractText = text_truncate(searchBarExtraData.abstract, maxAbstractTextChar);
+		const authors = searchBarExtraData.authors;
+		const journal = searchBarExtraData.journal;
+	
+		var authorText = "";
+		authors.forEach(function(author, i){
+			if(i < maxAuthorCount) {
+				if(i != (authors.length-1))
+					authorText += author + ", ";
+				else
+					authorText += author;
+			} else {
+				//author display limit  reached.
+			}
+		});
+		
+		overlayerModule.drawAbstractOverlay(x, y, abstractText, journal, authorText);
 	}
 	
 //Handle UI Actions
@@ -215,36 +273,14 @@
 		loggerModule.log("action", "nodeDragEnd", {"type": nodeType});
 	}
 	function searchResultMouseEnterCallback(e) {
-		const maxAbstractTextChar = 200;
-		const maxAuthorCount = 5;
-	
 		const target = e.target;
+		const targetTagNo = parseInt(target.getAttribute("tagNo"));
 		var rect = offset(target);
 	
-	
-		const targetTagNo = parseInt(target.getAttribute("tagNo"));
-		const googleScholarAcademicData = lastAcademicSearchDataList[targetTagNo].getSearchBarExtraArxiv();
-	
-		const abstractText = text_truncate(googleScholarAcademicData.abstract, maxAbstractTextChar);
-		const authors = googleScholarAcademicData.authors;
-		const journal = googleScholarAcademicData.journal;
 		const x = rect.left;
 		const y = rect.top + (target.offsetHeight/2);
-	
-		var authorText = "";
-		authors.forEach(function(author, i){
-			if(i < maxAuthorCount) {
-				if(i != (authors.length-1))
-					authorText += author + ", ";
-				else
-					authorText += author;
-			} else {
-				//author display limit  reached.
-			}
-		});
-		
-		overlayerModule.drawAbstractOverlay(x, y, abstractText, journal, authorText);
-		
+
+		displaySearchBarExtra(x, y, targetTagNo);
 	}
 	function searchResultMouseLeaveCallback(e) {
 		overlayerModule.clearAbstractOverlay();
@@ -252,16 +288,23 @@
 	var lastAcademicSearchDataList = [];
 	function searchRequestReceivedCallback(userInput) {
 		searchPanel.clearResults();
-		performSearch("arxiv", userInput, function(err, result){
+		performSearch(CURRENT_SEARCH_PLATFORM, userInput, function(err, result){
 			if(result && result.length > 0) {
 				lastAcademicSearchDataList = [];
 				var i = 0;
 				console.log(result[0]);
 				result.forEach(function(element){
-					const academicDataEntry = new AcademicData(element);
+					const academicDataEntry = new AcademicData(CURRENT_SEARCH_PLATFORM, element);
 					lastAcademicSearchDataList[i] = academicDataEntry;
-					const googleEssential = academicDataEntry.getSearchBarEssentialArxiv();
-					searchPanel.addResultElement(i, googleEssential.title, googleEssential.citationCount, googleEssential.year, googleEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback); //Input element ID as well.
+					if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
+						const googleEssential = academicDataEntry.getSearchBarEssentialGoogle();
+						searchPanel.addResultElement(i, googleEssential.title, googleEssential.citationCount, googleEssential.year, googleEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
+					} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
+						const arxivEssential = academicDataEntry.getSearchBarEssentialArxiv();
+						searchPanel.addResultElement(i, arxivEssential.title, googleEssential.arxivEssential, arxivEssential.year, arxivEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
+					} else {
+						loggerModule.error("error", "unknown search platform.");
+					}
 					i++;
 				});
 				searchPanel.enableNextSearch();
@@ -296,11 +339,10 @@
 
 				const pos = knowledgeTree.getAbsolutePositionOfGivenPos(event.clientX,event.clientY);
 				
-				const googleSearchDataPosition = parseInt(draggedSearchElementTagNo);
-				var scholarSearchMetadata = lastAcademicSearchDataList[googleSearchDataPosition].getFullMetadata();
+				const elementPositionInSearchData = parseInt(draggedSearchElementTagNo);
+				var fullMetadata = lastAcademicSearchDataList[elementPositionInSearchData].getFullMetadata();
 
-				createNewRootNodeOnKnowledgeTree(scholarSearchMetadata, pos.x, pos.y);
-				
+				createNewRootNodeOnKnowledgeTree(CURRENT_SEARCH_PLATFORM, fullMetadata, pos.x, pos.y);
 			} else {
 				searchPanel.setColorOfSearchResultElement(draggedSearchElementTagNo, "");
 			}
@@ -404,22 +446,30 @@
 		window.open(link);
 	}
 
-//Handle Knowledge Tree Actions
-	function createNewRootNodeOnKnowledgeTree(metadata, x, y) {
-		const rootNodeRadius = 30;
+//Knowledge Tree Action Helper Functions
+	function createRootNodeFromGoogleScholar(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
 		var rootNodeObjectID = knowledgeTree.createRootNode(metadata, rootNodeRadius, x, y);
-		
-		getCitedByOfArticle(scholarSearchMetadata.citedByLink, function(err, citedByList){
-			const leafNodeRadius = 15;
+		getCitedByOfArticle(metadata.citedByLink, function(err, citedByList){
 			if(citedByList) {
 				console.log(citedByList);
 				citedByList.forEach(function(citedByMetadata){
 					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByMetadata, leafNodeRadius);
 				});
 			} else {
-				console.log("Err cited by fetch");
+				loggerModule.error("error", "Err cited by fetch.");
 			}
 		});
+	}
+//Handle Knowledge Tree Actions
+	function createNewRootNodeOnKnowledgeTree(platform, metadata, x, y) {
+		const rootNodeRadius = 30;
+		const leafNodeRadius = 15;
+		if(platform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
+			createRootNodeFromGoogleScholar(metadata, x, y, rootNodeRadius, leafNodeRadius);
+		} else if (platform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
+		} else {
+			loggerModule.error("error", "unknown search platform requested.");
+		}
 	}
 	function handleCitationNodeToRootNode() {
 	}
@@ -437,7 +487,6 @@
 
 		knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200, nodeConnectionsConfig, mapClickedCallback);
 
-		//knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 		knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 		knowledgeTree.setNodeMouseOverCallback(nodeMouseOverCallback);
@@ -510,7 +559,6 @@
 			knowledgeTree.destroy();
 			knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
 
-			//knowledgeTree.setNodeCreateRequestCallback(createNodeRequestReceivedCallback);
 			knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 			knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 

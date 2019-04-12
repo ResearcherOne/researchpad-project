@@ -1,10 +1,13 @@
-function AcademicData(metadata){
+function AcademicData(platform, metadata){
+	this.platform = platform;
 	this.metadata = metadata;
-
+	
+	this.getPlatform = function() {
+		return this.platform;
+	}
 	this.getFullMetadata = function() {
 		return this.metadata
 	};
-	
 	this.getSearchBarEssentialGoogle = function() {
 		const title = this.metadata.title || "No title";
 		const year = this.metadata.year || "?";
@@ -29,7 +32,6 @@ function AcademicData(metadata){
 			journal: journal
 		}
 	}
-
 	this.getSearchBarEssentialArxiv = function() {
 		const extractedYear = new Date(this.metadata.published).getFullYear();
 

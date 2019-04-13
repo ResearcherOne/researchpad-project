@@ -177,12 +177,12 @@ function createPDFDownloadLink(arxivID) {
     return "https://arxiv.org/pdf/"+arxivID;
 }
 
-async function downloadArxivPDF(arxivID,saveFolderPath,fileName) {
+async function downloadArxivPDF(arxivID,saveFolderPath,fileName,callback) {
     let url = await createPDFDownloadLink(arxivID);
     let filePath = saveFolderPath+"/"+fileName+".pdf"
     download(url).then(data => {
         fs.writeFileSync(filePath, data);
-    });
+    }).catch(err => callback(err,null));
 }
 
 

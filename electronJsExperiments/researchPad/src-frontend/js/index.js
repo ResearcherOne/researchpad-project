@@ -1,5 +1,5 @@
 //Configurations
-	const backendApi = {
+	const BACKEND_API = {
 		//getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 		getHostname: "/get-hostname",
 		searchGoogleScholar: "/search-google-scholar",
@@ -26,7 +26,7 @@
 	const nodeExtraUpperClassName = "node-extra-upper-div";
 	const nodeExtraLowerClassName = "node-extra-lower-div";
 
-	const nodeConnectionsConfig = {
+	const NODE_CONNECTIONS_CONFIG = {
 		citedByAbsoluteStartDegree: 280,
 		citedByAbsoluteEndDegree: 90,
 		referenceAbsoluteStartDegree: 120,
@@ -41,7 +41,12 @@
 		GOOGLE: "google",
 		ARXIV: "arxiv"
 	};
-	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
+	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
+
+	const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
+		arxivId: "arxivId",
+		semananticId: "semanticId"
+	}
 //Backend Communication
 	function request(apiUrl, requestObj, callback) {
 		ipcRestRenderer.request(apiUrl, requestObj, callback);
@@ -49,7 +54,7 @@
 	/*
 	function getChromiumStatus(callback) {
 		const requestObj = {};
-		request(backendApi.isChromiumReady, requestObj, function(err, responseObj){
+		request(BACKEND_API.isChromiumReady, requestObj, function(err, responseObj){
 			if(!err) {
 				var status = responseObj.chorimumStatus;
 				callback(null, status);
@@ -62,7 +67,7 @@
 	*/
 	function getHostname(callback) {
 		const requestObj = {};
-		request(backendApi.getHostname, requestObj, function(err, responseObj){
+		request(BACKEND_API.getHostname, requestObj, function(err, responseObj){
 			if(!err) {
 				var hostname = responseObj.hostname;
 				callback(null, hostname);
@@ -77,9 +82,9 @@
 		const requestObj = {"searchText": searchText};
 		var api;
 		if(searchPlatform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
-			api = backendApi.searchGoogleScholar;
+			api = BACKEND_API.searchGoogleScholar;
 		} else if (searchPlatform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
-			api = backendApi.searchArxiv;
+			api = BACKEND_API.searchArxiv;
 		} else {
 			loggerModule.error("error", "unknown search platform requested.");
 		}
@@ -94,21 +99,21 @@
 			}
 		});
 	}
-	function fetchRootNodeDetails(paperId, callback) {
-		const requestObj = {"paperId": paperId};
-		request(backendApi.getSemanticScholarData, requestObj, function(err, responseObj){
+	function fetchPaperDetailsFromSemanticScholar(fetchMethod, paperId, callback) {
+		const requestObj = {"fetchMethod": fetchMethod, "paperId": paperId};
+		request(BACKEND_API.getSemanticScholarData, requestObj, function(err, responseObj){
 			if(!err) {
-				var result = responseObj.result;
+				var result = responseObj.metadata;
 				callback(null, result);
 			} else {
-				loggerModule.error("error", "unable to get data from google scholar.");
+				loggerModule.error("error", "unable to get data from semantic scholar.");
 				callback(err, null);
 			}
 		});
 	}
 	function getCitedByOfArticle(citedByLink, callback) {
 		const requestObj = {"citedByLink": citedByLink};
-		request(backendApi.getCitedByFromGoogleScholar, requestObj, function(err, responseObj){
+		request(BACKEND_API.getCitedByFromGoogleScholar, requestObj, function(err, responseObj){
 			if(!err) {
 				var resultList = responseObj.resultList;
 				callback(null, resultList);
@@ -185,10 +190,8 @@
 		const maxAuthorCount = 5;
 
 		var searchBarExtraData;
-		if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
-			searchBarExtraData = lastAcademicSearchDataList[elementTagNo].getSearchBarExtraGoogle();
-		} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
-			searchBarExtraData = lastAcademicSearchDataList[elementTagNo].getSearchBarExtraArxiv(); 
+		if(lastAcademicSearchDataList[elementTagNo]) {
+			searchBarExtraData = lastAcademicSearchDataList[elementTagNo].getSearchBarExtra();
 		} else {
 			searchBarExtraData = {
 				abstractText: "Unavailable",
@@ -294,14 +297,16 @@
 				var i = 0;
 				console.log(result[0]);
 				result.forEach(function(element){
-					const academicDataEntry = new AcademicData(CURRENT_SEARCH_PLATFORM, element);
-					lastAcademicSearchDataList[i] = academicDataEntry;
 					if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
-						const googleEssential = academicDataEntry.getSearchBarEssentialGoogle();
+						const academicDataEntry = new GoogleScholarData(element);
+						lastAcademicSearchDataList[i] = academicDataEntry;
+						const googleEssential = academicDataEntry.getSearchBarEssential();
 						searchPanel.addResultElement(i, googleEssential.title, googleEssential.citationCount, googleEssential.year, googleEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
 					} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
-						const arxivEssential = academicDataEntry.getSearchBarEssentialArxiv();
-						searchPanel.addResultElement(i, arxivEssential.title, googleEssential.arxivEssential, arxivEssential.year, arxivEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
+						const academicDataEntry = new ArxivData(element);
+						lastAcademicSearchDataList[i] = academicDataEntry;
+						const arxivEssential = academicDataEntry.getSearchBarEssential();
+						searchPanel.addResultElement(i, arxivEssential.title, arxivEssential.arxivEssential, arxivEssential.year, arxivEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
 					} else {
 						loggerModule.error("error", "unknown search platform.");
 					}
@@ -460,6 +465,18 @@
 			}
 		});
 	}
+	function createRootNodeFromArxiv(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
+		var rootNodeObjectID = knowledgeTree.createRootNode(metadata, rootNodeRadius, x, y);
+		const fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
+		const paperArxivId = "abc";
+		fetchPaperDetailsFromSemanticScholar(fetchMethod, paperArxivId, function(err, result){
+			if(result) {
+				console.log(result);
+			} else {
+				loggerModule.error("error", "Err semantic scholar data fetch.");
+			}
+		});
+	}
 //Handle Knowledge Tree Actions
 	function createNewRootNodeOnKnowledgeTree(platform, metadata, x, y) {
 		const rootNodeRadius = 30;
@@ -467,6 +484,7 @@
 		if(platform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
 			createRootNodeFromGoogleScholar(metadata, x, y, rootNodeRadius, leafNodeRadius);
 		} else if (platform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
+			createRootNodeFromArxiv(metadata, x, y, rootNodeRadius, leafNodeRadius);
 		} else {
 			loggerModule.error("error", "unknown search platform requested.");
 		}
@@ -485,7 +503,7 @@
 		ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
 		overlayerModule.initializeModule(overlayDivID, upperPanelDivID, abstractDivID);
 
-		knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200, nodeConnectionsConfig, mapClickedCallback);
+		knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200, NODE_CONNECTIONS_CONFIG, mapClickedCallback);
 
 		knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);

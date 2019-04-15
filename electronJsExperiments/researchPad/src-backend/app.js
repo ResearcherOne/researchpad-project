@@ -3,6 +3,7 @@ var os = require("os");
 var ipcRestModule = require(__dirname+'/ipcRestModule');
 var crossrefModule = require(__dirname+'/crossrefModule');
 var googleScholarModule = require(__dirname+'/googleScholarScrapperModule');
+var semanticScholarModule = require(__dirname+'/semanticScholarModule')
 var dataCleanerModule = require(__dirname+'/dataCleanerModule');
 var arxivModule = require(__dirname+'/arxivModule');
 
@@ -12,6 +13,7 @@ const backendApi = {
 	searchGoogleScholar: "/search-google-scholar",
 	searchArxiv: "/search-arxiv",
 	getCitedByFromGoogleScholar: "/get-citedby-google-scholar",
+	getSemanticScholarData: "/get-semantic-scholar",
 	isChromiumReady: "/get-chromium-status"
 };
 
@@ -100,6 +102,23 @@ function initializeBackend() {
 			});
 		} else {
 			response.error("Connection with Google Scholar is not ready yet.");
+		}
+	});
+
+	ipcRestModule.listen(backendApi.getSemanticScholarData, function(request, response){
+		const fetchMethod = request.fetchMethod;
+		const paperId = request.paperId;
+
+		if(fetchMethod == "arxivId") {
+			semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(err, result){
+				if(!err) {
+					response.send({"metadata": result});
+				} else {
+					response.error("OOps, unable to fetch data from semantic scholar");
+				}
+			});
+		} else {
+			response.error("Unknown fetch method.");
 		}
 	});
 

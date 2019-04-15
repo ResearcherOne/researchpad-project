@@ -6,7 +6,7 @@
 	//User Action Helper Functions
 	//Handle User Actions (Aggregated from UI Actions)
 	//Initialization
-//THIS IS A CHANGE FOR THE BAD COMMIT
+
 //Configurations
 	const BACKEND_API = {
 		//getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
@@ -47,8 +47,8 @@
 	const LEAF_NODE_HIDE_DURATION_SEC = 1.5;
 
 	const AVAILABLE_SEARCH_PLATFORMS = {
-		GOOGLE: "google",
-		ARXIV: "arxiv"
+		GOOGLE: "Google Scholar",
+		ARXIV: "Arxiv"
 	};
 	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
 
@@ -575,7 +575,8 @@
 
 		searchPanel = new SearchPanel(searchPanelDivID);
 		searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
-
+		searchPanel.setSearchPanelTitle(CURRENT_SEARCH_PLATFORM);
+		
 		nodeDetailsStaticOverlayer = new NodeDetailsStaticOverlayer(baseDivId, nodeEssentialClassName, nodeExtraUpperClassName, nodeExtraLowerClassName);
 		nodeDetailsStaticOverlayer.setViewButtonPressedCallback(viewWebButtonClicked);
 

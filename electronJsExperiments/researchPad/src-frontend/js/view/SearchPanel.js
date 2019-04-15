@@ -5,6 +5,7 @@ function SearchPanel(searchPanelDivId){
 	var firstDivInSearchPanel = document.getElementById(this.searchPanelDivId).getElementsByTagName('div')[0]
 	var secondDivInSearchPanel = document.getElementById(this.searchPanelDivId).getElementsByTagName('div')[1];
 
+	this.searchTitle = firstDivInSearchPanel.getElementsByTagName('p')[0];
 	this.textBox = firstDivInSearchPanel.getElementsByTagName('input')[0];
 	this.searchButton = firstDivInSearchPanel.getElementsByTagName('button')[0];
 
@@ -78,5 +79,8 @@ function SearchPanel(searchPanelDivId){
 		elements.forEach(function(element){
 			element.style.color = color;
 		});
+	}
+	this.setSearchPanelTitle = function(text) {
+		this.searchTitle.innerHTML = text;
 	}
 }

@@ -1,3 +1,12 @@
+//Index.js Sections
+	//Configurations
+	//Backend Communication
+	//UI Helper Functions
+	//Handle UI Actions
+	//User Action Helper Functions
+	//Handle User Actions (Aggregated from UI Actions)
+	//Initialization
+
 //Configurations
 	const BACKEND_API = {
 		//getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
@@ -124,7 +133,7 @@
 		});
 	}
 
-//Helper Functions
+//UI Helper Functions
 	function offset(el) {
 		var rect = el.getBoundingClientRect(),
 		scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,

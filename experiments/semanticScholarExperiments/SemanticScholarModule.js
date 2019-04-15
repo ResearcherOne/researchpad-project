@@ -21,33 +21,6 @@ function createUrlWithSemanticAuthor(id){
         +"?include_unknown_references=true";
 }
 
-async function createResults(url){
-    semanticPage = await fetch(url)
-        .then(res => res.json())
-        .catch(err => { throw err });
-    return semanticPage;
-}
-
-function getCitations(semanticResults){
-    return semanticResults.citations;
-}
-
-async function getCitationsAndReferencesOfArxivPaper(arxivId){
-    url = createUrlWithArxiv(arxivId);
-    citationsAndReferences = [];
-    results = await createResults(url).then((res) =>{
-        let citations = getCitations(res);
-        let references = getReferences(res);
-        citationsAndReferences.push({citations,references});
-    });
-    return citationsAndReferences;
-}
-
-
-function getReferences(semanticResults){
-    return semanticResults.references;
-}
-
 
 async function getStringifiedCitationsAndReferencesOfArxivPaper(arxivId){
     url = createUrlWithArxiv(arxivId);
@@ -59,14 +32,6 @@ async function getStringifiedCitationsAndReferencesOfArxivPaper(arxivId){
     });
     return citationsAndReferences;
 }
-
-
-async function getSemanticScholarDataWithPaperID(semanticScholarPaperID){
-    let url = createUrlWithSemanticPaper(semanticScholarPaperID);
-    let results = await createResults(url);
-    return results;
-}
-
 async function getSemanticScholarDataWithAuthorID(semanticScholarAuthorID){
     let url = createUrlWithSemanticAuthor(semanticScholarAuthorID);
     let results = await createResults(url);
@@ -80,14 +45,52 @@ async function getSemanticScholarDataWithDOI(doi){
 }
 
 
+async function createResults(url){
+    semanticPage = await fetch(url)
+        .then(res => res.json())
+        .catch(err => { return err });
+    return semanticPage;
+}
+
+function getCitations(semanticResults){
+    return semanticResults.citations;
+}
+
+async function getCitationsAndReferencesOfArxivPaper(arxivId,callback){
+    url = createUrlWithArxiv(arxivId);
+    citationsAndReferences = [];
+    results = await createResults(url).then((res) =>{
+        let citations = getCitations(res);
+        let references = getReferences(res);
+        citationsAndReferences.push({citations,references});
+    }).catch(err => callback(err,null));
+    return citationsAndReferences;
+}
+
+
+function getReferences(semanticResults){
+    return semanticResults.references;
+}
+
+
+async function getSemanticScholarDataViaId(semanticScholarPaperID){
+    let url = createUrlWithSemanticPaper(semanticScholarPaperID);
+    let results = await createResults(url).then((res) => callback(null,res)).catch(err => callback(err,null));
+    return results;
+}
+
+
+async function getSemanticScholarDataViaArxivId(id){
+    let url = createUrlWithArxiv(id);
+    let results = await createResults(url).then((res) => callback(null,res)).catch(err => callback(err,null));
+    return results;
+}
+
 module.exports = {
 
                     getCitationsAndReferencesOfArxivPaper : getCitationsAndReferencesOfArxivPaper,
-                    getStringifiedCitationsAndReferencesOfArxivPaper : getStringifiedCitationsAndReferencesOfArxivPaper,
-
-                    getSemanticScholarDataWithAuthorID : getSemanticScholarDataWithAuthorID,
-                    getSemanticScholarDataWithPaperID : getSemanticScholarDataWithPaperID,
-                    getSemanticScholarDataWithDOI : getSemanticScholarDataWithDOI
+                    getSemanticScholarDataViaId : getSemanticScholarDataViaId ,
+                    getSemanticScholarDataViaArxivId : getSemanticScholarDataViaArxivId
 };
 
 

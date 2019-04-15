@@ -6,7 +6,7 @@
 	//User Action Helper Functions
 	//Handle User Actions (Aggregated from UI Actions)
 	//Initialization
-
+//THIS IS A CHANGE FOR THE BAD COMMIT
 //Configurations
 	const BACKEND_API = {
 		//getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",

@@ -160,24 +160,15 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	this.getRootNodeTitleById = function(ID) {
 		return this.rootNodes[ID].getTitle();
 	}
-	this.createRootNode = function (metadata, radius, x, y) {
-		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+	this.createRootNode = function (initialAcademicData, radius, x, y) {
+		const ID = ("root-"+getRandomInt(99999)).hashCode();
+		this.rootNodes[ID] = new RootNode(ID, initialAcademicData, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
-	this.createRootNodeAtMousePos = function(metadata, radius) {
-		const x = this.getMouseAbsolutePosition().x;
-		const y = this.getMouseAbsolutePosition().y;
-
-		const ID = ("root-"+metadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[ID] = new RootNode(ID, metadata, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
-		this.rootNodeCount++;
-		return ID;
-	}
-	this.addReferenceToRootNode = function(rootID, refMetadata, radius) {
-		const refID = ("ref-"+refMetadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[rootID].createReference(refID, refMetadata, radius);
+	this.addReferenceToRootNode = function(rootID, initialAcademicData, radius) {
+		const refID = ("ref-"+getRandomInt(99999)).hashCode();
+		this.rootNodes[rootID].createReference(refID, initialAcademicData, radius);
 		return refID;
 	}
 	this.removeReferenceFromRootNode = function(rootID, refID) {
@@ -186,9 +177,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	this.removeCitedbyFromRootNode = function(rootID, citedByID) {
 		this.rootNodes[rootID].removeCitedBy(citedByID);
 	}
-	this.addCitedbyToRootNode = function(rootID, citedByMetadata, radius) {
-		const refID = ("ref-"+citedByMetadata.title+getRandomInt(99999)).hashCode();
-		this.rootNodes[rootID].createCitedBy(refID, citedByMetadata, radius);
+	this.addCitedbyToRootNode = function(rootID, initialAcademicData, radius) {
+		const refID = ("ref-"+getRandomInt(99999)).hashCode();
+		this.rootNodes[rootID].createCitedBy(refID, initialAcademicData, radius);
 		return refID;
 	}
 	this.setSiblingReference = function(rootID, siblingReferenceRootID) {

@@ -1,18 +1,5 @@
-/*
-	Core Metadata
-		Title
-		Authors
-	Ideal Extras
-		Year
-		Citedby Count
-		Citedby List
-		Reference Count
-		References List
-
-*/
-
-function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) { //nodeMouseOverCallback, nodeMouseOutCallback
-	Node.call(this, ID, metadata, radius);
+function CitedByNode(rootNodeID, rootNodeVisualObj, ID, academicData, radius, referencePosition, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) { //nodeMouseOverCallback, nodeMouseOutCallback
+	Node.call(this, ID, academicData, radius);
 
 	this.rootNodeID = rootNodeID;
 	this.referencePosition = referencePosition;
@@ -33,7 +20,7 @@ function CitedByNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, refere
 	this.serialize = function() {
 		var serializedObj = {};
 		serializedObj.ID = this.ID;
-		serializedObj.metadata = this.metadata;
+		serializedObj.academicData = this.academicData;
 		serializedObj.radius = this.radius;
 
 		serializedObj.rootNodeID = this.rootNodeID;

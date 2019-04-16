@@ -1,11 +1,14 @@
-function Node(ID, metadata, radius){ //Abstract Class
+function Node(ID, academicData, radius){ //Abstract Class
+	console.log("NODE DATA: "+JSON.stringify(academicData));
 	this.ID = ID;
-	this.metadata = metadata;
+	this.academicData = academicData;
 	this.radius = radius;
 
 	this.visualObject;
 	
 	this.isHidden = false;
+
+	this.metadata = this.academicData;//TEMPORARY, SCHOLAR DATA SUPPORT ONLY.
 
 	this.getVisualObject = function() {
 		return this.visualObject;

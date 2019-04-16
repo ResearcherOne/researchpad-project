@@ -1,5 +1,5 @@
-function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, clickedCallback) {
-	Node.call(this, ID, metadata, radius);
+function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, academicData, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, clickedCallback) {
+	Node.call(this, ID, academicData, radius);
 
 	this.rootNodeID = rootNodeID;
 	this.referencePosition = referencePosition;
@@ -40,7 +40,7 @@ function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, refe
 	this.serialize = function() {
 		var serializedReferenceObj = {};
 		serializedReferenceObj.ID = this.ID;
-		serializedReferenceObj.metadata = this.metadata;
+		serializedReferenceObj.academicData = this.academicData;
 		serializedReferenceObj.radius = this.radius;
 
 		serializedReferenceObj.rootNodeID = this.rootNodeID;

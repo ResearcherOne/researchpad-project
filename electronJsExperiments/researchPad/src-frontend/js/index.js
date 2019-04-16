@@ -49,15 +49,21 @@
 
 	const LEAF_NODE_HIDE_DURATION_SEC = 1.5;
 
-	const AVAILABLE_SEARCH_PLATFORMS = {
+	const AVAILABLE_SEARCH_PLATFORMS = { //This will turn into fields such as Physics, Computer Science, etc.
 		GOOGLE: "Google Scholar",
 		ARXIV: "Arxiv"
 	};
-	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
+	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
 
 	const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
 		arxivId: "arxivId",
 		semananticId: "semanticId"
+	}
+
+	const ACADEMIC_DATA_KEY_NAMES = {
+		ARXIV: "arxiv",
+		GOOGLE_SCHOLAR: "googleScholar",
+		SEMANTIC_SCHOLAR: "semanticScholar"
 	}
 
 //Backend Communication
@@ -307,6 +313,7 @@
 		academicMetadataObj[AVAILABLE_SEARCH_PLATFORMS.GOOGLE] = metadata;
 
 		var rootNodeObjectID = knowledgeTree.createRootNode(academicMetadataObj, rootNodeRadius, x, y);
+	
 		return rootNodeObjectID;
 	}
 	function createRootNodeFromGoogleScholar(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
@@ -683,3 +690,9 @@
 
 	//TODO
 		//Update knowledgeTree.createRootNode(academicMetadataObj, rootNodeRadius, x, y); function to accept academicMetadataObj instead of pure metadata.
+		//Update all nodes to have hashed ID by title. This will make them find easily from the Index.
+			//const nodeId = helperModule.hash(title)
+			//knowledgeTree.createRootNode(nodeId)
+		//EDIT createRootNodeWithScholarData
+			//give key & metadata for storing it in initialAcademicData in NodeObj.
+			//Do necessary changes in all citedby reference rootnode knowledge tree and nodeobj

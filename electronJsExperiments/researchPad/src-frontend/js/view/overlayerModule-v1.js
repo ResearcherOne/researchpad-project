@@ -54,8 +54,6 @@ var overlayerModule = (function() {
 	) {
 		document.getElementById(divId).style.display = "block";
 
-		console.log("HERE");
-
 		var offsetHeight = document.getElementById(divId).offsetHeight;
 		var offsetWidth = document.getElementById(divId).offsetWidth;
 
@@ -66,6 +64,10 @@ var overlayerModule = (function() {
 			title + "<br><br>" + "Citation: " + citationCount + " Year: " + year;
 	};
 
+	/**
+	 * Method to display the abstract overlay when a user hovers over
+	 * an item in the search content
+	 */
 	var drawAbstractOverlay = function(x, y, abstract, journal, authors) {
 		const overlayMargin = 1; // In vw/vh
 		const yBottomMax = window.innerHeight;

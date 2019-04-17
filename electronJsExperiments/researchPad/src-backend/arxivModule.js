@@ -10,7 +10,9 @@ const download = require('download');
 
 
 function searchQueryCreator(query){
-    return { q: query}
+    let newQuery = "\"" + query +"\""
+
+    return { q: newQuery}
 }
 
 makeUrl = function(query, max_results, sort_by) {
@@ -173,7 +175,6 @@ module.exports = {
     search : search,
     downloadArxivPDF : downloadArxivPDF,
 };
-
 
 
 

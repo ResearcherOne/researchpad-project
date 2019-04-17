@@ -1,4 +1,4 @@
-var overlayerModule = (function () {
+var overlayerModule = (function() {
 	var divId;
 	var titleId;
 
@@ -14,53 +14,93 @@ var overlayerModule = (function () {
 	var promptCallback = null;
 
 	function promptUserCallback() {
-		if(promptCallback) {
+		if (promptCallback) {
 			const userInput = document.getElementById("promptTextBox").value;
 			promptCallback(userInput);
 			promptCallback = null;
-			document.getElementById(divId).style.display = "none";	
+			document.getElementById(divId).style.display = "none";
 		} else {
-			document.getElementById(divId).style.display = "none";	
+			document.getElementById(divId).style.display = "none";
 		}
 	}
 
-	var initializeModule = function(overlayDivId, upperPanelDivId, abstractDivIdInput) {
+	var initializeModule = function(
+		overlayDivId,
+		upperPanelDivId,
+		abstractDivIdInput
+	) {
 		divId = overlayDivId;
 		titleId = divId + "-text";
 
 		abstractDivId = abstractDivIdInput;
 		abstractTextId = abstractDivId + "-text";
-		console.log("abstractDivId: "+abstractDivId);
+		console.log("abstractDivId: " + abstractDivId);
 
 		upperPanelId = upperPanelDivId;
 		infoDivId = upperPanelId + "-info-div";
 
 		divWidthVw = document.getElementById(divId).style.width;
 		divHeightVh = document.getElementById(divId).style.height;
-	}
+	};
 
-	var drawTitleOverlay = function(x, y, title, authors, year, journal, citationCount) {
+	var drawTitleOverlay = function(
+		x,
+		y,
+		title,
+		authors,
+		year,
+		journal,
+		citationCount
+	) {
 		document.getElementById(divId).style.display = "block";
+
+		console.log("HERE");
 
 		var offsetHeight = document.getElementById(divId).offsetHeight;
 		var offsetWidth = document.getElementById(divId).offsetWidth;
 
-	    document.getElementById(divId).style.left = x+"px"; //x.
-	    document.getElementById(divId).style.top = (y-offsetHeight)+"px"; //y
-	    //document.getElementById(titleId).innerHTML = title+"<br><br>"+"Authors: "+authors+"<br>"+"Year: "+year+"<br>"+"Journal: "+journal+"<br>"+"Citation: "+citationCount;
-		document.getElementById(titleId).innerHTML = title+"<br><br>"+"Citation: "+citationCount+" Year: "+year;
-	}
+		document.getElementById(divId).style.left = x + "px"; //x.
+		document.getElementById(divId).style.top = y - offsetHeight + "px"; //y
+		//document.getElementById(titleId).innerHTML = title+"<br><br>"+"Authors: "+authors+"<br>"+"Year: "+year+"<br>"+"Journal: "+journal+"<br>"+"Citation: "+citationCount;
+		document.getElementById(titleId).innerHTML =
+			title + "<br><br>" + "Citation: " + citationCount + " Year: " + year;
+	};
 
 	var drawAbstractOverlay = function(x, y, abstract, journal, authors) {
-		document.getElementById(abstractDivId).style.display = "block";
+		const overlayMargin = 1; // In vw/vh
+		const yBottomMax = window.innerHeight;
+		const yTopMax = 0;
 
-		var offsetWidth = document.getElementById(abstractDivId).offsetWidth;
-		var offsetHeight = document.getElementById(abstractDivId).offsetHeight;
+		var overlay = document.getElementById(abstractDivId);
+		var overlayText = document.getElementById(abstractTextId);
 
-	    document.getElementById(abstractDivId).style.left = (x-offsetWidth-20)+"px"; //x
-	    document.getElementById(abstractDivId).style.top = (y - (offsetHeight/2))+"px"; //y
-	    document.getElementById(abstractTextId).innerHTML = "<b>Abstract</b><br>"+abstract+"<br><br><b>Journal</b><br>"+journal+"<br><br><b>Authors</b><br>"+authors;
-	}
+		// Add information to overlay text
+		overlayText.innerHTML =
+			"<span><b>Abstract</b><br>" +
+			abstract +
+			"<br><br><b>Journal</b><br>" +
+			journal +
+			"<br><br><b>Authors</b><br>" +
+			authors +
+			"</span>";
+
+		// Display overlay to screen
+		overlay.style.display = "flex";
+		overlay.style.right = 20 + overlayMargin + "vw";
+		overlay.style.top = y - overlay.offsetHeight / 2 + "px";
+
+		// Handle overflow on bottom
+		var overlayRect = overlay.getBoundingClientRect();
+		if (overlayRect.bottom > yBottomMax) {
+			overlay.style.top = "auto";
+			overlay.style.bottom = overlayMargin + "vh";
+		}
+
+		// Handle overflow on top
+		if (overlayRect.top < yTopMax) {
+			overlay.style.top = overlayMargin + "vh";
+		}
+	};
 
 	var promptUser = function(text, callback) {
 		document.getElementById(divId).style.display = "block";
@@ -68,23 +108,27 @@ var overlayerModule = (function () {
 		var offsetHeight = document.getElementById(divId).offsetHeight;
 		var offsetWidth = document.getElementById(divId).offsetWidth;
 
-	    document.getElementById(divId).style.left = 500+"px"; //x
-	    document.getElementById(divId).style.top = (500-offsetHeight)+"px"; //y
+		document.getElementById(divId).style.left = 500 + "px"; //x
+		document.getElementById(divId).style.top = 500 - offsetHeight + "px"; //y
 
-	    document.getElementById(titleId).innerHTML = text+'<br><input id="promptTextBox" type="text" placeholder="insert DOI here">' +
-	    												'<button id="promptButton">Create Node</button>';
-	    document.getElementById("promptButton").onclick = promptUserCallback;
-	    promptCallback = callback;
+		document.getElementById(titleId).innerHTML =
+			text +
+			'<br><input id="promptTextBox" type="text" placeholder="insert DOI here">' +
+			'<button id="promptButton">Create Node</button>';
+		document.getElementById("promptButton").onclick = promptUserCallback;
+		promptCallback = callback;
 
-	    document.getElementById("promptTextBox").value = "";//10.1103/physrevlett.98.010505
-	    document.getElementById("promptTextBox").addEventListener("keydown", function(event) {
-	    	const ENTER = 13;
-			if (event.keyCode === ENTER) {
-				event.preventDefault();
-				document.getElementById("promptButton").click();
-			}
-		});
-	}
+		document.getElementById("promptTextBox").value = ""; //10.1103/physrevlett.98.010505
+		document
+			.getElementById("promptTextBox")
+			.addEventListener("keydown", function(event) {
+				const ENTER = 13;
+				if (event.keyCode === ENTER) {
+					event.preventDefault();
+					document.getElementById("promptButton").click();
+				}
+			});
+	};
 
 	var informUser = function(text) {
 		document.getElementById(divId).style.display = "block";
@@ -92,20 +136,21 @@ var overlayerModule = (function () {
 		var offsetHeight = document.getElementById(divId).offsetHeight;
 		var offsetWidth = document.getElementById(divId).offsetWidth;
 
-	    document.getElementById(divId).style.left = 500+"px"; //x
-	    document.getElementById(divId).style.top = (500-offsetHeight)+"px"; //y
+		document.getElementById(divId).style.left = 500 + "px"; //x
+		document.getElementById(divId).style.top = 500 - offsetHeight + "px"; //y
 
-	    document.getElementById(titleId).innerHTML = text+'<br><button id="promptButton">OK</button>';
-	    document.getElementById("promptButton").onclick = promptUserCallback;
-	}
+		document.getElementById(titleId).innerHTML =
+			text + '<br><button id="promptButton">OK</button>';
+		document.getElementById("promptButton").onclick = promptUserCallback;
+	};
 
 	var clearTitleOverlay = function() {
 		document.getElementById(divId).style.display = "none";
-	}
+	};
 
 	var clearAbstractOverlay = function() {
 		document.getElementById(abstractDivId).style.display = "none";
-	}
+	};
 
 	return {
 		initializeModule: initializeModule,
@@ -115,5 +160,5 @@ var overlayerModule = (function () {
 		clearAbstractOverlay: clearAbstractOverlay,
 		promptUser: promptUser,
 		informUser: informUser
-	}
+	};
 })();

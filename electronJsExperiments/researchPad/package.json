@@ -43,6 +43,7 @@
   "dependencies": {
     "crossref": "^1.2.1",
     "download": "^7.1.0",
+    "electron-reload": "^1.4.0",
     "electron-squirrel-startup": "^1.0.0",
     "file-saver": "^2.0.1",
     "node-fetch": "^2.3.0",

@@ -10,7 +10,8 @@ const download = require('download');
 
 
 function searchQueryCreator(query){
-    return { q: query}
+    let newQuery = "\"" + query +"\""
+    return { q: newQuery}
 }
 
 function advancedSearchQueryCreator(author,title,category,id){
@@ -42,7 +43,9 @@ makeUrl = function(query, max_results, sort_by) {
     if (sort_by == null) {
         sort_by = 'submittedDate';
     }
+    console.log("http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query)
     return "http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query;
+
 };
 
 key_map = {
@@ -71,6 +74,7 @@ coerceQueryValue = function(key, value) {
 };
 
 coerceQuery = function(query) {
+
     var k, querys, v;
     querys = [];
     for (k in query) {

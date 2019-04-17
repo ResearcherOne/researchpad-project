@@ -11,6 +11,7 @@ const download = require('download');
 
 function searchQueryCreator(query){
     let newQuery = "\"" + query +"\""
+
     return { q: newQuery}
 }
 

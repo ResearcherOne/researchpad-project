@@ -1,6 +1,6 @@
-function Node(ID, academicData, radius){ //Abstract Class
+function Node(ID, academicDataLibrary, radius){ //Abstract Class
 	this.ID = ID;
-	this.academicDataLibrary = academicData;
+	this.academicDataLibrary = academicDataLibrary;
 	this.radius = radius;
 
 	this.visualObject;

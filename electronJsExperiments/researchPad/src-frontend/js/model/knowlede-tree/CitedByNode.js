@@ -1,5 +1,5 @@
-function CitedByNode(rootNodeID, rootNodeVisualObj, ID, academicData, radius, referencePosition, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) { //nodeMouseOverCallback, nodeMouseOutCallback
-	Node.call(this, ID, academicData, radius);
+function CitedByNode(rootNodeID, rootNodeVisualObj, ID, academicDataLibrary, radius, referencePosition, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) { //nodeMouseOverCallback, nodeMouseOutCallback
+	Node.call(this, ID, academicDataLibrary, radius);
 
 	this.rootNodeID = rootNodeID;
 	this.referencePosition = referencePosition;
@@ -20,7 +20,7 @@ function CitedByNode(rootNodeID, rootNodeVisualObj, ID, academicData, radius, re
 	this.serialize = function() {
 		var serializedObj = {};
 		serializedObj.ID = this.ID;
-		serializedObj.academicData = this.academicData;
+		serializedObj.academicDataLibrary = this.academicDataLibrary;
 		serializedObj.radius = this.radius;
 
 		serializedObj.rootNodeID = this.rootNodeID;

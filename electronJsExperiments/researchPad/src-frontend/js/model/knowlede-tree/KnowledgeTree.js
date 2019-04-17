@@ -119,7 +119,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		var reconstructedRootNodes = {}
 		for (var serializedRootNodeID in serializedRootNodes){
 			var rootNodeData = JSON.parse(serializedRootNodes[serializedRootNodeID]);
-			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.metadata, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.academicDataLibrary, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.citedByNodes, rootNodeData.referenceCount, rootNodeData.citedByCount);
 			
 			reconstructedRootNodes[serializedRootNodeID].siblingIDs = rootNodeData.siblingIDs;
@@ -157,15 +157,15 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	//Initialization
 	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height, this.nodeConnectionsConfig, mapClickedCallback);
 	//Public Functions
-	this.createRootNode = function (initialAcademicData, radius, x, y) {
+	this.createRootNode = function (initialAcademicDataLibrary, radius, x, y) {
 		const ID = ("root-"+getRandomInt(99999)).hashCode();
-		this.rootNodes[ID] = new RootNode(ID, initialAcademicData, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+		this.rootNodes[ID] = new RootNode(ID, initialAcademicDataLibrary, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
-	this.addReferenceToRootNode = function(rootID, initialAcademicData, radius) {
+	this.addReferenceToRootNode = function(rootID, initialAcademicDataLibrary, radius) {
 		const refID = ("ref-"+getRandomInt(99999)).hashCode();
-		this.rootNodes[rootID].createReference(refID, initialAcademicData, radius);
+		this.rootNodes[rootID].createReference(refID, initialAcademicDataLibrary, radius);
 		return refID;
 	}
 	this.removeReferenceFromRootNode = function(rootID, refID) {
@@ -174,9 +174,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	this.removeCitedbyFromRootNode = function(rootID, citedByID) {
 		this.rootNodes[rootID].removeCitedBy(citedByID);
 	}
-	this.addCitedbyToRootNode = function(rootID, initialAcademicData, radius) {
+	this.addCitedbyToRootNode = function(rootID, initialAcademicDataLibrary, radius) {
 		const refID = ("ref-"+getRandomInt(99999)).hashCode();
-		this.rootNodes[rootID].createCitedBy(refID, initialAcademicData, radius);
+		this.rootNodes[rootID].createCitedBy(refID, initialAcademicDataLibrary, radius);
 		return refID;
 	}
 	this.setSiblingReference = function(rootID, siblingReferenceRootID) {

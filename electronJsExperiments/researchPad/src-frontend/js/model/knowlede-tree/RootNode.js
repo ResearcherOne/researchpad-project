@@ -1,5 +1,5 @@
-function RootNode(ID, academicData, radius, initialX, initialY, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
-	Node.call(this, ID, academicData, radius);
+function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
+	Node.call(this, ID, academicDataLibrary, radius);
 
 	this.references = {};
 	this.referenceCount = 0;
@@ -32,15 +32,15 @@ function RootNode(ID, academicData, radius, initialX, initialY, dragstartCallbac
 	const isDraggable = false;
 	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback, this.clickedCallback);
 
-	this.createReference = function(ID, academicData, radius) {
+	this.createReference = function(ID, academicDataLibrary, radius) {
 		const referencePosition = this.referenceCount;
-		this.references[ID] = new ReferenceNode(this.ID, this.visualObject, ID, academicData, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
+		this.references[ID] = new ReferenceNode(this.ID, this.visualObject, ID, academicDataLibrary, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 		this.references[ID].hide();
 		this.referenceCount++;
 	}
-	this.createCitedBy = function(ID, academicData, radius) {
+	this.createCitedBy = function(ID, academicDataLibrary, radius) {
 		const citedByPosition = this.citedByCount;
-		this.citedByNodes[ID] = new CitedByNode(this.ID, this.visualObject, ID, academicData, radius, citedByPosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
+		this.citedByNodes[ID] = new CitedByNode(this.ID, this.visualObject, ID, academicDataLibrary, radius, citedByPosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 		this.citedByNodes[ID].hide();
 		this.citedByCount++;
 	}
@@ -68,7 +68,7 @@ function RootNode(ID, academicData, radius, initialX, initialY, dragstartCallbac
 	this.serialize = function() {
 		var serializedNodeObj = {};
 		serializedNodeObj.ID = this.ID;
-		serializedNodeObj.academicData = this.academicData;
+		serializedNodeObj.academicDataLibrary = this.academicDataLibrary;
 		serializedNodeObj.radius = this.radius;
 		serializedNodeObj.x = this.getAbsolutePosition().x;
 		serializedNodeObj.y = this.getAbsolutePosition().y;
@@ -88,7 +88,7 @@ function RootNode(ID, academicData, radius, initialX, initialY, dragstartCallbac
 		var reconstructedReferences = {}
 		for (var referenceNodeID in serializedReferences){
 			var leafNodeData = JSON.parse(serializedReferences[referenceNodeID]);
-			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicData, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
+			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicDataLibrary, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 			reconstructedReferences[referenceNodeID].hide();
 		}
 		this.referenceCount = refCount;
@@ -97,7 +97,7 @@ function RootNode(ID, academicData, radius, initialX, initialY, dragstartCallbac
 		var reconstructedCitedbyNodes = {}
 		for (var referenceNodeID in serializedCitedbyNodes){
 			var leafNodeData = JSON.parse(serializedCitedbyNodes[referenceNodeID]);
-			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicData, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
+			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicDataLibrary, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 			reconstructedCitedbyNodes[referenceNodeID].hide();
 		}
 		this.citedByCount = citedbyCount;

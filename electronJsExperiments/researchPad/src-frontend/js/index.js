@@ -355,7 +355,6 @@
 		if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
 			const academicDataLibrary = nodeObj.getAcademicDataLibrary();
 			const googleData = academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.GOOGLE];
-			//const googleData = academicDataLibrary["googleScholar"];
 			const csAggregateData = new ComputerScienceAggregateModel(googleData);
 			var contentData = csAggregateData.getNodeFullContentData();
 			nodeDetailsStaticOverlayer.setContent(

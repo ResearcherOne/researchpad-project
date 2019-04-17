@@ -10,9 +10,7 @@ const download = require('download');
 
 
 function searchQueryCreator(query){
-    let newQuery = "\"" + query +"\""
-
-    return { q: newQuery}
+    return { q: query}
 }
 
 makeUrl = function(query, max_results, sort_by) {
@@ -22,9 +20,7 @@ makeUrl = function(query, max_results, sort_by) {
     if (sort_by == null) {
         sort_by = 'submittedDate';
     }
-    console.log("http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query)
     return "http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query;
-
 };
 
 key_map = {
@@ -53,7 +49,6 @@ coerceQueryValue = function(key, value) {
 };
 
 coerceQuery = function(query) {
-
     var k, querys, v;
     querys = [];
     for (k in query) {
@@ -164,12 +159,12 @@ function createPDFDownloadLink(arxivID) {
     return "https://arxiv.org/pdf/"+arxivID;
 }
 
-async function downloadArxivPDF(arxivID,saveFolderPath,fileName,callback) {
+async function downloadArxivPDF(arxivID,saveFolderPath,fileName) {
     let url = await createPDFDownloadLink(arxivID);
     let filePath = saveFolderPath+"/"+fileName+".pdf"
     download(url).then(data => {
         fs.writeFileSync(filePath, data);
-    }).catch(err => callback(err,null));
+    });
 }
 
 

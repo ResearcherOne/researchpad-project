@@ -7,7 +7,8 @@
   "scripts": {
     "start": "electron main.js",
     "build": "electron-packager . researchPad --overwrite --platform=win32",
-    "package": "asar pack build/researchPad-linux-x64/resources/app out/app.asar"
+    "build-mac": "electron-packager . researchPad-mac --overwrite --platform=darwin",
+    "package": "asar pack build/researchPad-win32-x64/resources/app out/app.asar"
   },
   "keywords": [],
   "author": "researcher1",
@@ -41,9 +42,13 @@
   },
   "dependencies": {
     "crossref": "^1.2.1",
+    "download": "^7.1.0",
     "electron-squirrel-startup": "^1.0.0",
+    "file-saver": "^2.0.1",
+    "node-fetch": "^2.3.0",
     "puppeteer": "^1.13.0",
-    "node-fetch": "latest"
+    "request": "^2.88.0",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.30",

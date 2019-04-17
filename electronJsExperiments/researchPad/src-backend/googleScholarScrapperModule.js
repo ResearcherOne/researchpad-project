@@ -7,19 +7,25 @@ let openBrowser = async (isHeadless, isDevtools) => {
 }
 
 let scrapGoogleScholarPageCodeToRunOnChromium = () => {
-  var extractYearFromGoogleScholarAuthorAndYearDiv = function(text) {
-    var splittedTextList = text.split(" - ");
-    const listLength = splittedTextList.length;
-    const yearTextIndex = listLength-2;
-    const yearTextLength = splittedTextList[yearTextIndex].length;
-
-    const year = splittedTextList[yearTextIndex].substr(yearTextLength - 4);
-    return year;
+  var extractYearFromGoogleScholarAuthorAndYearDiv = function(text) {;
+    var regex = /[0-9][0-9][0-9][0-9]/g;
+    yearList = text.match(regex);
+    if(!yearList) {
+      return "";
+    }
+    if(yearList.length > 1) {
+      return yearList[yearList.length-1];
+    } else if (yearList.length == 1) {
+      return yearList[0];
+    } else {
+      return "";
+    }
   }
 
   var extractAuthorsFromGoogleScholarAuthorAndYearDiv = function(text) {
-    const authors = text.split("-")[0];
-    if(authors) {
+    const splittedText = text.split("-");
+    if(splittedText.length > 2) {
+      const authors = splittedText[0];
       var rawAuthorList = authors.split(",");
       var authorList = [];
       rawAuthorList.forEach(function(element){
@@ -27,16 +33,20 @@ let scrapGoogleScholarPageCodeToRunOnChromium = () => {
         if(filteredElement.length > 0) authorList.push(filteredElement);
       });
       return authorList;
+    } else if (splittedText.length > 0) {
+      return [splittedText[0]];
     }
-    return text.split("-")[0];
+    return [];
   }
 
   var extractJournalFromGoogleScholarAuthorAndYearDiv = function(text) {
     var splittedTextList = text.split("-");
-    if(splittedTextList[1])
+    if(splittedTextList.length > 1)
       return splittedTextList[1];
-    else
+    else if (splittedTextList.length > 0)
       return splittedTextList[0];
+    else
+      return "";
   }
 
   let data = [];
@@ -47,7 +57,10 @@ let scrapGoogleScholarPageCodeToRunOnChromium = () => {
 
     let headerTagForTitle = containerDiv.querySelectorAll('.gs_rt')[0];
     const title = headerTagForTitle.innerText;
-    const paperLink = headerTagForTitle.childNodes[0].getAttribute("href");
+    var paperLink = null;
+    if(headerTagForTitle.childNodes[0].hasOwnProperty("href")) {
+      paperLink = headerTagForTitle.childNodes[0].getAttribute("href");
+    }
 
     var citedByCount = 0;
     var citedByLink = "";
@@ -65,24 +78,41 @@ let scrapGoogleScholarPageCodeToRunOnChromium = () => {
       }
     });
 
-    let authorAndYearDiv = containerDiv.querySelectorAll('.gs_a')[0];
-    const authorAndYearText = authorAndYearDiv.innerText;
+    var year = "";
+    var authors = [];
+    var journal = "";
 
-    let abstractDiv = containerDiv.querySelectorAll('.gs_rs')[0];
-    const abstractText = abstractDiv.innerText;    
+    const authorAndDivSearchResult = containerDiv.querySelectorAll('.gs_a');
+    if(authorAndDivSearchResult.length > 0) {
+      let authorAndYearDiv = containerDiv.querySelectorAll('.gs_a')[0];
+      const authorAndYearText = authorAndYearDiv.innerText;
 
-    data.push({
+      year = extractYearFromGoogleScholarAuthorAndYearDiv(authorAndYearText);
+      authors = extractAuthorsFromGoogleScholarAuthorAndYearDiv(authorAndYearText);
+      journal = extractJournalFromGoogleScholarAuthorAndYearDiv(authorAndYearText);
+    }
+
+    var abstractText = "";
+    const abstractDivSearchResult = containerDiv.querySelectorAll('.gs_rs');
+    if(abstractDivSearchResult.length > 0) {
+      let abstractDiv = containerDiv.querySelectorAll('.gs_rs')[0];
+      abstractText = abstractDiv.innerText;    
+    }
+    const currentElementData = {
       title: title,
       link: paperLink,
       citedByCount: citedByCount,
       citedByLink: citedByLink,
-      year: extractYearFromGoogleScholarAuthorAndYearDiv(authorAndYearText),
+      year: year,
       abstract: abstractText,
-      authors: extractAuthorsFromGoogleScholarAuthorAndYearDiv(authorAndYearText),
-      journal: extractJournalFromGoogleScholarAuthorAndYearDiv(authorAndYearText)
-    });
-  }
+      authors: authors,
+      journal: journal
+    };
 
+    //alert(JSON.stringify(currentElementData));
+    data.push(currentElementData);
+  }
+  
   return data;
 };
 

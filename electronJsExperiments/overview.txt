@@ -31,3 +31,4 @@ Electron-Forge
 			    "build": "electron-packager . my-new-app",
 			    "package": "asar pack my-new-app-linux-x64/resources/app out/app.asar"
 			  },
+	npm run-script build

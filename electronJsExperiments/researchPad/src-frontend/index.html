@@ -8,16 +8,19 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 	<head>
 		<script src="https://unpkg.com/konva@2.4.2/konva.min.js"></script>
 		<script src="./js/modules/visualizerModule-v1.2.js"></script>
-		<script src="./js/modules/overlayerModule-v1.js"></script>
+		<script src="./js/view/overlayerModule-v1.js"></script>
 		<script src="./js/modules/ipcRestRenderer.js"></script>
 		<script src="./js/modules/loggerModule.js"></script>
-		<script src="./js/objects/knowlede-tree/NodeObj.js"></script>
-		<script src="./js/objects/knowlede-tree/RootNode.js"></script>
-		<script src="./js/objects/knowlede-tree/ReferenceNode.js"></script>
-		<script src="./js/objects/knowlede-tree/CitedByNode.js"></script>
-		<script src="./js/objects/knowlede-tree/KnowledgeTree.js"></script>
-		<script src="./js/objects/SearchPanel.js"></script>
-		<script src="./js/objects/NodeDetailsStaticOverlayer.js"></script>
+		<script src="./js/model/knowlede-tree/NodeObj.js"></script>
+		<script src="./js/model/knowlede-tree/RootNode.js"></script>
+		<script src="./js/model/knowlede-tree/ReferenceNode.js"></script>
+		<script src="./js/model/knowlede-tree/CitedByNode.js"></script>
+		<script src="./js/model/knowlede-tree/KnowledgeTree.js"></script>
+		<script src="./js/view/SearchPanel.js"></script>
+		<script src="./js/model/academic-data-representations/AcademicData.js"></script>
+		<script src="./js/model/academic-data-representations/ArxivData.js"></script>
+		<script src="./js/model/academic-data-representations/GoogleScholarData.js"></script>
+		<script src="./js/view/NodeDetailsStaticOverlayer.js"></script>
 		<script src="./js/index.js"></script>
 		<style>
 			body {
@@ -95,10 +98,10 @@ mixpanel.init("188da479052e0f47136df656355ebdc4");</script><!-- end Mixpanel -->
 			#overlay-controlset-upper-panel {
 				position: fixed;
 				display: block;
-				width: 73vw;
+				width: 78vw;
 				height: 8vh;
 				top: 1vh;
-				left: 6vw;
+				left: 1vw;
 				right: 0;
 				bottom: 0;
 				background-color: rgba(0,0,0,0.75);

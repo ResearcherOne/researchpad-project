@@ -1,4 +1,4 @@
-function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut) {
+function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, clickedCallback) {
 	Node.call(this, ID, metadata, radius);
 
 	this.rootNodeID = rootNodeID;
@@ -31,7 +31,7 @@ function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, metadata, radius, refe
 	}
 
 
-	this.visualObject = visualizerModule.createReferenceNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback);
+	this.visualObject = visualizerModule.createReferenceNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback, clickedCallback);
 
 	this.getRootNodeID = function() {
 		return this.rootNodeID;

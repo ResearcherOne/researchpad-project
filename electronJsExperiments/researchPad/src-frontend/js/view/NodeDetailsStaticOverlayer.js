@@ -83,12 +83,13 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
         lastY = y-offsetHeight;
     }
 
-    this.showExtraContent = function() {
+    this.showExtraContent = function(isUpperContentShown) {
         const essentialX = lastX;
         const essentialY = lastY;
 
+        if(isUpperContentShown) this.extraUpperDiv.style.display = "flex";
+
         const essentialDivGap = 5;
-        this.extraUpperDiv.style.display = "flex";
         var offsetHeightUpperDiv = this.extraUpperDiv.offsetHeight;
         const upperDivX = essentialX;
         const upperDivY = essentialY - offsetHeightUpperDiv - essentialDivGap;
@@ -140,7 +141,7 @@ function NodeDetailsStaticOverlayer(baseDivId, nodeDetailsDivClassName, extraUpp
     }
 
     this.isExtraContentBeingDisplayed = function() {
-        return (this.extraUpperDiv.style.display == "flex")
+        return ((this.extraUpperDiv.style.display == "flex") || (this.extraLowerDiv.style.display == "flex"));
     }
 
     this.updatePosition = function(dx, dy) {

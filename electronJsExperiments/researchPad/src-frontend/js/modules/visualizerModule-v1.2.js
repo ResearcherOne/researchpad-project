@@ -19,7 +19,7 @@ var visualizerModule = (function () {
 		return group.findOne('Circle');
 	}
 
-	var createCircle = function(x, y, r, domId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback) {
+	var createCircle = function(x, y, r, domId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
 		var circle = new Konva.Circle({
 			x: x,
 			y: y,
@@ -42,6 +42,9 @@ var visualizerModule = (function () {
 		});
 		circle.on('dragend', function () {
 			dragendCallback(callbackReturnObject);
+		});
+		circle.on('click', function(evt) {
+			clickedCallback(callbackReturnObject);
 		});
 		return circle;
 	}
@@ -110,7 +113,7 @@ var visualizerModule = (function () {
 		return circle;
 	}
 
-	var createLeafNode = function(rootNode, angle, length, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback) {
+	var createLeafNode = function(rootNode, angle, length, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
 		var rootCircle = rootNode;
 		angle = -angle;
 
@@ -128,7 +131,7 @@ var visualizerModule = (function () {
 		var nx = rootCircleCenter.x + dX;
 		var ny = rootCircleCenter.y + dY;
 
-		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback);
+		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
 		leafCircle.connection = createConnection(rootCircleCenter.x, rootCircleCenter.y, nx, ny);
 
 		layer.add(leafCircle.connection);
@@ -138,7 +141,7 @@ var visualizerModule = (function () {
 		return leafCircle;
 	}
 
-	var createReferenceNode = function(rootNode, referenceNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback) {
+	var createReferenceNode = function(rootNode, referenceNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
 		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
 		const layerIndex = Math.floor(referenceNumber/maxNodeCountPerLayer);
 
@@ -153,10 +156,10 @@ var visualizerModule = (function () {
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
 		const isDraggable = true;
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback);
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
 	}
 
-	var createCitedByNode = function(rootNode, citedByNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback) {
+	var createCitedByNode = function(rootNode, citedByNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
 		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
 		const layerIndex = Math.floor(citedByNumber/maxNodeCountPerLayer);
 
@@ -171,7 +174,7 @@ var visualizerModule = (function () {
 		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
 
 		const isDraggable = true;
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback);
+		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
 	}
 
 	var getNodeById = function(nodeID) {

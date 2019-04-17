@@ -157,9 +157,6 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	//Initialization
 	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height, this.nodeConnectionsConfig, mapClickedCallback);
 	//Public Functions
-	this.getRootNodeTitleById = function(ID) {
-		return this.rootNodes[ID].getTitle();
-	}
 	this.createRootNode = function (initialAcademicData, radius, x, y) {
 		const ID = ("root-"+getRandomInt(99999)).hashCode();
 		this.rootNodes[ID] = new RootNode(ID, initialAcademicData, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
@@ -274,6 +271,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	}
 	this.getSelectedNode = function() {
 		return selectedNode;
+	}
+	this.addAcademicDataToRootNode = function(rootNodeID, key, value) {
+		this.rootNodes[rootNodeID].addAcademicData(key, value);
 	}
 	this.getNodeType = getNodeType;
 }

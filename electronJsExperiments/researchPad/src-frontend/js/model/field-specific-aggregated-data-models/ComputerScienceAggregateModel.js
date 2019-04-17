@@ -2,10 +2,10 @@ function ComputerScienceAggregateModel(googleScholarData){
     this.googleScholarData = googleScholarData;
 
     this.getSearchBarEssential = function() {
-		const title = this.metadata.title || "No title";
-		const year = this.metadata.year || "?";
-		const citationCount = this.metadata.citedByCount || "?";
-		const abstract = this.metadata.abstract || "No abstract";
+		const title = this.googleScholarData.title || "No title";
+		const year = this.googleScholarData.year || "?";
+		const citationCount = this.googleScholarData.citedByCount || "?";
+		const abstract = this.googleScholarData.abstract || "No abstract";
 		
 		return {
 			title: title,
@@ -15,9 +15,9 @@ function ComputerScienceAggregateModel(googleScholarData){
 		}
 	};
 	this.getSearchBarExtra = function() {
-		const abstractText = this.metadata.abstract || "No Abstract";
-		const authors = this.metadata.authors || [];
-		const journal = this.metadata.journal || "No Journal";
+		const abstractText = this.googleScholarData.abstract || "No Abstract";
+		const authors = this.googleScholarData.authors || [];
+		const journal = this.googleScholarData.journal || "No Journal";
 
 		return {
 			abstract: abstractText,
@@ -26,5 +26,21 @@ function ComputerScienceAggregateModel(googleScholarData){
 		}
 	}
     this.getNodeFullContentData  = function() {
+		const title = this.googleScholarData.title || "No title";
+		const year = this.googleScholarData.year || "No year";
+		const citationCount = this.googleScholarData.citedByCount || "No citation.";
+		const abstract = this.googleScholarData.abstract || "No abstract";
+		const journal = this.googleScholarData.journal || "No journal";
+		const authors = this.googleScholarData.authors || "No author";
+		const link = this.googleScholarData.link || "";
+		return {
+			title: title,
+			year: year,
+			citationCount: citationCount,
+			abstract: abstract,
+			journal: journal,
+			authors: authors,
+			link: link
+		}
     };
 }

@@ -62,7 +62,7 @@
 
 	const ACADEMIC_DATA_KEY_NAMES = {
 		ARXIV: "arxiv",
-		GOOGLE_SCHOLAR: "googleScholar",
+		GOOGLE: "googleScholar",
 		SEMANTIC_SCHOLAR: "semanticScholar"
 	}
 
@@ -310,7 +310,7 @@
 //User Action Helper Functions
 	function createRootNodeWithScholarData(metadata, x, y, rootNodeRadius) {
 		var academicMetadataObj = {};
-		academicMetadataObj[AVAILABLE_SEARCH_PLATFORMS.GOOGLE] = metadata;
+		academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = metadata;
 
 		var rootNodeObjectID = knowledgeTree.createRootNode(academicMetadataObj, rootNodeRadius, x, y);
 	
@@ -323,7 +323,9 @@
 			if(citedByList) {
 				console.log(citedByList);
 				citedByList.forEach(function(citedByMetadata){
-					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByMetadata, leafNodeRadius);
+					var academicMetadataObj = {};
+					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = citedByMetadata;
+					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, academicMetadataObj, leafNodeRadius);
 				});
 			} else {
 				loggerModule.error("error", "Err cited by fetch.");
@@ -332,7 +334,7 @@
 	}
 	function createRootNodeFromArxiv(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
 		var academicMetadataObj = {};
-		academicMetadataObj[AVAILABLE_SEARCH_PLATFORMS.ARXIV] = metadata;
+		academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.ARXIV] = metadata;
 
 		var rootNodeObjectID = knowledgeTree.createRootNode(academicMetadataObj, rootNodeRadius, x, y);
 		const fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
@@ -340,6 +342,7 @@
 		fetchPaperDetailsFromSemanticScholar(fetchMethod, paperArxivId, function(err, result){
 			if(result) {
 				console.log(result);
+				knowledgeTree.addAcademicDataToRootNode(rootNodeObjectID, ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR, result);
 			} else {
 				loggerModule.error("error", "Err semantic scholar data fetch.");
 			}
@@ -349,31 +352,43 @@
 		var nodeCenter = nodeObj.getPositionOnCamera();
 		var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
 		
-		const title = nodeObj.getTitle() || "No title";
-		const year = nodeObj.getYear() || "No year";
-		const citationCount = nodeObj.getCitationCount() || "No citation.";
-		const abstract = nodeObj.getAbstract() || "No abstract";
-		const journal = nodeObj.getJournal() || "No journal";
-		const authors = nodeObj.getAuthors() || "No author";
-		const link = nodeObj.getLink() || "";
-		console.log("LINK: "+link);
-		
-		nodeDetailsStaticOverlayer.setContent(title, year, citationCount, abstract, journal, authors, link);
-		nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+(nodeRadius*1.5)), (nodeCenter.y-nodeRadius));
+		if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
+			const academicDataLibrary = nodeObj.getAcademicDataLibrary();
+			const googleData = academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.GOOGLE];
+			//const googleData = academicDataLibrary["googleScholar"];
+			const csAggregateData = new ComputerScienceAggregateModel(googleData);
+			var contentData = csAggregateData.getNodeFullContentData();
+			nodeDetailsStaticOverlayer.setContent(
+				contentData.title,
+				contentData.year,
+				contentData.citationCount,
+				contentData.abstract,
+				contentData.journal,
+				contentData.authors,
+				contentData.link);
+			nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+(nodeRadius*1.5)), (nodeCenter.y-nodeRadius));	
+		} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
+
+		} else {
+			loggerModule.error("error", "unknown search platform..");
+		}
 	}
 	function transformCitationToRootNodeForGoogleScholar(x, y, ID, rootNodeIdOfLeafNode, nodeObj) {
-		const newRootNodeMetadata = nodeObj.getMetadata();
-		const citedByLink = nodeObj.getCitedByLink();
+		const academicDataLibrary = nodeObj.getAcademicDataLibrary();
+		const googleMetadataData = academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.GOOGLE];
+		const citedByLink = googleMetadataData.citedByLink;
 
 		if(citedByLink) {
 			knowledgeTree.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, ID);
-			const newRootNodeID = createRootNodeWithScholarData(newRootNodeMetadata, x, y, DEFAULT_ROOT_NODE_RADIUS);
+			const newRootNodeID = createRootNodeWithScholarData(googleMetadataData, x, y, DEFAULT_ROOT_NODE_RADIUS);
 			knowledgeTree.setSiblingReference(rootNodeIdOfLeafNode, newRootNodeID);
 
 			getCitedByOfArticle(citedByLink, function(err, citedByList){
 				if(citedByList) {
 					citedByList.forEach(function(citedByMetadata){
-						knowledgeTree.addCitedbyToRootNode(newRootNodeID, citedByMetadata, DEFAULT_LEAF_NODE_RADIUS);
+						var academicMetadataObj = {};
+						academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = citedByMetadata;
+						knowledgeTree.addCitedbyToRootNode(newRootNodeID, academicMetadataObj, DEFAULT_LEAF_NODE_RADIUS);
 					});
 				} else {
 					overlayerModule.informUser("Unable to fetch citations data.");
@@ -381,7 +396,7 @@
 			});
 		} else {
 			knowledgeTree.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, ID);
-			const newRootNodeID = createRootNodeWithScholarData(newRootNodeMetadata, x, y, DEFAULT_ROOT_NODE_RADIUS);
+			const newRootNodeID = createRootNodeWithScholarData(googleMetadataData, x, y, DEFAULT_ROOT_NODE_RADIUS);
 			knowledgeTree.setSiblingReference(rootNodeIdOfLeafNode, newRootNodeID);
 		}
 	}
@@ -560,7 +575,7 @@
 		const ID = nodeObj.getID();
 		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID();
 
-		transformCitationNodeToRootNode(x, y, ID, rootNodeIdOfLeafNode, nodeObj);
+		transformCitationNodeToRootNode(CURRENT_SEARCH_PLATFORM, x, y, ID, rootNodeIdOfLeafNode, nodeObj);
 	}
 	function referenceNodeDragEnd(nodeObj) {
 
@@ -574,7 +589,7 @@
 			loggerModule.error("error", "unknown search platform requested.");
 		}
 	}
-	function transformCitationNodeToRootNode(x, y, ID, rootNodeIdOfLeafNode, nodeObj) {
+	function transformCitationNodeToRootNode(platform, x, y, ID, rootNodeIdOfLeafNode, nodeObj) {
 		if(platform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
 			transformCitationToRootNodeForGoogleScholar(x, y, ID, rootNodeIdOfLeafNode, nodeObj);
 		} else if (platform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
@@ -696,3 +711,5 @@
 		//EDIT createRootNodeWithScholarData
 			//give key & metadata for storing it in initialAcademicData in NodeObj.
 			//Do necessary changes in all citedby reference rootnode knowledge tree and nodeobj
+		//REFACTOR
+			//Use academic-data-repsentations to determine available data from specific source.

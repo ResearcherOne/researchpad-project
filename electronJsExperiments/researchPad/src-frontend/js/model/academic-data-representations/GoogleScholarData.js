@@ -25,6 +25,10 @@ function GoogleScholarData(metadata){
 			journal: journal
 		}
 	}
+	
+	this.getCitedByLink = function() {
+		return this.metadata.citedByLink;
+	}
     
     GoogleScholarData.prototype = Object.create(AcademicData.prototype);
 	Object.defineProperty(GoogleScholarData.prototype, 'constructor', { 

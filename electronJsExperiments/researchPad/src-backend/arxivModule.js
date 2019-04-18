@@ -10,9 +10,16 @@ const download = require('download');
 
 
 function searchQueryCreator(query){
-    let newQuery = "\"" + query +"\""
-
-    return { q: newQuery}
+    let newQuery = query.split(" ")
+    let new_Query =""
+    for(let i = 0 ; i < newQuery.length ; i++)
+    {
+        if( i < newQuery.length-1)
+            new_Query += newQuery[i] + "+OR+"
+        else
+            new_Query += newQuery[i]
+    }
+    return { q: new_Query}
 }
 
 makeUrl = function(query, max_results, sort_by) {
@@ -175,7 +182,6 @@ module.exports = {
     search : search,
     downloadArxivPDF : downloadArxivPDF,
 };
-
 
 
 //Sample download : downloadArxivPDFWith("1904.02161", "/home/pc","mahmutTuncer")

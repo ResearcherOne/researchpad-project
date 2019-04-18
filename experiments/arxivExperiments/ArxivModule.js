@@ -10,10 +10,19 @@ const download = require('download');
 
 
 function searchQueryCreator(query){
-    let newQuery = "\"" + query +"\""
+        let newQuery = query.split(" ")
+        let new_Query =""
+        for(let i = 0 ; i < newQuery.length ; i++)
+        {
+            if( i < newQuery.length-1)
+                new_Query += newQuery[i] + "+OR+"
+            else
+                new_Query += newQuery[i]
+        }
+        return { q: new_Query}
+    }
 
-    return { q: newQuery}
-}
+
 
 makeUrl = function(query, max_results, sort_by) {
     if (max_results == null) {

@@ -20,6 +20,7 @@ makeUrl = function(query, max_results, sort_by) {
     if (sort_by == null) {
         sort_by = 'submittedDate';
     }
+    //return "http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query;
     return "http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query;
 };
 

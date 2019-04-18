@@ -1,12 +1,16 @@
-function ComputerScienceAggregateModel(googleScholarData){
-    this.googleScholarData = googleScholarData;
+function ComputerScienceAggregateModel(googleScholarMetadata){
+	this.googleScholarData = googleScholarMetadata;
 
-    this.getSearchBarEssential = function() {
+	this.getFullMetadata = function() { //Temp. function.
+		return this.googleScholarData
+	};
+
+	this.getSearchBarEssential = function() {
 		const title = this.googleScholarData.title || "No title";
 		const year = this.googleScholarData.year || "?";
 		const citationCount = this.googleScholarData.citedByCount || "?";
 		const abstract = this.googleScholarData.abstract || "No abstract";
-		
+
 		return {
 			title: title,
 			year: year,
@@ -25,7 +29,7 @@ function ComputerScienceAggregateModel(googleScholarData){
 			journal: journal
 		}
 	}
-    this.getNodeFullContentData  = function() {
+	this.getNodeFullContentData  = function() {
 		const title = this.googleScholarData.title || "No title";
 		const year = this.googleScholarData.year || "No year";
 		const citationCount = this.googleScholarData.citedByCount || "No citation.";
@@ -34,13 +38,13 @@ function ComputerScienceAggregateModel(googleScholarData){
 		const authors = this.googleScholarData.authors || "No author";
 		const link = this.googleScholarData.link || "";
 		return {
-			title: title,
-			year: year,
-			citationCount: citationCount,
-			abstract: abstract,
-			journal: journal,
-			authors: authors,
-			link: link
+		title: title,
+		year: year,
+		citationCount: citationCount,
+		abstract: abstract,
+		journal: journal,
+		authors: authors,
+		link: link
 		}
-    };
+	};
 }

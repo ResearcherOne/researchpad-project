@@ -333,6 +333,7 @@
 		});
 	}
 	function createRootNodeFromArxiv(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
+		console.log("ARXIV METADATA: "+JSON.stringify(metadata));
 		var academicMetadataObj = {};
 		academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.ARXIV] = metadata;
 
@@ -477,9 +478,9 @@
 			const pos = knowledgeTree.getAbsolutePositionOfGivenPos(cursorX, cursorY);
 			
 			const elementPositionInSearchData = parseInt(DRAGGED_SEARCH_ELEMENT_TAG_NO);
-			var fullMetadata = lastAcademicSearchDataList[elementPositionInSearchData].getFullMetadata();
+			var aggregateModelData = lastAcademicSearchDataList[elementPositionInSearchData];
 
-			createNewRootNodeOnKnowledgeTree(CURRENT_SEARCH_PLATFORM, fullMetadata, pos.x, pos.y);
+			createNewRootNodeOnKnowledgeTreeViaSearchOperation(CURRENT_SEARCH_PLATFORM, aggregateModelData, pos.x, pos.y);
 		} else {
 			searchPanel.setColorOfSearchResultElement(DRAGGED_SEARCH_ELEMENT_TAG_NO, "");
 		}
@@ -491,15 +492,14 @@
 			if(result && result.length > 0) {
 				lastAcademicSearchDataList = [];
 				var i = 0;
-				console.log(result[0]);
-				result.forEach(function(element){
+				result.forEach(function(searchElementMetadata){
 					if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
-						const academicDataEntry = new GoogleScholarData(element);
+						const academicDataEntry = new ComputerScienceAggregateModel(searchElementMetadata);
 						lastAcademicSearchDataList[i] = academicDataEntry;
 						const googleEssential = academicDataEntry.getSearchBarEssential();
 						searchPanel.addResultElement(i, googleEssential.title, googleEssential.citationCount, googleEssential.year, googleEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
 					} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
-						const academicDataEntry = new ArxivData(element);
+						const academicDataEntry = new PhysicsAggregateModel(searchElementMetadata);
 						lastAcademicSearchDataList[i] = academicDataEntry;
 						const arxivEssential = academicDataEntry.getSearchBarEssential();
 						searchPanel.addResultElement(i, arxivEssential.title, arxivEssential.arxivEssential, arxivEssential.year, arxivEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
@@ -579,10 +579,12 @@
 	function referenceNodeDragEnd(nodeObj) {
 
 	}
-	function createNewRootNodeOnKnowledgeTree(platform, metadata, x, y) {
+	function createNewRootNodeOnKnowledgeTreeViaSearchOperation(platform, aggregateModelData, x, y) {
 		if(platform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
+			var metadata = aggregateModelData.getFullMetadata();
 			createRootNodeFromGoogleScholar(metadata, x, y, DEFAULT_ROOT_NODE_RADIUS, DEFAULT_LEAF_NODE_RADIUS);
 		} else if (platform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
+			var metadata = aggregateModelData.getArxivMetadata();
 			createRootNodeFromArxiv(metadata, x, y, DEFAULT_ROOT_NODE_RADIUS, DEFAULT_LEAF_NODE_RADIUS);
 		} else {
 			loggerModule.error("error", "unknown search platform requested.");
@@ -710,5 +712,3 @@
 		//EDIT createRootNodeWithScholarData
 			//give key & metadata for storing it in initialAcademicData in NodeObj.
 			//Do necessary changes in all citedby reference rootnode knowledge tree and nodeobj
-		//REFACTOR
-			//Use academic-data-repsentations to determine available data from specific source.

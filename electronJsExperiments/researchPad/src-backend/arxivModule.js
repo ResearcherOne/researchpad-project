@@ -15,7 +15,7 @@ function searchQueryCreator(query){
     for(let i = 0 ; i < newQuery.length ; i++)
     {
         if( i < newQuery.length-1)
-            new_Query += newQuery[i] + "+OR+"
+            new_Query += newQuery[i] + "+AND+"
         else
             new_Query += newQuery[i]
     }

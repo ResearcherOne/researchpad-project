@@ -1,12 +1,16 @@
 {
 	"production": {
 		"port": 8080,
-		"darwin": "releases/darwin",
-		"win32": "releases/win32"
+		"releaseDirs": {
+			"darwin": "releases/darwin",
+			"win32": "releases/win32"
+		}
 	},
 	"development": {
 		"port": 3000,
-		"darwin": "releases/darwin",
-		"win32": "releases/win32"
+		"release_dirs": {
+			"darwin": "releases/darwin",
+			"win32": "releases/win32"
+		}
 	}
 }

@@ -90,7 +90,7 @@ function darwinReleaseRoute(req, res) {
   // Create version file and do validation
   let info = createVersion(darwinReleasePath, hookData);
   if (
-    !validVersionName(info.version) &&
+    !validVersionName(info.version) ||
     info.from_branch !== darwinReleaseBranch
   ) {
     deleteVersion(darwinReleasePath, info.version);

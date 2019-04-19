@@ -1,9 +1,14 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const fs = require("fs");
 const config = require("./config.json");
 
 const app = express();
 const env = process.env.NODE_ENV || "development";
 const env_config = config[env];
+
+app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({extended: true}));
 
 // Server routes
 app.get("/updates/latest", latestUpdateRoute);
@@ -33,8 +38,7 @@ function latestUpdateRoute(req, res) {
  *
  */
 function darwinReleaseRoute(req, res) {
-  console.log(req.data);
-
+  fs.writeFileSync("testdata.json", JSON.stringify(req.body))
   res.send("darwin release route");
 }
 
@@ -42,7 +46,6 @@ function darwinReleaseRoute(req, res) {
  *
  */
 function win32ReleaseRoute(req, res) {
-  console.log(req.data);
 
   res.send("win32 release route");
 }

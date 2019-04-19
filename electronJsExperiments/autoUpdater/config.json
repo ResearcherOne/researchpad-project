@@ -2,8 +2,8 @@
 	"production": {
 		"port": 8080,
 		"release_branches": {
-			"darwin": "master/darwin",
-			"win32": "master/win32"
+			"darwin": "darwin/master",
+			"win32": "win32/master"
 		},
 		"release_dirs": {
 			"darwin": "releases/darwin",
@@ -13,8 +13,8 @@
 	"development": {
 		"port": 3000,
 		"release_branches": {
-			"darwin": "master/darwin",
-			"win32": "master/win32"
+			"darwin": "darwin/master",
+			"win32": "win32/master"
 		},
 		"release_dirs": {
 			"darwin": "releases/darwin",

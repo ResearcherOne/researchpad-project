@@ -91,7 +91,7 @@ function darwinReleaseRoute(req, res) {
   let info = createVersion(darwinReleasePath, hookData);
   if (
     !validVersionName(info.version) &&
-    info.from_branch === darwinReleaseBranch
+    info.from_branch !== darwinReleaseBranch
   ) {
     deleteVersion(darwinReleasePath, info.version);
     return res.status(204).send("invalid tag name " + info.version);

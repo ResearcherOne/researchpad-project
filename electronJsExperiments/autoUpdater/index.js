@@ -156,6 +156,9 @@ function getVersionUrl(releasePath, version) {
  * the name of the release version. Some useful information
  * about the release event is stored in the file in a json
  * object.
+ *
+ * If directory does not exist, it will be created
+ * recursively
  */
 function createVersion(releasePath, info) {
   const version = info.release.tag_name;
@@ -176,6 +179,11 @@ function createVersion(releasePath, info) {
   // write data to version file
   try {
     let data = JSON.stringify(versionData, null, "\t");
+
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(releasePath)) {
+      fs.mkdirSync(releasePath, { recursive: true });
+    }
     fs.writeFileSync(file, data);
   } catch (err) {
     //TODO: logging

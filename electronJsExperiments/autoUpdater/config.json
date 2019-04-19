@@ -1,0 +1,12 @@
+{
+	"production": {
+		"port": 8080,
+		"darwin": "releases/darwin",
+		"win32": "releases/win32"
+	},
+	"development": {
+		"port": 3000,
+		"darwin": "releases/darwin",
+		"win32": "releases/win32"
+	}
+}

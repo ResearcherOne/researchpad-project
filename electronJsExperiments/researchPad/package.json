@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": "main.js",
+  "repository": "https://github.com/ResearcherOne/researchpad-project",
   "scripts": {
     "start": "electron main.js",
     "build": "electron-packager . researchPad --overwrite --platform=win32",

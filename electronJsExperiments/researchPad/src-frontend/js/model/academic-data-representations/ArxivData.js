@@ -27,17 +27,21 @@ function ArxivData(metadata){
 		});
 		return authorList;
 	}
+	
+	this.getArxivId = function() {
+		const splittedArxivUrl = this.metadata.id.split("/");
+		const arxivId = splittedArxivUrl[splittedArxivUrl.length-1];
 
+		const vSplittedId = arxivId.split("v");
+		const versionCleanizedId = vSplittedId[0];
+
+		return versionCleanizedId;
+	}
 	/*
 		this.getArxivUrl = function() {
 			return this.metadata.id;
 		}
 
-		this.getArxivId = function() {
-			const splittedArxivUrl = this.metadata.id.split("/");
-			const arxivId = splittedArxivUrl[splittedArxivUrl.length-1];
-			return arxivId;
-		}
 	*/
     
     ArxivData.prototype = Object.create(AcademicData.prototype);

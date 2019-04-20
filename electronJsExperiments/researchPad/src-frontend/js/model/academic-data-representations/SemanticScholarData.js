@@ -2,25 +2,21 @@ function SemanticScholarData(metadata){
     AcademicData.call(this, metadata);
     
     this.getCitationCount = function() {
-        if(this.metadata == null) return null;
+        if(this.metadata == null || this.metadata.citations == null) return null;
         return this.metadata.citations.length;
     }
-
     this.getUrl = function() {
         if(this.metadata == null) return null;
         return this.metadata.url;
     }
-
     this.getTitle = function() {
         if(this.metadata == null) return null;
         return this.metadata.title;
     }
-
     this.getYear = function() {
         if(this.metadata == null) return null;
         return this.metadata.year.toString();
     }
-
     this.getAuthorList = function() {
 		if(this.metadata == null) return null;
 		var authorList = [];
@@ -30,7 +26,13 @@ function SemanticScholarData(metadata){
 			}
         });
         return authorList;
-	}
+    }
+    this.getCitations = function() {
+        return this.metadata.citations;
+    }
+    this.getReferences = function() {
+        return this.metadata.references;
+    }
     
     SemanticScholarData.prototype = Object.create(AcademicData.prototype);
 	Object.defineProperty(SemanticScholarData.prototype, 'constructor', { 

@@ -7,6 +7,9 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 	this.citedByNodes = {};
 	this.citedByCount = 0;
 
+	this.suggestedCitedByNodeList = [];
+	this.suggestedReferenceNodeList = [];
+
 	this.siblingIDs = {};
 	this.siblingCount = 0;
 
@@ -79,6 +82,9 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		serializedNodeObj.citedByNodes = getSerializedLeafNodesObj(this.citedByNodes);
 		serializedNodeObj.citedByCount = this.citedByCount;
 
+		serializedNodeObj.suggestedCitedByNodeList = this.suggestedCitedByNodeList;
+		serializedNodeObj.suggestedReferenceNodeList = this.suggestedReferenceNodeList;
+
 		serializedNodeObj.siblingIDs = this.siblingIDs;
 		serializedNodeObj.siblingCount = this.siblingCount;
 		return JSON.stringify(serializedNodeObj);
@@ -102,26 +108,24 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		}
 		this.citedByCount = citedbyCount;
 		this.citedByNodes = reconstructedCitedbyNodes;
+
+		//this.suggestedCitedByNodeList = suggestedCitedByNodeList;
+		//this.suggestedReferenceNodeList = suggestedReferenceNodeList;
 	}
 
 	this.hideLeafNodes = function(durationSec) {
-		/*
-		for (var citationNodeID in this.citedByNodes){
-			this.citedByNodes[citationNodeID].hide();
-		}
-		for (var referenceNodeID in this.references){
-			this.references[referenceNodeID].hide();
-		}
-		*/
 		if(!this.hideLeafNodesTimer) {
+			const suggestedCitedByNodeList = this.suggestedCitedByNodeList;
+			const suggestedReferenceNodeList = this.suggestedReferenceNodeList;
+			const citedByNodes = this.citedByNodes;
+			const references = this.references;
 			this.hideLeafNodesTimer = setTimeout(function(rootNodeObj){
-				for (var citationNodeID in rootNodeObj.citedByNodes){
-					rootNodeObj.citedByNodes[citationNodeID].hide();
-				}
-				for (var referenceNodeID in rootNodeObj.references){
-					rootNodeObj.references[referenceNodeID].hide();
-				}
-
+				suggestedCitedByNodeList.forEach(function(nodeID) {
+					citedByNodes[nodeID].hide();
+				});
+				suggestedReferenceNodeList.forEach(function(nodeID) {
+					references[nodeID].hide();
+				});
 				rootNodeObj.hideLeafNodesTimer = null;
 			}, durationSec * 1000, this);
 		} else {
@@ -132,18 +136,53 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 			}, durationSec * 1000, this);
 		}
 	}
-
 	this.showLeafNodes = function() {
 		clearTimeout(this.hideLeafNodesTimer);
 		this.hideLeafNodesTimer = null;
-		for (var citationNodeID in this.citedByNodes){
-			this.citedByNodes[citationNodeID].show();
-		}
-		for (var referenceNodeID in this.references){
-			this.references[referenceNodeID].show();
-		}
+		const citedByNodes = this.citedByNodes;
+		const references = this.references;
+		this.suggestedCitedByNodeList.forEach(function(nodeID) {
+			citedByNodes[nodeID].show();
+		});
+		this.suggestedReferenceNodeList.forEach(function(nodeID) {
+			references[nodeID].show();
+		});
 	}
-
+	this.getSuggestedCitedByCount = function() {
+		return this.suggestedCitedByNodeList.length;
+	}
+	this.getSuggestedReferenceCount = function() {
+		return this.suggestedReferenceNodeList.length;
+	}
+	this.isSuggestedNode = function(nodeID) {
+		const isSuggestedCitedBy = (this.suggestedCitedByNodeList.indexOf(nodeID) > -1);
+		if(isSuggestedCitedBy) return true;
+		else return (this.suggestedReferenceNodeList.indexOf(nodeID) > -1);
+	}
+	this.suggestCitedBy = function(citedByID) {
+		this.suggestedCitedByNodeList.push(citedByID);
+	}
+	this.suggestReference = function(referenceID) {
+		this.suggestedReferenceNodeList.push(referenceID);
+	}
+	this.removeCitedBySuggestion = function(citedByID) {
+		const indexOfNode = this.suggestedCitedByNodeList.indexOf(citedByID);
+		this.suggestedCitedByNodeList.splice(indexOfNode, 1); 
+	}
+	this.removeReferenceSuggestion = function(referenceID) {
+		const indexOfNode = this.suggestedReferenceNodeList.indexOf(referenceID);
+		this.suggestedReferenceNodeList.splice(indexOfNode, 1); 
+	}
+	this.getLeafNode = function(leafNodeID) {
+		if(this.references[leafNodeID]) return this.references[leafNodeID];
+		else return this.citedByNodes[leafNodeID];
+	}
+	this.getAllCitedByNodes = function() {
+		return this.citedByNodes;
+	}
+	this.getAllReferenceNodes = function() {
+		return this.references;
+	}
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 
 	    value: RootNode, 

@@ -14,17 +14,6 @@ function SiblingConnection(ID, firstNodeID, secondNodeID) {
 	}
 }
 
-String.prototype.hashCode = function() {
-  var hash = 0, i, chr;
-  if (this.length === 0) return hash;
-  for (i = 0; i < this.length; i++) {
-    chr   = this.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
-
 function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClickedCallback) {
 	//Config & Private Functions
 	this.konvaDivID = konvaDivID;
@@ -38,6 +27,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 
 	this.siblingConnections = {};
 	this.siblingConnectionCount = 0;
+
+	this.citedByNodes = {};
+	this.referenceNodes = {};
 	
 	var dragStartCallback = null;
 	var dragEndCallback = null;
@@ -47,8 +39,6 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 
 	var clickedCallback = null;
 
-	//var selectedNodes = {};
-	//var leafNodesLockedRootNodes = {};
 	var selectedNode = null;
 
 	var getNodeType = function(nodeObj) {
@@ -94,7 +84,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 			//callback not set.
 		}
 	}
-
+	
 	var nodeClickedCallback = function(nodeObj) {
 		if(clickedCallback) {
 			clickedCallback(getNodeType(nodeObj), nodeObj);
@@ -102,11 +92,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 			//callback not set.
 		}
 	}
-
-	var getRandomInt = function(max) {
-		return Math.floor(Math.random() * Math.floor(max));
-	}
-
+	
 	var mapSerializeCallOnObj = function(obj) {
 		var serializedObj = {};
 		for (var elementKey in obj){
@@ -114,7 +100,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		}
 		return serializedObj;		
 	}
-
+	
 	var reconstructRootNodes = function(serializedRootNodes) {
 		var reconstructedRootNodes = {}
 		for (var serializedRootNodeID in serializedRootNodes){
@@ -125,10 +111,15 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 			reconstructedRootNodes[serializedRootNodeID].siblingIDs = rootNodeData.siblingIDs;
 			reconstructedRootNodes[serializedRootNodeID].siblingCount = rootNodeData.siblingCount;
 
+			const citedByNodes = reconstructedRootNodes[serializedRootNodeID].getAllCitedByNodes();
+			this.citedByNodes = {...this.citedByNodes, ...citedByNodes};
+
+			const referenceNodes = reconstructedRootNodes[serializedRootNodeID].getAllReferenceNodes();
+			this.referenceNodes = {...this.referenceNodes, ...referenceNodes};
 		}
 		return reconstructedRootNodes;	
 	}
-
+	
 	var reconstructSiblingConnections = function(serializedSiblingConnections) {
 		var reconstructedSiblingConnections = {}
 		for (var siblingConnectionID in serializedSiblingConnections){
@@ -137,7 +128,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		}
 		return reconstructedSiblingConnections;	
 	}
-
+	
 	var mapClickedCallback = function(clickedObjName) {
 		if(clickedObjName == "Circle") {
 			this.mapClickedCallback("node");
@@ -145,7 +136,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 			this.mapClickedCallback(clickedObjName);
 		}
 	} 
-
+	
 	var isSelectedNode = function(ID) {
 		if(selectedNodes[ID]) {
 			return true;
@@ -153,40 +144,60 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 			return false;
 		}
 	}
+	
+	var setSiblingReference = function(rootID, siblingReferenceRootID, firstNodeType, secondNodeType, thisContext) {
+		const connectionID = rootID + siblingReferenceRootID;
+		var connectionObj = new SiblingConnection(connectionID, rootID, siblingReferenceRootID);
+		thisContext.siblingConnections[connectionID] = connectionObj;
+		thisContext.siblingConnectionCount++;
+
+		thisContext.rootNodes[rootID].setSibling(siblingReferenceRootID, secondNodeType);
+		thisContext.rootNodes[siblingReferenceRootID].setSibling(rootID, firstNodeType);
+	}
 
 	//Initialization
 	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height, this.nodeConnectionsConfig, mapClickedCallback);
 	//Public Functions
-	this.createRootNode = function (initialAcademicDataLibrary, radius, x, y) {
-		const ID = ("root-"+getRandomInt(99999)).hashCode();
+	this.createRootNode = function (ID, initialAcademicDataLibrary, radius, x, y) {
 		this.rootNodes[ID] = new RootNode(ID, initialAcademicDataLibrary, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 		this.rootNodeCount++;
 		return ID;
 	}
-	this.addReferenceToRootNode = function(rootID, initialAcademicDataLibrary, radius) {
-		const refID = ("ref-"+getRandomInt(99999)).hashCode();
+	this.addReferenceToRootNode = function(rootID, refID, initialAcademicDataLibrary, radius) {
+		const suggestedReferenceCount = this.rootNodes[rootID].getSuggestedReferenceCount();
 		this.rootNodes[rootID].createReference(refID, initialAcademicDataLibrary, radius);
+		this.referenceNodes[refID] = this.rootNodes[rootID].getLeafNode(refID);
+		
+		if(suggestedReferenceCount < 10) {
+			this.rootNodes[rootID].suggestReference(refID);
+		}
 		return refID;
 	}
 	this.removeReferenceFromRootNode = function(rootID, refID) {
+		const isSuggested = this.rootNodes[rootID].isSuggestedNode(citedByID);
+		if(isSuggested) {
+			this.rootNodes[rootID].removeReferenceSuggestion(refID);
+		}
+		delete this.referenceNodes[refID];
 		this.rootNodes[rootID].removeReference(refID);
 	}
 	this.removeCitedbyFromRootNode = function(rootID, citedByID) {
+		const isSuggested = this.rootNodes[rootID].isSuggestedNode(citedByID);
+		if(isSuggested) {
+			this.rootNodes[rootID].removeCitedBySuggestion(citedByID);
+		}
+		delete this.citedByNodes[citedByID];
 		this.rootNodes[rootID].removeCitedBy(citedByID);
 	}
-	this.addCitedbyToRootNode = function(rootID, initialAcademicDataLibrary, radius) {
-		const refID = ("ref-"+getRandomInt(99999)).hashCode();
-		this.rootNodes[rootID].createCitedBy(refID, initialAcademicDataLibrary, radius);
+	this.addCitedbyToRootNode = function(rootID, refID, initialAcademicDataLibrary, radius) {
+		const suggestedCitedByCount = this.rootNodes[rootID].getSuggestedCitedByCount();
+		//this.rootNodes[rootID].createCitedBy(refID, initialAcademicDataLibrary, radius);
+		if(suggestedCitedByCount < 10) {
+			this.rootNodes[rootID].createCitedBy(refID, initialAcademicDataLibrary, radius);
+			this.rootNodes[rootID].suggestCitedBy(refID);
+			this.citedByNodes[refID] = this.rootNodes[rootID].getLeafNode(refID);
+		}
 		return refID;
-	}
-	this.setSiblingReference = function(rootID, siblingReferenceRootID) {
-		const connectionID = rootID + siblingReferenceRootID;
-		var connectionObj = new SiblingConnection(connectionID, rootID, siblingReferenceRootID);
-		this.siblingConnections[connectionID] = connectionObj;
-		this.siblingConnectionCount++;
-
-		this.rootNodes[rootID].setSibling(siblingReferenceRootID, "reference");
-		this.rootNodes[siblingReferenceRootID].setSibling(rootID, "citedby");
 	}
 	this.setNodeDragStartCallback = function(callback) {
 		dragStartCallback = callback;
@@ -276,4 +287,13 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		this.rootNodes[rootNodeID].addAcademicData(key, value);
 	}
 	this.getNodeType = getNodeType;
+	this.transformCitationNodeToRootNode = function(rootNodeIdOfLeafNode, nodeIdToTransform, newNodeRadius, x , y) {
+		const academicDataLibrary = this.citedByNodes[nodeIdToTransform].getAcademicDataLibrary();
+		this.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, nodeIdToTransform);
+		this.createRootNode(nodeIdToTransform, academicDataLibrary, newNodeRadius, x, y);
+
+		const firstNodeType = "reference";
+		const secondNodeType = "citation";
+		setSiblingReference(rootNodeIdOfLeafNode, nodeIdToTransform, firstNodeType, secondNodeType, this);
+	}
 }

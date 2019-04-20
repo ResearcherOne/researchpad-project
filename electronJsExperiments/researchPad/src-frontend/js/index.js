@@ -308,13 +308,26 @@
 	}
 
 //User Action Helper Functions
+	String.prototype.hashCode = function() {
+		var hash = 0, i, chr;
+		if (this.length === 0) return hash;
+		for (i = 0; i < this.length; i++) {
+		chr   = this.charCodeAt(i);
+		hash  = ((hash << 5) - hash) + chr;
+		hash |= 0; // Convert to 32bit integer
+		}
+		return ""+hash;
+	};
+  
 	function createRootNodeWithScholarData(metadata, x, y, rootNodeRadius) {
 		var academicMetadataObj = {};
 		academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = metadata;
+		const scholarData = new GoogleScholarData(metadata);
+		const paperTitle = scholarData.getTitle();
+		const nodeID = paperTitle.hashCode();
 
-		var rootNodeObjectID = knowledgeTree.createRootNode(academicMetadataObj, rootNodeRadius, x, y);
-	
-		return rootNodeObjectID;
+		knowledgeTree.createRootNode(nodeID, academicMetadataObj, rootNodeRadius, x, y);
+		return nodeID;
 	}
 	function createRootNodeFromGoogleScholar(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
 		var rootNodeObjectID = createRootNodeWithScholarData(metadata, x, y, rootNodeRadius);
@@ -325,7 +338,10 @@
 				citedByList.forEach(function(citedByMetadata){
 					var academicMetadataObj = {};
 					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = citedByMetadata;
-					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, academicMetadataObj, leafNodeRadius);
+					const scholarData = new GoogleScholarData(citedByMetadata);
+					const paperTitle = scholarData.getTitle();
+					const citedByID = paperTitle.hashCode();
+					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius); //GENERATE ID FOR CITEDBY AS WELL.
 				});
 			} else {
 				loggerModule.error("error", "Err cited by fetch.");
@@ -333,17 +349,31 @@
 		});
 	}
 	function createRootNodeFromArxiv(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
-		console.log("ARXIV METADATA: "+JSON.stringify(metadata));
+		//console.log("ARXIV METADATA: "+JSON.stringify(metadata));
 		var academicMetadataObj = {};
 		academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.ARXIV] = metadata;
+		const arxivDataModel = new ArxivData(metadata);
+		const paperTitle = arxivDataModel.getTitle();
+		const rootNodeObjectID = paperTitle.hashCode();
 
-		var rootNodeObjectID = knowledgeTree.createRootNode(academicMetadataObj, rootNodeRadius, x, y);
+		knowledgeTree.createRootNode(rootNodeObjectID, academicMetadataObj, rootNodeRadius, x, y);
 		const fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
-		const paperArxivId = "abc";
+		const paperArxivId = arxivDataModel.getArxivId();
+		console.log("PAPER ID: "+paperArxivId);
 		fetchPaperDetailsFromSemanticScholar(fetchMethod, paperArxivId, function(err, result){
 			if(result) {
-				console.log(result);
+				const semanticDataModel = new SemanticScholarData(result);
+				const citedByList = semanticDataModel.getCitations();
 				knowledgeTree.addAcademicDataToRootNode(rootNodeObjectID, ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR, result);
+				citedByList.forEach(function(citedByMetadata){
+					var academicMetadataObj = {};
+					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = citedByMetadata;
+					const semanticScholarData = new SemanticScholarData(citedByMetadata);
+					const paperTitle = semanticScholarData.getTitle();
+					const citedByID = paperTitle.hashCode();
+
+					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
+				});
 			} else {
 				loggerModule.error("error", "Err semantic scholar data fetch.");
 			}
@@ -368,7 +398,21 @@
 				contentData.link);
 			nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+(nodeRadius*1.5)), (nodeCenter.y-nodeRadius));	
 		} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
-
+			const academicDataLibrary = nodeObj.getAcademicDataLibrary();
+			var arxivData = academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.ARXIV];
+			var semanticData = academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR];
+			const physicsAggregateData = new PhysicsAggregateModel(arxivData, semanticData);
+			var contentData = physicsAggregateData.getNodeFullContentData();
+			console.log("LINK: "+contentData.link);
+			nodeDetailsStaticOverlayer.setContent(
+				contentData.title,
+				contentData.year,
+				contentData.citationCount,
+				contentData.abstract,
+				contentData.journal,
+				contentData.authors,
+				contentData.link);
+			nodeDetailsStaticOverlayer.showEssential((nodeCenter.x+(nodeRadius*1.5)), (nodeCenter.y-nodeRadius));	
 		} else {
 			loggerModule.error("error", "unknown search platform..");
 		}
@@ -379,25 +423,24 @@
 		const citedByLink = googleMetadataData.citedByLink;
 
 		if(citedByLink) {
-			knowledgeTree.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, ID);
-			const newRootNodeID = createRootNodeWithScholarData(googleMetadataData, x, y, DEFAULT_ROOT_NODE_RADIUS);
-			knowledgeTree.setSiblingReference(rootNodeIdOfLeafNode, newRootNodeID);
+			knowledgeTree.transformCitationNodeToRootNode(rootNodeIdOfLeafNode, ID, DEFAULT_ROOT_NODE_RADIUS, x , y);
 
 			getCitedByOfArticle(citedByLink, function(err, citedByList){
 				if(citedByList) {
 					citedByList.forEach(function(citedByMetadata){
 						var academicMetadataObj = {};
 						academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = citedByMetadata;
-						knowledgeTree.addCitedbyToRootNode(newRootNodeID, academicMetadataObj, DEFAULT_LEAF_NODE_RADIUS);
+						const scholarData = new GoogleScholarData(citedByMetadata);
+						const paperTitle = scholarData.getTitle();
+						const citedByID = paperTitle.hashCode();
+						knowledgeTree.addCitedbyToRootNode(ID, citedByID, academicMetadataObj, DEFAULT_LEAF_NODE_RADIUS);
 					});
 				} else {
 					overlayerModule.informUser("Unable to fetch citations data.");
 				}
 			});
 		} else {
-			knowledgeTree.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, ID);
-			const newRootNodeID = createRootNodeWithScholarData(googleMetadataData, x, y, DEFAULT_ROOT_NODE_RADIUS);
-			knowledgeTree.setSiblingReference(rootNodeIdOfLeafNode, newRootNodeID);
+			knowledgeTree.transformCitationNodeToRootNode(rootNodeIdOfLeafNode, ID, DEFAULT_ROOT_NODE_RADIUS, x , y);
 		}
 	}
 	function transformCitationToRootNodeForArxiv(x, y, ID, rootNodeIdOfLeafNode, nodeObj) {
@@ -703,12 +746,3 @@
 		initializeScript();
 		console.log("DOM fully loaded and parsed");
 	});
-
-	//TODO
-		//Update knowledgeTree.createRootNode(academicMetadataObj, rootNodeRadius, x, y); function to accept academicMetadataObj instead of pure metadata.
-		//Update all nodes to have hashed ID by title. This will make them find easily from the Index.
-			//const nodeId = helperModule.hash(title)
-			//knowledgeTree.createRootNode(nodeId)
-		//EDIT createRootNodeWithScholarData
-			//give key & metadata for storing it in initialAcademicData in NodeObj.
-			//Do necessary changes in all citedby reference rootnode knowledge tree and nodeobj

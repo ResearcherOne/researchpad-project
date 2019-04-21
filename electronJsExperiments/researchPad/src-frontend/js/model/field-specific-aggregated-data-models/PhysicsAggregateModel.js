@@ -2,10 +2,12 @@ function PhysicsAggregateModel(arxivMetadata, semanticScholarMetadata){
     this.arxivData = new ArxivData(arxivMetadata);
     this.semanticScholarData = new SemanticScholarData(semanticScholarMetadata);
 
+    this.getTitle = function() {
+        return (this.arxivData.getTitle() || this.semanticScholarData.getTitle());
+    }
     this.getArxivMetadata = function() {
         return this.arxivData.getFullMetadata();
     }
-
     this.getSearchBarEssential = function() {
         const title = this.arxivData.getTitle() || "No title";
         const year = this.arxivData.getYear() || "?";

@@ -335,33 +335,37 @@
 	};
   
 	function createRootNodeWithScholarData(metadata, x, y, rootNodeRadius) {
+		return nodeID;
+	}
+	function createRootNodeFromGoogleScholar(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
 		var academicMetadataObj = {};
 		academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = metadata;
 		const scholarData = new GoogleScholarData(metadata);
 		const paperTitle = scholarData.getTitle();
-		const nodeID = paperTitle.hashCode();
-
-		knowledgeTree.createRootNode(nodeID, academicMetadataObj, rootNodeRadius, x, y);
-		return nodeID;
-	}
-	function createRootNodeFromGoogleScholar(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
-		var rootNodeObjectID = createRootNodeWithScholarData(metadata, x, y, rootNodeRadius);
-
-		getCitedByOfArticle(metadata.citedByLink, function(err, citedByList){
-			if(citedByList) {
-				console.log(citedByList);
-				citedByList.forEach(function(citedByMetadata){
-					var academicMetadataObj = {};
-					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = citedByMetadata;
-					const scholarData = new GoogleScholarData(citedByMetadata);
-					const paperTitle = scholarData.getTitle();
-					const citedByID = paperTitle.hashCode();
-					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius); //GENERATE ID FOR CITEDBY AS WELL.
-				});
-			} else {
-				loggerModule.error("error", "Err cited by fetch.");
-			}
-		});
+		const rootNodeObjectID = paperTitle.hashCode();
+	
+		
+		if(!knowledgeTree.isRootNodeExists(rootNodeObjectID)) {
+			knowledgeTree.createRootNode(nodeID, academicMetadataObj, rootNodeRadius, x, y);
+	
+			getCitedByOfArticle(metadata.citedByLink, function(err, citedByList){
+				if(citedByList) {
+					console.log(citedByList);
+					citedByList.forEach(function(citedByMetadata){
+						var academicMetadataObj = {};
+						academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.GOOGLE] = citedByMetadata;
+						const scholarData = new GoogleScholarData(citedByMetadata);
+						const paperTitle = scholarData.getTitle();
+						const citedByID = paperTitle.hashCode();
+						knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius); //GENERATE ID FOR CITEDBY AS WELL.
+					});
+				} else {
+					loggerModule.error("error", "Err cited by fetch.");
+				}
+			});
+		} else {
+			overlayerModule.informUser("This root node already exists in your tree.");
+		}
 	}
 	function createRootNodeFromArxiv(metadata, x ,y, rootNodeRadius, leafNodeRadius) {
 		//console.log("ARXIV METADATA: "+JSON.stringify(metadata));
@@ -371,39 +375,43 @@
 		const paperTitle = arxivDataModel.getTitle();
 		const rootNodeObjectID = paperTitle.hashCode();
 
-		knowledgeTree.createRootNode(rootNodeObjectID, academicMetadataObj, rootNodeRadius, x, y);
-		const fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
-		const paperArxivId = arxivDataModel.getArxivId();
-		console.log("PAPER ID: "+paperArxivId);
-		fetchPaperDetailsFromSemanticScholar(fetchMethod, paperArxivId, function(err, result){
-			if(result) {
-				const semanticDataModel = new SemanticScholarData(result);
-				const citedByList = semanticDataModel.getCitations();
-				const referenceList = semanticDataModel.getReferences();
-				knowledgeTree.addAcademicDataToRootNode(rootNodeObjectID, ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR, result);
-				citedByList.forEach(function(citedByMetadata){
-					var academicMetadataObj = {};
-					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = citedByMetadata;
-					const semanticScholarData = new SemanticScholarData(citedByMetadata);
-					const paperTitle = semanticScholarData.getTitle();
-					const citedByID = paperTitle.hashCode();
+		if(!knowledgeTree.isRootNodeExists(rootNodeObjectID)) {
+			knowledgeTree.createRootNode(rootNodeObjectID, academicMetadataObj, rootNodeRadius, x, y);
+			const fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
+			const paperArxivId = arxivDataModel.getArxivId();
+			console.log("PAPER ID: "+paperArxivId);
+			fetchPaperDetailsFromSemanticScholar(fetchMethod, paperArxivId, function(err, result){
+				if(result) {
+					const semanticDataModel = new SemanticScholarData(result);
+					const citedByList = semanticDataModel.getCitations();
+					const referenceList = semanticDataModel.getReferences();
+					knowledgeTree.addAcademicDataToRootNode(rootNodeObjectID, ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR, result);
+					citedByList.forEach(function(citedByMetadata){
+						var academicMetadataObj = {};
+						academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = citedByMetadata;
+						const semanticScholarData = new SemanticScholarData(citedByMetadata);
+						const paperTitle = semanticScholarData.getTitle();
+						const citedByID = paperTitle.hashCode();
 
-					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
-				});
+						knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
+					});
 
-				referenceList.forEach(function(referenceMetadata){
-					var academicMetadataObj = {};
-					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = referenceMetadata;
-					const semanticScholarData = new SemanticScholarData(referenceMetadata);
-					const paperTitle = semanticScholarData.getTitle();
-					const citedByID = paperTitle.hashCode();
+					referenceList.forEach(function(referenceMetadata){
+						var academicMetadataObj = {};
+						academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = referenceMetadata;
+						const semanticScholarData = new SemanticScholarData(referenceMetadata);
+						const paperTitle = semanticScholarData.getTitle();
+						const citedByID = paperTitle.hashCode();
 
-					knowledgeTree.addReferenceToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
-				});
-			} else {
-				loggerModule.error("error", "Err semantic scholar data fetch.");
-			}
-		});
+						knowledgeTree.addReferenceToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
+					});
+				} else {
+					loggerModule.error("error", "Err semantic scholar data fetch.");
+				}
+			});
+		} else {
+			overlayerModule.informUser("This root node already exists in your tree.");
+		}
 	}
 	function showEssentialContentForNode(nodeObj) {
 		var nodeCenter = nodeObj.getPositionOnCamera();
@@ -582,7 +590,14 @@
 		knowledgeTree.hideLeafNodes(rootNodeId, LEAF_NODE_HIDE_DURATION_SEC);
 	}
 	function searchBarElementDragStarted(searchElementIndex) {
-		searchPanel.setColorOfSearchResultElement(searchElementIndex, "yellow");
+		const elementPositionInSearchData = parseInt(DRAGGED_SEARCH_ELEMENT_TAG_NO);
+		var aggregateModelData = lastAcademicSearchDataList[elementPositionInSearchData];
+		const title = aggregateModelData.getTitle();
+		const rootID = title.hashCode();
+		const isRootAlreadyExists = knowledgeTree.isRootNodeExists(rootID);
+		if(!isRootAlreadyExists) {
+			searchPanel.setColorOfSearchResultElement(searchElementIndex, "yellow");
+		}
 	}
 	function searchBarElementDragFinished(isTargetPointsKnowledgeTree, cursorX ,cursorY) {
 		if(isTargetPointsKnowledgeTree) {
@@ -610,12 +625,16 @@
 						const academicDataEntry = new ComputerScienceAggregateModel(searchElementMetadata);
 						lastAcademicSearchDataList[i] = academicDataEntry;
 						const googleEssential = academicDataEntry.getSearchBarEssential();
+						const isRootNodeExists = knowledgeTree.isRootNodeExists(googleEssential.title.hashCode());
 						searchPanel.addResultElement(i, googleEssential.title, googleEssential.citationCount, googleEssential.year, googleEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
+						if(isRootNodeExists) searchPanel.setColorOfSearchResultElement(i, "green");
 					} else if (CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
 						const academicDataEntry = new PhysicsAggregateModel(searchElementMetadata);
 						lastAcademicSearchDataList[i] = academicDataEntry;
 						const arxivEssential = academicDataEntry.getSearchBarEssential();
+						const isRootNodeExists = knowledgeTree.isRootNodeExists(arxivEssential.title.hashCode());
 						searchPanel.addResultElement(i, arxivEssential.title, arxivEssential.arxivEssential, arxivEssential.year, arxivEssential.abstract, searchResultMouseEnterCallback, searchResultMouseLeaveCallback);
+						if(isRootNodeExists) searchPanel.setColorOfSearchResultElement(i, "green");
 					} else {
 						loggerModule.error("error", "unknown search platform.");
 					}

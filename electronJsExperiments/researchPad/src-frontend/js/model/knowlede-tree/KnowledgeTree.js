@@ -305,4 +305,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		const secondNodeType = "reference";
 		setSiblingReference(rootNodeIdOfLeafNode, nodeIdToTransform, firstNodeType, secondNodeType, this);
 	}
+	this.isRootNodeExists = function(nodeID) {
+		return (this.rootNodes[nodeID] != null);
+	}
 }

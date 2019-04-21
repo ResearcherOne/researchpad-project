@@ -1,10 +1,12 @@
 function ComputerScienceAggregateModel(googleScholarMetadata){
 	this.googleScholarData = googleScholarMetadata;
 
+	this.getTitle = function() {
+		return this.googleScholarData.getTitle();
+	};
 	this.getFullMetadata = function() { //Temp. function.
 		return this.googleScholarData
 	};
-
 	this.getSearchBarEssential = function() {
 		const title = this.googleScholarData.title || "No title";
 		const year = this.googleScholarData.year || "?";

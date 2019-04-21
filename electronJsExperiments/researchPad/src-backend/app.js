@@ -77,8 +77,9 @@ function initializeBackend() {
 
 	ipcRestModule.listen(backendApi.searchArxiv, function(request, response){
 		const searchText = request.searchText;
-	
-		arxivModule.search(searchText, function(err, result){
+		const trimmedText = searchText.trim();
+
+		arxivModule.search(trimmedText, function(err, result){
 			if(!err) {
 				//dataCleanerModule.cleanGoogleResultList(result);
 				response.send({"resultList": result.items});

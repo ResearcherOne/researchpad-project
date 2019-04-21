@@ -10,17 +10,19 @@ const download = require('download');
 
 
 function searchQueryCreator(query){
-    let newQuery = query.split(" ")
-    let new_Query =""
-    for(let i = 0 ; i < newQuery.length ; i++)
-    {
-        if( i < newQuery.length-1)
-            new_Query += newQuery[i] + "+AND+"
-        else
-            new_Query += newQuery[i]
+        let newQuery = query.split(" ")
+        let new_Query =""
+        for(let i = 0 ; i < newQuery.length ; i++)
+        {
+            if( i < newQuery.length-1)
+                new_Query += newQuery[i] + "+AND+"
+            else
+                new_Query += newQuery[i]
+        }
+        return { q: new_Query}
     }
-    return { q: new_Query}
-}
+
+
 
 makeUrl = function(query, max_results, sort_by) {
     if (max_results == null) {
@@ -29,8 +31,9 @@ makeUrl = function(query, max_results, sort_by) {
     if (sort_by == null) {
         sort_by = 'submittedDate';
     }
-    //return "http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query;
+    console.log("http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query)
     return "http://export.arxiv.org/api/query?sortBy=" + sort_by + "&max_results=" + max_results + "&search_query=" + query;
+
 };
 
 key_map = {
@@ -59,6 +62,7 @@ coerceQueryValue = function(key, value) {
 };
 
 coerceQuery = function(query) {
+
     var k, querys, v;
     querys = [];
     for (k in query) {
@@ -111,12 +115,25 @@ coerceEntry = function(entry) {
 
 
 
-var mockResult = [{"id":"http://arxiv.org/abs/1901.02929v1","updated":"2019-01-09T21:03:17.000Z","published":"2019-01-09T21:03:17.000Z","title":"Report of the Third Global Experimentation for Future Internet (GEFI 2018) Workshop","summary":"The third Global Experimentation for Future Internet (GEFI 2018) workshop was held October 25-26, 2018 in Tokyo, Japan, hosted by the University of Tokyo. A total of forty-four participants attended, representing Belgium, Brazil, China, Denmark, France, Ireland, Japan, the Republic of Korea, and the United States. The workshop employed a mixed format of presentations and open group discussions to advance multi-national coordination and interoperation of research infrastructure for advanced networking and computer science research. Major topic areas included: softwareization and virtualization of radios and networks; testbed support for networking experiments; EdgeNet; a federated testbed of elastic optical networks; and reproducibility in experimentation. Workshop goals included both the formulation of specific new research collaborations and strategies for coordination and interoperation of research testbeds. Workshop outcomes include a variety of new and ongoing collaborative efforts, ranging from an agreement to pursue the development of optical \"white boxes\" in support of elastic optical testbeds to the identification of strategies for effective use of open-source software and hardware platforms in future research infrastructure.","links":[{"href":"http://arxiv.org/abs/1901.02929v1"},{"href":"http://arxiv.org/pdf/1901.02929v1","title":"pdf"}],"authors":[{"name":"Mark Berman"},{"name":"Timur Friedman"},{"name":"Abhimanyu Gosain"},{"name":"Kate Keahey"},{"name":"Rick McGeer"},{"name":"Ingrid Moerman"},{"name":"Akihiro Nakao"},{"name":"Lucas Nussbaum"},{"name":"Kristin Rauschenbach"},{"name":"Violet Syrotiuk"},{"name":"Malathi Veeraraghavan"},{"name":"Naoaki Yamanaka"}],"categories":["cs.NI"]},{"id":"http://arxiv.org/abs/1810.08260v2","updated":"2018-11-08T18:16:57.000Z","published":"2018-10-18T19:54:36.000Z","title":"Merge: An Architecture for Interconnected Testbed Ecosystems","summary":"In the cybersecurity research community, there is no one-size-fits-all solution for merging large numbers of heterogeneous resources and experimentation capabilities from disparate specialized testbeds into integrated experiments. The current landscape for cyber-experimentation is diverse, encompassing many fields including critical infrastructure, enterprise IT, cyber-physical systems, cellular networks, automotive platforms, IoT and industrial control systems. Existing federated testbeds are constricted in design to predefined domains of applicability, lacking the systematic ability to integrate the burgeoning number of heterogeneous devices or tools that enable their effective use for experimentation. We have developed the Merge architecture to dynamically integrate disparate testbeds in a logically centralized way that allows researchers to effectively discover, and use the resources and capabilities provided the by evolving ecosystem of distributed testbeds for the development of rigorous and high-fidelity cybersecurity experiments.","links":[{"href":"http://arxiv.org/abs/1810.08260v2"},{"href":"http://arxiv.org/pdf/1810.08260v2","title":"pdf"}],"authors":[{"name":"Ryan Goodfellow"},{"name":"Lincoln Thurlow"},{"name":"Srivatsan Ravi"}],"categories":["cs.DC"]},{"id":"http://arxiv.org/abs/1806.04467v1","updated":"2018-06-12T12:39:00.000Z","published":"2018-06-12T12:39:00.000Z","title":"Next generation portal for federated testbeds MySlice v2: from prototype to production","summary":"A number of projects in computer science around the world have contributed to build federated experimental facilities providing access to a large set of distributed compute, storage and network resources for the research community. Several tools have been developed to provide users an easy access to the federated testbeds. This paper presents the architecture of the new version of the MySlice web portal, that has evolved from a prototype to a production ready software.","links":[{"href":"http://arxiv.org/abs/1806.04467v1"},{"href":"http://arxiv.org/pdf/1806.04467v1","title":"pdf"}],"authors":[{"name":"Lo├»c Baron"},{"name":"Radomir Klacza"},{"name":"Pauline Gaudet-Chardonnet"},{"name":"Amira Bradai"},{"name":"Ciro Scognamiglio"},{"name":"Serge Fdida"}],"categories":["cs.NI","cs.CY","cs.DB"]},{"id":"http://arxiv.org/abs/1711.07362v1","updated":"2017-11-20T15:12:24.000Z","published":"2017-11-20T15:12:24.000Z","title":"Performance Evaluation of SDN-Controlled Green Mobile Fronthaul Using a Federation of Experimental Network","summary":"When evolved NodeB (eNB) flexible functional split is implemented in Virtualized Radio Access Network (V-RAN) 5G systems, fronthaul connectivity between the virtualized network functions (VNFs) must be seamlessly guaranteed. This study proposes the utilization of Software Defined Networking (SDN) to control the mobile fronthaul. In particular, this study investigates the ability of the SDN-based control of reconfiguring the fronthaul to maintain VNF connectivity when cell and optical access turn into sleep mode (off mode) for energy efficiency purposes. The evaluation of the proposed scheme is performed by federating two remote experimental testbeds. Results show that, upon cell and optical access turning on and off, the fronthaul reconfiguration time is limited to few tens of milliseconds.","links":[{"href":"http://arxiv.org/abs/1711.07362v1"},{"href":"http://arxiv.org/pdf/1711.07362v1","title":"pdf"}],"authors":[{"name":"K. Kondepu"},{"name":"A. Sgambelluri"},{"name":"F. Cugini"},{"name":"P. Castoldi"},{"name":"R. Aparicio Morenilla"},{"name":"D. Larrabeiti"},{"name":"B. Vermeulen"},{"name":"L. Valcarenghi"}],"categories":["cs.NI"]},{"id":"http://arxiv.org/abs/1708.03389v1","updated":"2017-08-10T21:17:18.000Z","published":"2017-08-10T21:17:18.000Z","title":"A Logical Approach to Cloud Federation","summary":"Federated clouds raise a variety of challenges for managing identity, resource access, naming, connectivity, and object access control. This paper shows how to address these challenges in a comprehensive and uniform way using a data-centric approach. The foundation of our approach is a trust logic in which participants issue authenticated statements about principals, objects, attributes, and relationships in a logic language, with reasoning based on declarative policy rules. We show how to use the logic to implement a trust infrastructure for cloud federation that extends the model of NSF GENI, a federated IaaS testbed. It captures shared identity management, GENI authority services, cross-site interconnection using L2 circuits, and a naming and access control system similar to AWS Identity and Access Management (IAM), but extended to a federated system without central control.","links":[{"href":"http://arxiv.org/abs/1708.03389v1"},{"href":"http://arxiv.org/pdf/1708.03389v1","title":"pdf"}],"authors":[{"name":"Qiang Cao"},{"name":"Yuanjun Yao"},{"name":"Jeff Chase"}],"categories":["cs.DC","cs.CR"]},{"id":"http://arxiv.org/abs/1601.03984v1","updated":"2016-01-15T16:14:22.000Z","published":"2016-01-15T16:14:22.000Z","title":"GPLMT: A Lightweight Experimentation and Testbed Management Framework","summary":"Conducting experiments in federated, distributed, and heterogeneous testbeds is a challenging task for researchers. Researchers have to take care of the whole experiment life cycle, ensure the reproducibility of each run, and the comparability of the results. We present GPLMT, a flexible and lightweight framework for managing testbeds and the experiment life cycle. \\gplmt provides an intuitive way to formalize experiments. The resulting experiment description is portable across varying experimentation platforms. GPLMT enables researchers to manage and control networked testbeds and resources, and conduct experiments on large-scale, heterogeneous, and distributed testbeds. We state the requirements and the design of GPLMT, describe the challenges of developing and using such a tool, and present selected user studies along with their experience of using GPLMT in varying scenarios.","links":[{"href":"http://arxiv.org/abs/1601.03984v1"},{"href":"http://arxiv.org/pdf/1601.03984v1","title":"pdf"}],"authors":[{"name":"Matthias Wachs"},{"name":"Nadine Herold"},{"name":"Stephan-A. Posselt"},{"name":"Florian Dold"},{"name":"Georg Carle"}],"categories":["cs.NI"]},{"id":"http://arxiv.org/abs/1509.03069v1","updated":"2015-09-10T09:37:03.000Z","published":"2015-09-10T09:37:03.000Z","title":"Federating OMNeT++ Simulations with Testbed Environments","summary":"We are in the process of developing a system architecture for opportunistic and information centric communications. This architecture (called Keetchi), meant for the Internet of Things (IoT) is focussed on enabling applications to perform distributed and decentralised communications among smart devices. To realise and evaluate this architecture, we follow a 3-step approach. Our first approach of evaluation is the development of a testbed with smart devices (mainly smart phones and tablets) deployed with this architecture including the applications. The second step is where the architecture is evaluated in large scale scenarios with the OMNeT++ simulation environment. The third step is where the OMNeT++ simulation environment is fed with traces of data collected from experiments done using the testbed. In realising these environments, we develop the functionality of this architecture as a common code base that is able to operate in the OMNeT++ environment as well as in the smart devices of the testbed (e.g., Android, iOS, Contiki, etc.). This paper presents the details of the \"Write once, compile anywhere\" (WOCA) code base architecture of Keetchi.","links":[{"href":"http://arxiv.org/abs/1509.03069v1"},{"href":"http://arxiv.org/pdf/1509.03069v1","title":"pdf"}],"authors":[{"name":"Asanga Udugama"},{"name":"Koojana Kuladinithi"},{"name":"Anna F├╢rster"},{"name":"Carmelita G├╢rg"}],"categories":["cs.NI","cs.PF"]},{"id":"http://arxiv.org/abs/1312.3504v1","updated":"2013-12-12T14:47:50.000Z","published":"2013-12-12T14:47:50.000Z","title":"Building An Information System for a Distributed Testbed","summary":"This paper describes an information system designed to support the large volume of monitoring information generated by a distributed testbed. This monitoring information is produced by several subsystems and consists of status and performance data that needs to be federated, distributed, and stored in a timely and easy to use manner. Our approach differs from existing approaches because it federates and distributes information at a low architectural level via messaging; a natural match to many of the producers and consumers of information. In addition, a database is easily layered atop the messaging layer for consumers that want to query and search the information. Finally, a common language to represent information in all layers of the information system makes it significantly easier for users to consume information. Performance data shows that this approach meets the significant needs of FutureGrid and would meet the needs of an experimental infrastructure twice the size of FutureGrid. In addition, this design also meets the needs of existing distributed scientific infrastructures.","links":[{"href":"http://arxiv.org/abs/1312.3504v1"},{"href":"http://arxiv.org/pdf/1312.3504v1","title":"pdf"}],"authors":[{"name":"Warren Smith"},{"name":"Shava Smallen"}],"categories":["cs.DC","cs.PF"]}];
 async function search (query, cb) {
-    cb(null, {
-        items: mockResult,
-        total: mockResult.length
-    })
+    let search_query = await searchQueryCreator(query);
+    return request.get(makeUrl(coerceQuery(search_query)), function(err, resp, data) {
+        return  xml2js.parseString(data, function(err, parsed) {
+            var items, ref, ref1, total;
+            if (err != null) {
+                return cb(err);
+            } else {
+                items = parsed != null ? (ref = parsed.feed) != null ? (ref1 = ref.entry) != null ? ref1.map(coerceEntry) : void 0 : void 0 : void 0;
+                items || (items = []);
+                total = Number(parsed.feed['opensearch:totalResults'][0]['_']);
+                total || (total = 0);
+                return cb(err, {
+                    items: items,
+                    total: total
+                });
+            }
+        });
+    });
 };
 
 
@@ -156,12 +173,12 @@ function createPDFDownloadLink(arxivID) {
     return "https://arxiv.org/pdf/"+arxivID;
 }
 
-async function downloadArxivPDF(arxivID,saveFolderPath,fileName) {
+async function downloadArxivPDF(arxivID,saveFolderPath,fileName,callback) {
     let url = await createPDFDownloadLink(arxivID);
     let filePath = saveFolderPath+"/"+fileName+".pdf"
     download(url).then(data => {
         fs.writeFileSync(filePath, data);
-    });
+    }).catch(err => callback(err,null));
 }
 
 
@@ -170,6 +187,8 @@ module.exports = {
     search : search,
     downloadArxivPDF : downloadArxivPDF,
 };
+
+
 
 
 //Sample download : downloadArxivPDFWith("1904.02161", "/home/pc","mahmutTuncer")

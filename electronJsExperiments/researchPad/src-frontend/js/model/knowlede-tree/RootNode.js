@@ -90,7 +90,7 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		return JSON.stringify(serializedNodeObj);
 	}
 
-	this.importSerializedReferences = function(serializedReferences, serializedCitedbyNodes, refCount, citedbyCount) {
+	this.importSerializedReferences = function(serializedReferences, serializedCitedbyNodes, refCount, citedbyCount, suggestedCitedByNodeList, suggestedReferenceNodeList) {
 		var reconstructedReferences = {}
 		for (var referenceNodeID in serializedReferences){
 			var leafNodeData = JSON.parse(serializedReferences[referenceNodeID]);
@@ -109,8 +109,8 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		this.citedByCount = citedbyCount;
 		this.citedByNodes = reconstructedCitedbyNodes;
 
-		//this.suggestedCitedByNodeList = suggestedCitedByNodeList;
-		//this.suggestedReferenceNodeList = suggestedReferenceNodeList;
+		this.suggestedCitedByNodeList = suggestedCitedByNodeList;
+		this.suggestedReferenceNodeList = suggestedReferenceNodeList;
 	}
 
 	this.hideLeafNodes = function(durationSec) {

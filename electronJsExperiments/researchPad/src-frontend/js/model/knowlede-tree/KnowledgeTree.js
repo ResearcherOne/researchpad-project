@@ -106,7 +106,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		for (var serializedRootNodeID in serializedRootNodes){
 			var rootNodeData = JSON.parse(serializedRootNodes[serializedRootNodeID]);
 			reconstructedRootNodes[serializedRootNodeID] = new RootNode(rootNodeData.ID, rootNodeData.academicDataLibrary, rootNodeData.radius, rootNodeData.x, rootNodeData.y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
-			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.citedByNodes, rootNodeData.referenceCount, rootNodeData.citedByCount);
+			reconstructedRootNodes[serializedRootNodeID].importSerializedReferences(rootNodeData.references, rootNodeData.citedByNodes, rootNodeData.referenceCount, rootNodeData.citedByCount, rootNodeData.suggestedCitedByNodeList, rootNodeData.suggestedReferenceNodeList);
 			
 			reconstructedRootNodes[serializedRootNodeID].siblingIDs = rootNodeData.siblingIDs;
 			reconstructedRootNodes[serializedRootNodeID].siblingCount = rootNodeData.siblingCount;
@@ -174,7 +174,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		return refID;
 	}
 	this.removeReferenceFromRootNode = function(rootID, refID) {
-		const isSuggested = this.rootNodes[rootID].isSuggestedNode(citedByID);
+		const isSuggested = this.rootNodes[rootID].isSuggestedNode(refID);
 		if(isSuggested) {
 			this.rootNodes[rootID].removeReferenceSuggestion(refID);
 		}
@@ -294,6 +294,15 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 
 		const firstNodeType = "reference";
 		const secondNodeType = "citation";
+		setSiblingReference(rootNodeIdOfLeafNode, nodeIdToTransform, firstNodeType, secondNodeType, this);
+	}
+	this.transformReferenceNodeToRootNode = function(rootNodeIdOfLeafNode, nodeIdToTransform, newNodeRadius, x , y) {
+		const academicDataLibrary = this.referenceNodes[nodeIdToTransform].getAcademicDataLibrary();
+		this.removeReferenceFromRootNode(rootNodeIdOfLeafNode, nodeIdToTransform);
+		this.createRootNode(nodeIdToTransform, academicDataLibrary, newNodeRadius, x, y);
+
+		const firstNodeType = "citation";
+		const secondNodeType = "reference";
 		setSiblingReference(rootNodeIdOfLeafNode, nodeIdToTransform, firstNodeType, secondNodeType, this);
 	}
 }

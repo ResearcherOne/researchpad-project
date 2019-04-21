@@ -36,10 +36,10 @@
 	const nodeExtraLowerClassName = "node-extra-lower-div";
 
 	const NODE_CONNECTIONS_CONFIG = {
-		citedByAbsoluteStartDegree: 280,
-		citedByAbsoluteEndDegree: 90,
-		referenceAbsoluteStartDegree: 120,
-		referenceAbsoluteEndDegree: 240,
+		citedByAbsoluteStartDegree: 285,
+		citedByAbsoluteEndDegree: 85,
+		referenceAbsoluteStartDegree: 100,
+		referenceAbsoluteEndDegree: 265,
 		connectionLength: 50,
 		maxConnectionPerLayer: 10
 	};
@@ -58,13 +58,19 @@
 	const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
 		arxivId: "arxivId",
 		semananticId: "semanticId"
-	}
+	};
 
 	const ACADEMIC_DATA_KEY_NAMES = {
 		ARXIV: "arxiv",
 		GOOGLE: "googleScholar",
 		SEMANTIC_SCHOLAR: "semanticScholar"
-	}
+	};
+
+	const NODE_TYPES = {
+		ROOT: "root",
+		CITATION: "citedby",
+		REFERENCE: "root"
+	};
 
 //Backend Communication
 	function request(apiUrl, requestObj, callback) {
@@ -242,7 +248,10 @@
 				document.body.style.cursor = 'pointer';
 				showRootNodeEssentialContent(nodeObj);
 			} else if (nodeType == "ref") {
-				showReferenceNodeEssentialContent(nodeObj);
+				if(!nodeObj.isHiddenNode()) {
+					showCitationNodeEssentialContent(nodeObj);
+					document.body.style.cursor = 'pointer';
+				}
 			} else if (nodeType == "citedby") {
 				if(!nodeObj.isHiddenNode()) {
 					showCitationNodeEssentialContent(nodeObj);
@@ -263,11 +272,14 @@
 					hideRootNodeEssentialContent(nodeObj);
 				}
 			} else if (nodeType == "ref") {
-				hideReferenceNodeEssentialContent(nodeObj);
+				if(!nodeObj.isHiddenNode()) {
+					document.body.style.cursor = 'default';
+					hideLeafNodeEssentialContent(nodeObj);
+				}
 			} else if (nodeType == "citedby") {
 				if(!nodeObj.isHiddenNode()) {
 					document.body.style.cursor = 'default';
-					hideCitationNodeEssentialContent(nodeObj);
+					hideLeafNodeEssentialContent(nodeObj);
 				}
 			} else {
 				console.log("Unknown type name: "+nodeType);
@@ -282,14 +294,17 @@
 				selectRootNode(nodeObj);
 			}
 		} else if (nodeType == "ref") {
-			selectReferenceNode(nodeObj);
-			console.log("Clicked:  Type of reference node");
+			if(knowledgeTree.isSelectedNode(nodeObj)) {
+				deselectNode(nodeType, nodeObj);
+			} else {
+				selectLeafNode(nodeObj);
+			}
 		} else if (nodeType == "citedby") {
 			console.log("Clicked: Type of citedby");
 			if(knowledgeTree.isSelectedNode(nodeObj)) {
 				deselectNode(nodeType, nodeObj);
 			} else {
-				selectCitationNode(nodeObj);
+				selectLeafNode(nodeObj);
 			}
 		} else {
 			console.log("Clicked: Unknown type name: "+nodeType);
@@ -364,6 +379,7 @@
 			if(result) {
 				const semanticDataModel = new SemanticScholarData(result);
 				const citedByList = semanticDataModel.getCitations();
+				const referenceList = semanticDataModel.getReferences();
 				knowledgeTree.addAcademicDataToRootNode(rootNodeObjectID, ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR, result);
 				citedByList.forEach(function(citedByMetadata){
 					var academicMetadataObj = {};
@@ -373,6 +389,16 @@
 					const citedByID = paperTitle.hashCode();
 
 					knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
+				});
+
+				referenceList.forEach(function(referenceMetadata){
+					var academicMetadataObj = {};
+					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = referenceMetadata;
+					const semanticScholarData = new SemanticScholarData(referenceMetadata);
+					const paperTitle = semanticScholarData.getTitle();
+					const citedByID = paperTitle.hashCode();
+
+					knowledgeTree.addReferenceToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
 				});
 			} else {
 				loggerModule.error("error", "Err semantic scholar data fetch.");
@@ -403,7 +429,6 @@
 			var semanticData = academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR];
 			const physicsAggregateData = new PhysicsAggregateModel(arxivData, semanticData);
 			var contentData = physicsAggregateData.getNodeFullContentData();
-			console.log("LINK: "+contentData.link);
 			nodeDetailsStaticOverlayer.setContent(
 				contentData.title,
 				contentData.year,
@@ -443,7 +468,7 @@
 			knowledgeTree.transformCitationNodeToRootNode(rootNodeIdOfLeafNode, ID, DEFAULT_ROOT_NODE_RADIUS, x , y);
 		}
 	}
-	function transformCitationToRootNodeForArxiv(x, y, ID, rootNodeIdOfLeafNode, nodeObj) {
+	function transformLeafToRootNodeForArxiv(x, y, ID, rootNodeIdOfLeafNode, nodeObj, nodeType) {
 		const academicDataLibrary = nodeObj.getAcademicDataLibrary();
 		const semanticData = new SemanticScholarData(academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR]);
 		const semanticId = semanticData.getPaperId();
@@ -452,23 +477,27 @@
 
 		var fetchMethod;
 		var paperId;
-		if(arxivId) {
-			fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
-			paperId = arxivId;
-		} else if (semanticId) {
+		if(semanticId) {
 			fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.semananticId;
 			paperId = semanticId;
+		} else if (arxivId) {
+			fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
+			paperId = arxivId;
 		} else {
 			loggerModule.error("error", "Neither arxivId nor semanticId exists.");
 			overlayerModule.informUser("Unable to fetch citations data, because this paper does not have necessary data attached to it.");
 		}
-		console.log("PAPER ID: "+paperId);
 
-		knowledgeTree.transformCitationNodeToRootNode(rootNodeIdOfLeafNode, ID, DEFAULT_ROOT_NODE_RADIUS, x , y);
+		if(nodeType == NODE_TYPES.CITATION) {
+			knowledgeTree.transformCitationNodeToRootNode(rootNodeIdOfLeafNode, ID, DEFAULT_ROOT_NODE_RADIUS, x , y);
+		} else {
+			knowledgeTree.transformReferenceNodeToRootNode(rootNodeIdOfLeafNode, ID, DEFAULT_ROOT_NODE_RADIUS, x , y);
+		}
 		fetchPaperDetailsFromSemanticScholar(fetchMethod, paperId, function(err, metadata){
 			if(metadata) {
 				const semanticDataModel = new SemanticScholarData(metadata);
 				const citedByList = semanticDataModel.getCitations();
+				const referenceList = semanticDataModel.getReferences();
 				knowledgeTree.addAcademicDataToRootNode(ID, ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR, metadata);
 				citedByList.forEach(function(citedByMetadata){
 					var academicMetadataObj = {};
@@ -478,6 +507,16 @@
 					const citedByID = paperTitle.hashCode();
 
 					knowledgeTree.addCitedbyToRootNode(ID, citedByID, academicMetadataObj, DEFAULT_LEAF_NODE_RADIUS);
+				});
+
+				referenceList.forEach(function(referenceMetadata){
+					var academicMetadataObj = {};
+					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = referenceMetadata;
+					const semanticScholarData = new SemanticScholarData(referenceMetadata);
+					const paperTitle = semanticScholarData.getTitle();
+					const refID = paperTitle.hashCode();
+
+					knowledgeTree.addReferenceToRootNode(ID, refID, academicMetadataObj, DEFAULT_LEAF_NODE_RADIUS);
 				});
 			} else {
 				loggerModule.error("error", "Err semantic scholar data fetch.");
@@ -499,7 +538,7 @@
 		nodeDetailsStaticOverlayer.showExtraContent(isUpperContentShown);
 		console.log("selected root node");
 	}
-	function selectCitationNode(nodeObj) {
+	function selectLeafNode(nodeObj) {
 		if(knowledgeTree.isSelectedNodeExists()) {
 			knowledgeTree.clearSelectedNode();
 		}
@@ -507,10 +546,6 @@
 		showEssentialContentForNode(nodeObj);
 		const isUpperContentShown = false;
 		nodeDetailsStaticOverlayer.showExtraContent(isUpperContentShown);
-		console.log("selected citedby node");
-	}
-	function selectReferenceNode(nodeObj) {
-
 	}
 	function deselectNode(nodeType, nodeObj) {
 		knowledgeTree.clearSelectedNode();
@@ -521,8 +556,8 @@
 			const hideDelaySec = 0;
 			knowledgeTree.hideLeafNodes(ID, hideDelaySec);
 			console.log("deselected root node");
-		} else if (nodeType == "citedby") {
-			console.log("deselected citedby");
+		} else if (nodeType == "citedby" || nodeType == "ref") {
+			console.log("deselected leaf");
 		}
 	}
 	function showRootNodeEssentialContent(nodeObj) {
@@ -541,13 +576,10 @@
 		knowledgeTree.hideLeafNodes(nodeObj.getID(), LEAF_NODE_HIDE_DURATION_SEC);
 		nodeDetailsStaticOverlayer.hideEssential();
 	}
-	function hideCitationNodeEssentialContent(nodeObj) {
+	function hideLeafNodeEssentialContent(nodeObj) {
 		const rootNodeId = nodeObj.getRootNodeID();
 		nodeDetailsStaticOverlayer.hideEssential();
 		knowledgeTree.hideLeafNodes(rootNodeId, LEAF_NODE_HIDE_DURATION_SEC);
-	}
-	function hideReferenceNodeEssentialContent(nodeObj) {
-		console.log("hide reference node essential content");
 	}
 	function searchBarElementDragStarted(searchElementIndex) {
 		searchPanel.setColorOfSearchResultElement(searchElementIndex, "yellow");
@@ -658,7 +690,12 @@
 		transformCitationNodeToRootNode(CURRENT_SEARCH_PLATFORM, x, y, ID, rootNodeIdOfLeafNode, nodeObj);
 	}
 	function referenceNodeDragEnd(nodeObj) {
+		const x = nodeObj.getAbsolutePosition().x;
+		const y = nodeObj.getAbsolutePosition().y;
+		const ID = nodeObj.getID();
+		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID();
 
+		transformReferenceNodeToRootNode(CURRENT_SEARCH_PLATFORM, x, y, ID, rootNodeIdOfLeafNode, nodeObj);
 	}
 	function createNewRootNodeOnKnowledgeTreeViaSearchOperation(platform, aggregateModelData, x, y) {
 		if(platform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
@@ -675,12 +712,21 @@
 		if(platform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
 			transformCitationToRootNodeForGoogleScholar(x, y, ID, rootNodeIdOfLeafNode, nodeObj);
 		} else if (platform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
-			transformCitationToRootNodeForArxiv(x, y, ID, rootNodeIdOfLeafNode, nodeObj);
+			const nodeType = NODE_TYPES.CITATION;
+			transformLeafToRootNodeForArxiv(x, y, ID, rootNodeIdOfLeafNode, nodeObj, nodeType);
 		} else {
 			loggerModule.error("error", "unknown search platform requested.");
 		}
 	}
-	function transformReferenceNodeToRootNode() {
+	function transformReferenceNodeToRootNode(platform, x, y, ID, rootNodeIdOfLeafNode, nodeObj) {
+		if(platform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
+			//transformCitationToRootNodeForGoogleScholar(x, y, ID, rootNodeIdOfLeafNode, nodeObj);
+		} else if (platform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
+			const nodeType = NODE_TYPES.REFERENCE;
+			transformLeafToRootNodeForArxiv(x, y, ID, rootNodeIdOfLeafNode, nodeObj, nodeType);
+		} else {
+			loggerModule.error("error", "unknown search platform requested.");
+		}
 	}
 
 //Initialization

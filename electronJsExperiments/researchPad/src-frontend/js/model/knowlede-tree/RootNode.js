@@ -17,11 +17,11 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 
 	this.clickedCallback = clickedCallback;
 
-	var mouseOver = function(rootNodeObject) {
-		if(mouseOverCallback) mouseOverCallback(rootNodeObject);
+	var mouseOver = function(rootNodeObject, visualObjID) {
+		if(mouseOverCallback) mouseOverCallback(rootNodeObject, visualObjID);
 	}
-	var mouseOut = function(rootNodeObject) {
-		if(mouseOutCallback) mouseOutCallback(rootNodeObject);
+	var mouseOut = function(rootNodeObject, visualObjID) {
+		if(mouseOutCallback) mouseOutCallback(rootNodeObject, visualObjID);
 	}
 
 	var getSerializedLeafNodesObj = function(leafNodes) {
@@ -73,8 +73,8 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		serializedNodeObj.ID = this.ID;
 		serializedNodeObj.academicDataLibrary = this.academicDataLibrary;
 		serializedNodeObj.radius = this.radius;
-		serializedNodeObj.x = this.getAbsolutePosition().x;
-		serializedNodeObj.y = this.getAbsolutePosition().y;
+		serializedNodeObj.x = this.getAbsolutePosition(this.ID).x;
+		serializedNodeObj.y = this.getAbsolutePosition(this.ID).y;
 
 		serializedNodeObj.references = getSerializedLeafNodesObj(this.references);
 		serializedNodeObj.referenceCount = this.referenceCount;

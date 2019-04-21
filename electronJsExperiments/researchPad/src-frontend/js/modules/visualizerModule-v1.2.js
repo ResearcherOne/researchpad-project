@@ -32,19 +32,19 @@ var visualizerModule = (function () {
 		});
 
 		circle.on('mouseover', function () {
-			mouseOverCallback(callbackReturnObject);
+			mouseOverCallback(callbackReturnObject, domId);
 		});
 		circle.on('mouseout', function () {
-			mouseOutCallback(callbackReturnObject);
+			mouseOutCallback(callbackReturnObject, domId);
 		});
 		circle.on('dragstart', function () {
-			dragstartCallback(callbackReturnObject);
+			dragstartCallback(callbackReturnObject, domId);
 		});
 		circle.on('dragend', function () {
-			dragendCallback(callbackReturnObject);
+			dragendCallback(callbackReturnObject, domId);
 		});
 		circle.on('click', function(evt) {
-			clickedCallback(callbackReturnObject);
+			clickedCallback(callbackReturnObject, domId);
 		});
 		return circle;
 	}
@@ -93,19 +93,19 @@ var visualizerModule = (function () {
 		});
 
 		circle.on('mouseover', function () {
-			mouseOverCallback(rootNodeObject);
+			mouseOverCallback(rootNodeObject, rootId);
 		});
 		circle.on('mouseout', function () {
-			mouseOutCallback(rootNodeObject);
+			mouseOutCallback(rootNodeObject, rootId);
 		});
 		circle.on('dragstart', function () {
-			dragstartCallback(rootNodeObject);
+			dragstartCallback(rootNodeObject, rootId);
 		});
 		circle.on('dragend', function () {
-			dragendCallback(rootNodeObject);
+			dragendCallback(rootNodeObject, rootId);
 		});
 		circle.on('click', function(evt) {
-			clickedCallback(rootNodeObject);
+			clickedCallback(rootNodeObject, rootId);
 		});
 
 		layer.add(circle);
@@ -225,7 +225,8 @@ var visualizerModule = (function () {
 		updateScene();
 	}
 
-	var setStrokeColor = function(visualObject, color) {
+	var setStrokeColor = function(visualObjID, color) {
+		var visualObject = getNodeById(visualObjID);
 		visualObject.stroke(color);
 	}
 

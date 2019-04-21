@@ -4,8 +4,8 @@ function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, academicDataLibrary, r
 	this.rootNodeID = rootNodeID;
 	this.referencePosition = referencePosition;
 
-	var mouseOverLeafNode = function(referenceNodeObject) {
-        if(mouseOver) mouseOver(referenceNodeObject);
+	var mouseOverLeafNode = function(referenceNodeObject, visualObjID) {
+        if(mouseOver) mouseOver(referenceNodeObject, visualObjID);
         /*
         document.body.style.cursor = 'pointer';
 		var nodeCenter = referenceNodeObject.getPositionOnCamera();
@@ -22,16 +22,16 @@ function ReferenceNode(rootNodeID, rootNodeVisualObj, ID, academicDataLibrary, r
         */
 	}
 
-	var mouseOutLeafNode = function(referenceNodeObject) {
-        if(mouseOut) mouseOut(referenceNodeObject);
+	var mouseOutLeafNode = function(referenceNodeObject, visualObjID) {
+        if(mouseOut) mouseOut(referenceNodeObject, visualObjID);
         /*
 		document.body.style.cursor = 'default';
         overlayerModule.clearTitleOverlay();
         */
 	}
 
-
-	this.visualObject = visualizerModule.createReferenceNode(rootNodeVisualObj, this.referencePosition, this.ID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback, clickedCallback);
+	const initialVisualObjectID = this.ID + this.rootNodeID;
+	this.visualObject = visualizerModule.createReferenceNode(rootNodeVisualObj, this.referencePosition, initialVisualObjectID, this.radius, mouseOverLeafNode, mouseOutLeafNode, this, dragstartCallback, dragendCallback, clickedCallback);
 
 	this.getRootNodeID = function() {
 		return this.rootNodeID;

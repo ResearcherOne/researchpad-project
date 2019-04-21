@@ -182,24 +182,24 @@
 	}
 	
 //Handle UI Actions
-	function nodeDragStartCallback(nodeType, nodeObj) {
+	function nodeDragStartCallback(nodeType, nodeObj, visualObjID) {
 		if(nodeType == "root") {
-			rootNodeDragStart(nodeObj);
+			rootNodeDragStart(nodeObj, visualObjID);
 		} else if (nodeType == "ref") {
-			referenceNodeDragStart(nodeObj);
+			referenceNodeDragStart(nodeObj, visualObjID);
 		} else if (nodeType == "citedby") {
-			citationNodeDragStart(nodeObj);
+			citationNodeDragStart(nodeObj, visualObjID);
 		} else {
 			console.log("Unknown node drag start: "+nodeType);
 		}
 	}
-	function nodeDragEndCallback(nodeType, nodeObj) {
+	function nodeDragEndCallback(nodeType, nodeObj, visualObjID) {
 		if(nodeType == "root") {
-			rootNodeDragEnd(nodeObj);
+			rootNodeDragEnd(nodeObj, visualObjID);
 		} else if (nodeType == "ref") {
-			referenceNodeDragEnd(nodeObj);
+			referenceNodeDragEnd(nodeObj, visualObjID);
 		} else if (nodeType == "citedby") {
-			citationNodeDragEnd(nodeObj);
+			citationNodeDragEnd(nodeObj, visualObjID);
 		} else {
 			console.log("Unknown node drag end: "+nodeType);
 		}
@@ -240,21 +240,21 @@
 			searchBarElementDragFinished(isTargetPointsKnowledgeTree, cursorX, cursorY);			
 		}
 	}
-	function nodeMouseOverCallback(nodeType, nodeObj) {
+	function nodeMouseOverCallback(nodeType, nodeObj, visualObjID) {
 		if(nodeDetailsStaticOverlayer.isExtraContentBeingDisplayed()) {
 			//DONT SHOW ANYTHING
 		} else {
 			if(nodeType == "root") {
 				document.body.style.cursor = 'pointer';
-				showRootNodeEssentialContent(nodeObj);
+				showRootNodeEssentialContent(nodeObj, visualObjID);
 			} else if (nodeType == "ref") {
 				if(!nodeObj.isHiddenNode()) {
-					showCitationNodeEssentialContent(nodeObj);
+					showLeafNodeEssentialContent(nodeObj, visualObjID);
 					document.body.style.cursor = 'pointer';
 				}
 			} else if (nodeType == "citedby") {
 				if(!nodeObj.isHiddenNode()) {
-					showCitationNodeEssentialContent(nodeObj);
+					showLeafNodeEssentialContent(nodeObj, visualObjID);
 					document.body.style.cursor = 'pointer';
 				}
 			} else {
@@ -262,49 +262,49 @@
 			}
 		}
 	}
-	function nodeMouseOutCallback(nodeType, nodeObj) {
+	function nodeMouseOutCallback(nodeType, nodeObj, visualObjID) {
 		if(nodeDetailsStaticOverlayer.isExtraContentBeingDisplayed()) {
 			//pass
 		} else {
 			if(nodeType == "root") {
 				document.body.style.cursor = 'default';
 				if(!knowledgeTree.isSelectedNode(nodeObj)){
-					hideRootNodeEssentialContent(nodeObj);
+					hideRootNodeEssentialContent(nodeObj, visualObjID);
 				}
 			} else if (nodeType == "ref") {
 				if(!nodeObj.isHiddenNode()) {
 					document.body.style.cursor = 'default';
-					hideLeafNodeEssentialContent(nodeObj);
+					hideLeafNodeEssentialContent(nodeObj, visualObjID);
 				}
 			} else if (nodeType == "citedby") {
 				if(!nodeObj.isHiddenNode()) {
 					document.body.style.cursor = 'default';
-					hideLeafNodeEssentialContent(nodeObj);
+					hideLeafNodeEssentialContent(nodeObj, visualObjID);
 				}
 			} else {
 				console.log("Unknown type name: "+nodeType);
 			}
 		}
 	}
-	function nodeClickedCallback(nodeType, nodeObj) {
+	function nodeClickedCallback(nodeType, nodeObj, visualObjID) {
 		if(nodeType == "root") {
 			if(knowledgeTree.isSelectedNode(nodeObj)) {
-				deselectNode(nodeType, nodeObj);
+				deselectNode(nodeType, nodeObj, visualObjID);
 			} else {
-				selectRootNode(nodeObj);
+				selectRootNode(nodeObj, visualObjID);
 			}
 		} else if (nodeType == "ref") {
 			if(knowledgeTree.isSelectedNode(nodeObj)) {
-				deselectNode(nodeType, nodeObj);
+				deselectNode(nodeType, nodeObj, visualObjID);
 			} else {
-				selectLeafNode(nodeObj);
+				selectLeafNode(nodeObj, visualObjID);
 			}
 		} else if (nodeType == "citedby") {
 			console.log("Clicked: Type of citedby");
 			if(knowledgeTree.isSelectedNode(nodeObj)) {
-				deselectNode(nodeType, nodeObj);
+				deselectNode(nodeType, nodeObj, visualObjID);
 			} else {
-				selectLeafNode(nodeObj);
+				selectLeafNode(nodeObj, visualObjID);
 			}
 		} else {
 			console.log("Clicked: Unknown type name: "+nodeType);
@@ -413,9 +413,9 @@
 			overlayerModule.informUser("This root node already exists in your tree.");
 		}
 	}
-	function showEssentialContentForNode(nodeObj) {
-		var nodeCenter = nodeObj.getPositionOnCamera();
-		var nodeRadius = visualizerModule.getNodeRadiusById(nodeObj.getID());
+	function showEssentialContentForNode(nodeObj, visualObjID) {
+		var nodeCenter = nodeObj.getPositionOnCamera(visualObjID);
+		var nodeRadius = visualizerModule.getNodeRadiusById(visualObjID);
 		
 		if(CURRENT_SEARCH_PLATFORM == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
 			const academicDataLibrary = nodeObj.getAcademicDataLibrary();
@@ -533,30 +533,30 @@
 	}
 
 //Handle User Actions (Aggregated from UI Actions)
-	function selectRootNode(nodeObj) {
+	function selectRootNode(nodeObj, visualObjID) {
 		if(knowledgeTree.isSelectedNodeExists()) {
 			knowledgeTree.clearSelectedNode();
 		}
 
 		const nodeObjID = nodeObj.getID();
-		knowledgeTree.selectNode(nodeObj);
+		knowledgeTree.selectNode(nodeObj, visualObjID);
 		knowledgeTree.showLeafNodes(nodeObjID);
-		showEssentialContentForNode(nodeObj);
+		showEssentialContentForNode(nodeObj, visualObjID);
 		const isUpperContentShown = true;
 		nodeDetailsStaticOverlayer.showExtraContent(isUpperContentShown);
 		console.log("selected root node");
 	}
-	function selectLeafNode(nodeObj) {
+	function selectLeafNode(nodeObj, visualObjID) {
 		if(knowledgeTree.isSelectedNodeExists()) {
 			knowledgeTree.clearSelectedNode();
 		}
-		knowledgeTree.selectNode(nodeObj);
-		showEssentialContentForNode(nodeObj);
+		knowledgeTree.selectNode(nodeObj, visualObjID);
+		showEssentialContentForNode(nodeObj, visualObjID);
 		const isUpperContentShown = false;
 		nodeDetailsStaticOverlayer.showExtraContent(isUpperContentShown);
 	}
-	function deselectNode(nodeType, nodeObj) {
-		knowledgeTree.clearSelectedNode();
+	function deselectNode(nodeType, nodeObj, visualObjID) {
+		knowledgeTree.clearSelectedNode(visualObjID);
 		nodeDetailsStaticOverlayer.hideExtraContent();
 		
 		if(nodeType == "root") {
@@ -568,24 +568,24 @@
 			console.log("deselected leaf");
 		}
 	}
-	function showRootNodeEssentialContent(nodeObj) {
-		showEssentialContentForNode(nodeObj);
+	function showRootNodeEssentialContent(nodeObj, visualObjID) {
+		showEssentialContentForNode(nodeObj, visualObjID);
 		knowledgeTree.showLeafNodes(nodeObj.getID());
 	}
-	function showCitationNodeEssentialContent(nodeObj) {
-		const rootNodeID = nodeObj.getRootNodeID();
-		showEssentialContentForNode(nodeObj);
+	function showLeafNodeEssentialContent(nodeObj, visualObjID) {
+		const rootNodeID = nodeObj.getRootNodeID(visualObjID);
+		showEssentialContentForNode(nodeObj, visualObjID);
 		knowledgeTree.showLeafNodes(rootNodeID);
 	}
 	function showReferenceNodeEssentialContent(nodeObj) {
 		console.log("show reference node essential content");
 	}
-	function hideRootNodeEssentialContent(nodeObj) {
+	function hideRootNodeEssentialContent(nodeObj, visualObjID) {
 		knowledgeTree.hideLeafNodes(nodeObj.getID(), LEAF_NODE_HIDE_DURATION_SEC);
 		nodeDetailsStaticOverlayer.hideEssential();
 	}
-	function hideLeafNodeEssentialContent(nodeObj) {
-		const rootNodeId = nodeObj.getRootNodeID();
+	function hideLeafNodeEssentialContent(nodeObj, visualObjID) {
+		const rootNodeId = nodeObj.getRootNodeID(visualObjID);
 		nodeDetailsStaticOverlayer.hideEssential();
 		knowledgeTree.hideLeafNodes(rootNodeId, LEAF_NODE_HIDE_DURATION_SEC);
 	}
@@ -688,31 +688,31 @@
 	function hideSearchBarExtraSection() {
 		overlayerModule.clearAbstractOverlay();
 	}
-	function rootNodeDragStart(nodeObj) {
+	function rootNodeDragStart(nodeObj, visualObjID) {
 
 	}
-	function citationNodeDragStart(nodeObj) {
+	function citationNodeDragStart(nodeObj, visualObjID) {
 
 	}
-	function referenceNodeDragStart(nodeObj) {
+	function referenceNodeDragStart(nodeObj, visualObjID) {
 
 	}
-	function rootNodeDragEnd(nodeObj) {
+	function rootNodeDragEnd(nodeObj, visualObjID) {
 
 	}
-	function citationNodeDragEnd(nodeObj) {
-		const x = nodeObj.getAbsolutePosition().x;
-		const y = nodeObj.getAbsolutePosition().y;
+	function citationNodeDragEnd(nodeObj, visualObjID) {
+		const x = nodeObj.getAbsolutePosition(visualObjID).x;
+		const y = nodeObj.getAbsolutePosition(visualObjID).y;
 		const ID = nodeObj.getID();
-		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID();
+		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID(visualObjID);
 
 		transformCitationNodeToRootNode(CURRENT_SEARCH_PLATFORM, x, y, ID, rootNodeIdOfLeafNode, nodeObj);
 	}
-	function referenceNodeDragEnd(nodeObj) {
-		const x = nodeObj.getAbsolutePosition().x;
-		const y = nodeObj.getAbsolutePosition().y;
+	function referenceNodeDragEnd(nodeObj, visualObjID) {
+		const x = nodeObj.getAbsolutePosition(visualObjID).x;
+		const y = nodeObj.getAbsolutePosition(visualObjID).y;
 		const ID = nodeObj.getID();
-		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID();
+		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID(visualObjID);
 
 		transformReferenceNodeToRootNode(CURRENT_SEARCH_PLATFORM, x, y, ID, rootNodeIdOfLeafNode, nodeObj);
 	}

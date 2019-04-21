@@ -15,13 +15,13 @@ function Node(ID, academicDataLibrary, radius){ //Abstract Class
 		return this.ID;
 	}
 
-	this.getAbsolutePosition = function() {
-		return {x: visualizerModule.getNodeCenterById(this.ID).x, y:visualizerModule.getNodeCenterById(this.ID).y};
+	this.getAbsolutePosition = function(visualObjID) {
+		return {x: visualizerModule.getNodeCenterById(visualObjID).x, y:visualizerModule.getNodeCenterById(visualObjID).y};
 	}
 
-	this.getPositionOnCamera = function() {
+	this.getPositionOnCamera = function(visualObjID) {
 		var cameraPos = visualizerModule.getCanvasPos();
-		var nodePos = visualizerModule.getNodeCenterById(this.ID);
+		var nodePos = visualizerModule.getNodeCenterById(visualObjID);
 		var nodeOnCameraPos = {x: cameraPos.x+nodePos.x, y: cameraPos.y+nodePos.y};
 		return nodeOnCameraPos;
 	}
@@ -54,8 +54,8 @@ function Node(ID, academicDataLibrary, radius){ //Abstract Class
 		return this.isHidden;
 	}
 
-	this.changeStrokeColor = function(color) {
-        visualizerModule.setStrokeColor(this.visualObject, color);
+	this.changeStrokeColor = function(visualObjID, color) {
+        visualizerModule.setStrokeColor(visualObjID, color);
 	}
 
 	this.addAcademicData = function(key, value) {

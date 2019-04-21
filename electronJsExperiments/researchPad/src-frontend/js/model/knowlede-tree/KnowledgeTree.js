@@ -53,41 +53,41 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		}
 	}
 
-	var nodeDragStartCallback = function(nodeObj) {
+	var nodeDragStartCallback = function(nodeObj, visualObjID) {
 		if(dragStartCallback) {
-			dragStartCallback(getNodeType(nodeObj), nodeObj);
+			dragStartCallback(getNodeType(nodeObj), nodeObj, visualObjID);
 		} else {
 			//callback not set.
 		}
 
 	}
-	var nodeDragEndCallback = function(nodeObj) {
+	var nodeDragEndCallback = function(nodeObj, visualObjID) {
 		if(dragEndCallback) {
-			dragEndCallback(getNodeType(nodeObj), nodeObj);
+			dragEndCallback(getNodeType(nodeObj), nodeObj, visualObjID);
 		} else {
 			//callback not set.
 		}
 	}
 
-	var nodeMouseOverCallback = function(nodeObj) {
+	var nodeMouseOverCallback = function(nodeObj, visualObjID) {
 		if(mouseOverCallback) {
-			mouseOverCallback(getNodeType(nodeObj), nodeObj);
+			mouseOverCallback(getNodeType(nodeObj), nodeObj, visualObjID);
 		} else {
 			//callback not set.
 		}
 
 	}
-	var nodeMouseOutCallback = function(nodeObj) {
+	var nodeMouseOutCallback = function(nodeObj, visualObjID) {
 		if(mouseOutCallback) {
-			mouseOutCallback(getNodeType(nodeObj), nodeObj);
+			mouseOutCallback(getNodeType(nodeObj), nodeObj, visualObjID);
 		} else {
 			//callback not set.
 		}
 	}
 	
-	var nodeClickedCallback = function(nodeObj) {
+	var nodeClickedCallback = function(nodeObj, visualObjID) {
 		if(clickedCallback) {
-			clickedCallback(getNodeType(nodeObj), nodeObj);
+			clickedCallback(getNodeType(nodeObj), nodeObj, visualObjID);
 		} else {
 			//callback not set.
 		}
@@ -296,13 +296,13 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		this.rootNodes[rootNodeID].hideLeafNodes(hideDurationSec);
 		visualizerModule.updateCanvas();
 	}
-	this.selectNode = function(nodeObj) {
+	this.selectNode = function(nodeObj, visualObjID) {
 		selectedNode = nodeObj;
-		selectedNode.changeStrokeColor("dimgray");
+		selectedNode.changeStrokeColor(visualObjID, "dimgray");
 		visualizerModule.updateCanvas();
 	}
-	this.clearSelectedNode = function() {
-		selectedNode.changeStrokeColor("black");
+	this.clearSelectedNode = function(visualObjID) {
+		selectedNode.changeStrokeColor(visualObjID, "black");
 		visualizerModule.updateCanvas();
 		selectedNode = null;
 	}

@@ -7,7 +7,7 @@ const package = require("./package.json");
 const appVersion = package.version;
 const platform = os.platform();
 const env = process.env.NODE_ENV || "production";
-const updateServerHost = "localhost:3000"; // Domain name of update server
+const updateServerHost = "ec2-54-70-142-30.us-west-2.compute.amazonaws.com:3000";//"localhost:3000"; // Domain name of update server
 
 let updateFeed = null;
 
@@ -18,14 +18,15 @@ if (require("electron-squirrel-startup")) {
 }
 
 // Get links for build releases
-if (env === "development") {
+if (env === "production") {
   updateFeed =
-    platform === "darwin" ? `http://${updateServerHost}/updates/latest` : null;
+    platform === "darwin" ? `http://${updateServerHost}/updates/darwin/latest` : null;
 }
 
 // Setup autoUpdater with feed link
 if (updateFeed !== null) {
   autoUpdater.setFeedURL(updateFeed + "?v=" + appVersion);
+  autoUpdater.checkForUpdates();
 }
 
 // Keep a global reference of the window object, if you don't, the window will

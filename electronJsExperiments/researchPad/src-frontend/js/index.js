@@ -53,7 +53,7 @@
 		GOOGLE: "Google Scholar",
 		ARXIV: "Arxiv"
 	};
-	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
+	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
 
 	const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
 		arxivId: "arxivId",
@@ -346,7 +346,7 @@
 	
 		
 		if(!knowledgeTree.isRootNodeExists(rootNodeObjectID)) {
-			knowledgeTree.createRootNode(nodeID, academicMetadataObj, rootNodeRadius, x, y);
+			knowledgeTree.createRootNode(rootNodeObjectID, academicMetadataObj, rootNodeRadius, x, y);
 	
 			getCitedByOfArticle(metadata.citedByLink, function(err, citedByList){
 				if(citedByList) {
@@ -357,7 +357,7 @@
 						const scholarData = new GoogleScholarData(citedByMetadata);
 						const paperTitle = scholarData.getTitle();
 						const citedByID = paperTitle.hashCode();
-						knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius); //GENERATE ID FOR CITEDBY AS WELL.
+						knowledgeTree.addCitedbyToRootNode(rootNodeObjectID, citedByID, academicMetadataObj, leafNodeRadius);
 					});
 				} else {
 					loggerModule.error("error", "Err cited by fetch.");
@@ -753,17 +753,21 @@
 	var searchPanel = null;
 	var nodeDetailsStaticOverlayer = null;
 
-	function initializeScript() {
-		ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-		overlayerModule.initializeModule(overlayDivID, upperPanelDivID, abstractDivID);
-
+	function initializeKnowledeTree() {
 		knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200, NODE_CONNECTIONS_CONFIG, mapClickedCallback);
-
+	
 		knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
 		knowledgeTree.setNodeMouseOverCallback(nodeMouseOverCallback);
 		knowledgeTree.setNodeMouseOutCallback(nodeMouseOutCallback);
 		knowledgeTree.setNodeClickedCallback(nodeClickedCallback);
+	}
+
+	function initializeScript() {
+		ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
+		overlayerModule.initializeModule(overlayDivID, upperPanelDivID, abstractDivID);
+
+		initializeKnowledeTree();
 
 		searchPanel = new SearchPanel(searchPanelDivID);
 		searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);
@@ -829,11 +833,9 @@
 		document.getElementById("reset-button").addEventListener("click", function(event){
 			event.preventDefault();
 			localStorage.removeItem("knowledgeTree");
-			knowledgeTree.destroy();
-			knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200);
-
-			knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
-			knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);
+			
+			knowledgeTree.destroy();			
+			initializeKnowledeTree();
 
 			overlayerModule.informUser("Your Knowledge Tree is resetted.");
 			loggerModule.log("action", "reset button clicked");

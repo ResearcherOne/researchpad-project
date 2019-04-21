@@ -2,7 +2,7 @@ function ComputerScienceAggregateModel(googleScholarMetadata){
 	this.googleScholarData = googleScholarMetadata;
 
 	this.getTitle = function() {
-		return this.googleScholarData.getTitle();
+		return this.googleScholarData.title;
 	};
 	this.getFullMetadata = function() { //Temp. function.
 		return this.googleScholarData

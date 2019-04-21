@@ -53,7 +53,7 @@
 		GOOGLE: "Google Scholar",
 		ARXIV: "Arxiv"
 	};
-	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
+	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
 
 	const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
 		arxivId: "arxivId",
@@ -444,7 +444,45 @@
 		}
 	}
 	function transformCitationToRootNodeForArxiv(x, y, ID, rootNodeIdOfLeafNode, nodeObj) {
+		const academicDataLibrary = nodeObj.getAcademicDataLibrary();
+		const semanticData = new SemanticScholarData(academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR]);
+		const semanticId = semanticData.getPaperId();
+		const arxivData = new ArxivData(academicDataLibrary[ACADEMIC_DATA_KEY_NAMES.ARXIV]);
+		const arxivId = arxivData.getArxivId();
 
+		var fetchMethod;
+		var paperId;
+		if(arxivId) {
+			fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
+			paperId = arxivId;
+		} else if (semanticId) {
+			fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.semananticId;
+			paperId = semanticId;
+		} else {
+			loggerModule.error("error", "Neither arxivId nor semanticId exists.");
+			overlayerModule.informUser("Unable to fetch citations data, because this paper does not have necessary data attached to it.");
+		}
+		console.log("PAPER ID: "+paperId);
+
+		knowledgeTree.transformCitationNodeToRootNode(rootNodeIdOfLeafNode, ID, DEFAULT_ROOT_NODE_RADIUS, x , y);
+		fetchPaperDetailsFromSemanticScholar(fetchMethod, paperId, function(err, metadata){
+			if(metadata) {
+				const semanticDataModel = new SemanticScholarData(metadata);
+				const citedByList = semanticDataModel.getCitations();
+				knowledgeTree.addAcademicDataToRootNode(ID, ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR, metadata);
+				citedByList.forEach(function(citedByMetadata){
+					var academicMetadataObj = {};
+					academicMetadataObj[ACADEMIC_DATA_KEY_NAMES.SEMANTIC_SCHOLAR] = citedByMetadata;
+					const semanticScholarData = new SemanticScholarData(citedByMetadata);
+					const paperTitle = semanticScholarData.getTitle();
+					const citedByID = paperTitle.hashCode();
+
+					knowledgeTree.addCitedbyToRootNode(ID, citedByID, academicMetadataObj, DEFAULT_LEAF_NODE_RADIUS);
+				});
+			} else {
+				loggerModule.error("error", "Err semantic scholar data fetch.");
+			}
+		});
 	}
 
 //Handle User Actions (Aggregated from UI Actions)

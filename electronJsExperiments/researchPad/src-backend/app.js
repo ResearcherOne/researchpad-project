@@ -117,6 +117,14 @@ function initializeBackend() {
 					response.error("OOps, unable to fetch data from semantic scholar");
 				}
 			});
+		} else if (fetchMethod == "semanticId") {
+			semanticScholarModule.getSemanticScholarDataViaId(paperId, function(err, result){
+				if(!err) {
+					response.send({"metadata": result});
+				} else {
+					response.error("OOps, unable to fetch data from semantic scholar");
+				}
+			});
 		} else {
 			response.error("Unknown fetch method.");
 		}

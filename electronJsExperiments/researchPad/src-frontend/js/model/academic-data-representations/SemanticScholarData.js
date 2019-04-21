@@ -28,10 +28,16 @@ function SemanticScholarData(metadata){
         return authorList;
     }
     this.getCitations = function() {
+        if(this.metadata == null) return null;
         return this.metadata.citations;
     }
     this.getReferences = function() {
+        if(this.metadata == null) return null;
         return this.metadata.references;
+    }
+    this.getPaperId = function() {
+        if(this.metadata == null) return null;
+        return this.metadata.paperId;
     }
     
     SemanticScholarData.prototype = Object.create(AcademicData.prototype);

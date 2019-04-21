@@ -29,7 +29,8 @@ function ArxivData(metadata){
 	}
 	
 	this.getArxivId = function() {
-		const splittedArxivUrl = this.metadata.id.split("/");
+    if(this.metadata == null) return null;
+ 		const splittedArxivUrl = this.metadata.id.split("/");
 		const arxivId = splittedArxivUrl[splittedArxivUrl.length-1];
 
 		const vSplittedId = arxivId.split("v");

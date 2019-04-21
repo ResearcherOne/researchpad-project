@@ -146,7 +146,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	}
 	
 	var setSiblingReference = function(rootID, siblingReferenceRootID, firstNodeType, secondNodeType, thisContext) {
-		const connectionID = rootID + siblingReferenceRootID;
+		const connectionID = "conn-"+rootID + siblingReferenceRootID;
 		var connectionObj = new SiblingConnection(connectionID, rootID, siblingReferenceRootID);
 		thisContext.siblingConnections[connectionID] = connectionObj;
 		thisContext.siblingConnectionCount++;
@@ -155,31 +155,74 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		thisContext.rootNodes[siblingReferenceRootID].setSibling(rootID, firstNodeType);
 	}
 
+	var isLeafNodeExists = function(nodeID) {
+		const isCitedByExists = this.citedByNodes[nodeID] != null;
+		const isReferenceExists = this.referenceNodes[nodeID] != null;
+		return (isCitedByExists || isReferenceExists);
+	}
+
+	var connectRootNodeToExistingLeafNodes = function(rootNodeID, leafNodeID,  radius, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
+		/*
+			const rootNodeCitedByCount = rootObj.getCitedByCount();
+			const newCitedByPosition = rootNodeCitedByCount+1;
+			citedByObj.connectRoot(rootID, rootVisualObj, radius, newCitedByPosition, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+			rootObj.connectCitedBy(refID);
+		*/
+		const rootObj = this.rootNodes[rootNodeID];
+		const rootVisualObj = rootObj.getVisualObj();
+
+		if(this.citedByNodes[leafNodeID]) {
+			const citedByObj = this.citedByNodes[leafNodeID];
+			citedByObj.connectRoot(rootID, rootVisualObj);
+			rootObj.connectCitedBy(leafNodeID);
+		}
+
+		if(this.referenceNodes[leafNodeID]) {
+			const referenceObj = this.referenceNodes[leafNodeID];
+			referenceObj.connectRoot(rootID, rootVisualObj);
+			rootObj.connectCitedBy(leafNodeID);
+		}
+	}
+
+	var createCitedByObj = function(refID, initialAcademicDataLibrary, radius) {
+
+	}
+	
+
 	//Initialization
 	visualizerModule.initializeModule(this.konvaDivID, this.width, this.height, this.nodeConnectionsConfig, mapClickedCallback);
 	//Public Functions
 	this.createRootNode = function (ID, initialAcademicDataLibrary, radius, x, y) {
 		if(this.citedByNodes[ID]) {
-			const rootNodeIdOfLeafNode = this.citedByNodes[ID].getRootNodeID();
-			this.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, ID);
+			const rootNodesIdListOfLeafNode = this.citedByNodes[ID].getRootNodeIdList();
+			for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+				this.removeCitedbyFromRootNode(rootNodesIdListOfLeafNode[i], ID);
+			}
 
 			this.rootNodes[ID] = new RootNode(ID, initialAcademicDataLibrary, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 			this.rootNodeCount++;
 			
 			const firstNodeType = "reference";
 			const secondNodeType = "citation";
-			setSiblingReference(rootNodeIdOfLeafNode, ID, firstNodeType, secondNodeType, this);
+			for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+				setSiblingReference(rootNodesIdListOfLeafNode[i], ID, firstNodeType, secondNodeType, this);
+			}
+
 			return ID;
 		} else if (this.referenceNodes[ID]) {
-			const rootNodeIdOfLeafNode= this.referenceNodes[ID].getRootNodeID();
-			this.removeReferenceFromRootNode(rootNodeIdOfLeafNode, ID);
+			const rootNodesIdListOfLeafNode = this.referenceNodes[ID].getRootNodeIdList();
+			for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+				this.removeReferenceFromRootNode(rootNodesIdListOfLeafNode[i], ID);
+			}
 
 			this.rootNodes[ID] = new RootNode(ID, initialAcademicDataLibrary, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 			this.rootNodeCount++;
 			
 			const firstNodeType = "citation";
 			const secondNodeType = "reference";
-			setSiblingReference(rootNodeIdOfLeafNode, ID, firstNodeType, secondNodeType, this);
+			for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+				setSiblingReference(rootNodesIdListOfLeafNode[i], ID, firstNodeType, secondNodeType, this);
+			}
 			return ID;
 		} else {
 			this.rootNodes[ID] = new RootNode(ID, initialAcademicDataLibrary, radius, x, y, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
@@ -188,18 +231,25 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		}
 	}
 	this.addReferenceToRootNode = function(rootID, refID, initialAcademicDataLibrary, radius) {
+		const rootObj = this.rootNodes[rootID];
+		const rootVisualObj = rootObj.getVisualObj();
 		if(!this.isRootNodeExists(refID)) {
-			const suggestedReferenceCount = this.rootNodes[rootID].getSuggestedReferenceCount();
-			this.rootNodes[rootID].createReference(refID, initialAcademicDataLibrary, radius);
-			this.referenceNodes[refID] = this.rootNodes[rootID].getLeafNode(refID);
-			
-			if(suggestedReferenceCount < 10) {
-				this.rootNodes[rootID].suggestReference(refID);
+			if(isLeafNodeExists(refID)) {
+				connectRootNodeToExistingLeafNodes(rootNodeID, leafNodeID);
+			} else {
+				const referenceObj = createReferenceObj(refID, initialAcademicDataLibrary, radius);
+				referenceObj.connectRoot(rootID, rootVisualObj);
+				rootObj.connectReference(refID);
+
+				const suggestedReferenceCount = this.rootNodes[rootID].getSuggestedReferenceCount();
+				if(suggestedReferenceCount < 10) {
+					suggestReference(rootID, refID);
+				}	
 			}
 		} else {
 			//this reference already exists as a root node, we should connect those root nodes!
-			const firstNodeType = "citation";
-			const secondNodeType = "reference";
+			const firstNodeType = "reference";
+			const secondNodeType = "citation";
 			setSiblingReference(rootID, refID, firstNodeType, secondNodeType, this);
 		}
 		return refID;
@@ -213,22 +263,35 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		this.rootNodes[rootID].removeReference(refID);
 	}
 	this.removeCitedbyFromRootNode = function(rootID, citedByID) {
-		const isSuggested = this.rootNodes[rootID].isSuggestedNode(citedByID);
+		const rootObj = this.rootNodes[rootID];
+		const citedByObj = this.citedByNodes[citedByID];
+		const isSuggested = rootObj.isSuggestedNode(citedByID);
+
 		if(isSuggested) {
-			this.rootNodes[rootID].removeCitedBySuggestion(citedByID);
+			rootObj.removeCitedBySuggestion(citedByID);
 		}
-		delete this.citedByNodes[citedByID];
-		this.rootNodes[rootID].removeCitedBy(citedByID);
+		citedByObj.removeRootConnection(rootID);
+		rootObj.removeCitedByConnection(citedByID);
+
+		if(citedByObj.getConnectionCount() == 0) {
+			delete this.citedByNodes[citedByID];
+		}
 	}
 	this.addCitedbyToRootNode = function(rootID, refID, initialAcademicDataLibrary, radius) {
+		const rootObj = this.rootNodes[rootID];
+		const rootVisualObj = rootObj.getVisualObj();
 		if(!this.isRootNodeExists(refID)) {
-			const suggestedCitedByCount = this.rootNodes[rootID].getSuggestedCitedByCount();
-			//this.rootNodes[rootID].createCitedBy(refID, initialAcademicDataLibrary, radius);
-			if(suggestedCitedByCount < 10) {
-				this.rootNodes[rootID].createCitedBy(refID, initialAcademicDataLibrary, radius);
-				this.rootNodes[rootID].suggestCitedBy(refID);
-				this.citedByNodes[refID] = this.rootNodes[rootID].getLeafNode(refID);
-			}	
+			if(isLeafNodeExists(refID)) {
+				connectRootNodeToExistingLeafNodes(rootNodeID, leafNodeID, radius, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+			} else {
+				createCitedByObj(refID, initialAcademicDataLibrary, radius);
+				connectRootNodeToExistingLeafNodes(rootNodeID, leafNodeID, radius, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+				
+				const suggestedCitedByCount = this.rootNodes[rootID].getSuggestedCitedByCount();
+				if(suggestedCitedByCount < 10) {
+					suggestCitedBy(rootID, refID);
+				}	
+			}
 		} else {
 			//this reference already exists as a root node, we should connect those root nodes!
 			const firstNodeType = "reference";
@@ -275,6 +338,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		serializedKnowledgeTree.siblingConnections = mapSerializeCallOnObj(this.siblingConnections);
 		serializedKnowledgeTree.siblingConnectionCount = this.siblingConnectionCount;
 
+		serializedKnowledgeTree.citedByNodes = mapSerializeCallOnObj(this.citedByNodes);
+		serializedKnowledgeTree.referenceNodes = mapSerializeCallOnObj(this.referenceNodes);
+		
 		return JSON.stringify(serializedKnowledgeTree);
 	}
 	this.importSerializedData = function(serializedKnowledgeTree) {
@@ -284,6 +350,10 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 
 		this.siblingConnections = reconstructSiblingConnections(knowledgeTreeData.siblingConnections);
 		this.siblingConnectionCount = knowledgeTreeData.siblingConnectionCount;
+
+		this.citedByNodes = reconstructCitedByNodes(this.citedByNodes);
+		this.referenceNodes = reconstructReferenceNodes(this.referenceNodes);
+
 	}
 	this.destroy = function() {
 		visualizerModule.destroy();
@@ -327,21 +397,35 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	this.getNodeType = getNodeType;
 	this.transformCitationNodeToRootNode = function(rootNodeIdOfLeafNode, nodeIdToTransform, newNodeRadius, x , y) {
 		const academicDataLibrary = this.citedByNodes[nodeIdToTransform].getAcademicDataLibrary();
-		this.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, nodeIdToTransform);
+		
+		const rootNodesIdListOfLeafNode = this.citedByNodes[nodeIdToTransform].getRootNodeIdList();
+		for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+			this.removeCitedbyFromRootNode(rootNodesIdListOfLeafNode[i], nodeIdToTransform);
+		}
+		
 		this.createRootNode(nodeIdToTransform, academicDataLibrary, newNodeRadius, x, y);
 
 		const firstNodeType = "reference";
 		const secondNodeType = "citation";
-		setSiblingReference(rootNodeIdOfLeafNode, nodeIdToTransform, firstNodeType, secondNodeType, this);
+		for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+			setSiblingReference(rootNodesIdListOfLeafNode[i], nodeIdToTransform, firstNodeType, secondNodeType, this);
+		}
 	}
 	this.transformReferenceNodeToRootNode = function(rootNodeIdOfLeafNode, nodeIdToTransform, newNodeRadius, x , y) {
 		const academicDataLibrary = this.referenceNodes[nodeIdToTransform].getAcademicDataLibrary();
-		this.removeReferenceFromRootNode(rootNodeIdOfLeafNode, nodeIdToTransform);
+		
+		const rootNodesIdListOfLeafNode = this.referenceNodes[nodeIdToTransform].getRootNodeIdList();
+		for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+			this.removeReferenceFromRootNode(rootNodesIdListOfLeafNode[i], nodeIdToTransform);
+		}
+
 		this.createRootNode(nodeIdToTransform, academicDataLibrary, newNodeRadius, x, y);
 
 		const firstNodeType = "citation";
 		const secondNodeType = "reference";
-		setSiblingReference(rootNodeIdOfLeafNode, nodeIdToTransform, firstNodeType, secondNodeType, this);
+		for(var i=0; i<rootNodesIdListOfLeafNode.length; i++) {
+			setSiblingReference(rootNodesIdListOfLeafNode[i], nodeIdToTransform, firstNodeType, secondNodeType, this);
+		}
 	}
 	this.isRootNodeExists = function(nodeID) {
 		return (this.rootNodes[nodeID] != null);

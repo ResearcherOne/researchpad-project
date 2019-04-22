@@ -31,28 +31,27 @@ body {
 	padding: 20%;
 }
 
+/* Abstract Overlay and Text*/
 #overlay-abstract-div {
 	position: fixed;
 	display: none;
-	width: 40vw;
-	height: 70vh;
-	top: 50px;
-	left: 50px;
-	right: 0;
-	bottom: 0;
+	justify-content: space-around;
+	width: 30vw;
+	height: 50vh;
+	max-width: 400px;
+	padding: 20px;
+	border-radius: 5px;
 	background-color: rgba(0, 0, 0, 0.95);
 	z-index: 3;
-	border-radius: 5px;
 }
-
 #overlay-abstract-div-text {
-	position: absolute;
-	top: 50%;
-	left: 50%;
+	display: flex;
+	align-items: center;
+	align-self: center;
+	width: 100%;
+	height: 100%;
 	font-size: 20px;
 	color: white;
-	transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
 	text-align: center;
 }
 

@@ -1,10 +1,14 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const backend = require('./src-backend/app.js');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const backend = require("./src-backend/app.js");
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+if (require("electron-squirrel-startup")) {
+  // eslint-disable-line global-require
   app.quit();
 }
+
+// Added live reload for development
+require("electron-reload")(__dirname);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -25,7 +29,7 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
+  mainWindow.on("closed", () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -36,18 +40,18 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on("ready", createWindow);
 
 // Quit when all windows are closed.
-app.on('window-all-closed', () => {
+app.on("window-all-closed", () => {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
+  if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-app.on('activate', () => {
+app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
@@ -61,4 +65,4 @@ app.on('activate', () => {
 backend.initializeBackend();
 //console.log("User Data: "+app.getPath("userData"))
 
-console.log("App path: "+app.getAppPath());
+console.log("App path: " + app.getAppPath());

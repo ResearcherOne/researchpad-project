@@ -113,7 +113,47 @@ var visualizerModule = (function () {
 		return circle;
 	}
 
-	var createLeafNode = function(rootNode, angle, length, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
+	var calculateReferenceAngleAndLength = function(rootNode, referenceNumber) {
+		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
+		const layerIndex = Math.floor(referenceNumber/maxNodeCountPerLayer);
+
+		const absoluteStartDegree = nodeConnectionsConfig.referenceAbsoluteStartDegree;
+		const absoluteEndDegree = nodeConnectionsConfig.referenceAbsoluteEndDegree;
+
+		const degreePerNode = (absoluteEndDegree - absoluteStartDegree) / maxNodeCountPerLayer;
+		const nodeIndex = referenceNumber % maxNodeCountPerLayer;
+
+		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
+		const connectionUnitLength = nodeConnectionsConfig.connectionLength;
+		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
+
+		return {
+			nodeDegree: nodeDegree,
+			nodeConnectionLength: nodeConnectionLength
+		}
+	};
+
+	var calculateCitedByAngleAndLength = function(rootNode, citedByNumber) {
+		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
+		const layerIndex = Math.floor(citedByNumber/maxNodeCountPerLayer);
+
+		const absoluteStartDegree = nodeConnectionsConfig.citedByAbsoluteStartDegree;
+		const absoluteEndDegree = nodeConnectionsConfig.citedByAbsoluteEndDegree;
+
+		const degreePerNode = ((360 - absoluteStartDegree) + absoluteEndDegree) / maxNodeCountPerLayer;
+		const nodeIndex = citedByNumber % maxNodeCountPerLayer;
+
+		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
+		const connectionUnitLength = nodeConnectionsConfig.connectionLength;
+		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
+
+		return {
+			nodeDegree: nodeDegree,
+			nodeConnectionLength: nodeConnectionLength
+		}
+	}
+
+	var calculateLeafNodeCoordinateAroundRootNode = function(rootNode, angle, length, radius) {
 		var rootCircle = rootNode;
 		angle = -angle;
 
@@ -131,8 +171,61 @@ var visualizerModule = (function () {
 		var nx = rootCircleCenter.x + dX;
 		var ny = rootCircleCenter.y + dY;
 
-		var leafCircle = createCircle(nx, ny, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
-		leafCircle.connection = createConnection(rootCircleCenter.x, rootCircleCenter.y, nx, ny);
+		return {
+			x: nx,
+			y: ny
+		}
+	}
+
+	var setCitedByPosition = function (rootVisualObj, leafVisualObj, position, leafRadius) {
+		
+		var calculation = calculateCitedByAngleAndLength(rootVisualObj, position);
+		var newPos = calculateLeafNodeCoordinateAroundRootNode(rootVisualObj, calculation.nodeDegree, calculation.nodeConnectionLength, leafRadius);
+		leafVisualObj.position({
+			x: newPos.x,
+			y: newPos.y
+		});
+		
+		var rootCircleAbsolutePosition = rootVisualObj.getAbsolutePosition();
+		var rootCircleCenter = {"x":  rootCircleAbsolutePosition.x-stage.x(), "y": rootCircleAbsolutePosition.y-stage.y()};
+	
+		leafVisualObj.connection.destroy();
+		leafVisualObj.connection = createConnection(rootCircleCenter.x, rootCircleCenter.y, newPos.x, newPos.y);
+
+		layer.add(leafVisualObj.connection);
+		leafVisualObj.connection.moveToBottom();
+		updateScene();
+	};
+
+	var setReferencePosition = function (rootVisualObj, leafVisualObj, position, leafRadius) {
+		var calculation = calculateCitedByAngleAndLength(rootVisualObj, position);
+		var newPos = calculateLeafNodeCoordinateAroundRootNode(rootVisualObj, calculation.nodeDegree, calculation.nodeConnectionLength, leafRadius);
+		leafVisualObj.position({
+			x: newPos.x,
+			y: newPos.y
+		});
+
+		var rootCircleAbsolutePosition = rootVisualObj.getAbsolutePosition();
+		var rootCircleCenter = {"x":  rootCircleAbsolutePosition.x-stage.x(), "y": rootCircleAbsolutePosition.y-stage.y()};
+	
+		leafVisualObj.connection.destroy();
+		leafVisualObj.connection = createConnection(rootCircleCenter.x, rootCircleCenter.y, newPos.x, newPos.y);
+
+		layer.add(leafVisualObj.connection);
+		leafVisualObj.connection.moveToBottom();
+		updateScene();
+	};
+
+	var createLeafNode = function(rootNode, angle, length, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
+		var leafPos = calculateLeafNodeCoordinateAroundRootNode(rootNode, angle, length, radius);
+		var rootCircle = rootNode;
+
+		var leafShapeRadius = radius;
+		var rootCircleAbsolutePosition = rootCircle.getAbsolutePosition();
+		var rootCircleCenter = {"x":  rootCircleAbsolutePosition.x-stage.x(), "y": rootCircleAbsolutePosition.y-stage.y()};
+
+		var leafCircle = createCircle(leafPos.x, leafPos.y, leafShapeRadius, nodeId, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
+		leafCircle.connection = createConnection(rootCircleCenter.x, rootCircleCenter.y, leafPos.x, leafPos.y);
 
 		layer.add(leafCircle.connection);
 		leafCircle.connection.moveToBottom();
@@ -142,39 +235,17 @@ var visualizerModule = (function () {
 	}
 
 	var createReferenceNode = function(rootNode, referenceNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
-		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
-		const layerIndex = Math.floor(referenceNumber/maxNodeCountPerLayer);
-
-		const absoluteStartDegree = nodeConnectionsConfig.referenceAbsoluteStartDegree;
-		const absoluteEndDegree = nodeConnectionsConfig.referenceAbsoluteEndDegree;
-
-		const degreePerNode = (absoluteEndDegree - absoluteStartDegree) / maxNodeCountPerLayer;
-		const nodeIndex = referenceNumber % maxNodeCountPerLayer;
-
-		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
-		const connectionUnitLength = nodeConnectionsConfig.connectionLength;
-		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
+		var calculation = calculateReferenceAngleAndLength(rootNode, referenceNumber);
 
 		const isDraggable = true;
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
+		return createLeafNode(rootNode, calculation.nodeDegree, calculation.nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
 	}
 
 	var createCitedByNode = function(rootNode, citedByNumber, nodeId, radius, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback) {
-		const maxNodeCountPerLayer = nodeConnectionsConfig.maxConnectionPerLayer;
-		const layerIndex = Math.floor(citedByNumber/maxNodeCountPerLayer);
-
-		const absoluteStartDegree = nodeConnectionsConfig.citedByAbsoluteStartDegree;
-		const absoluteEndDegree = nodeConnectionsConfig.citedByAbsoluteEndDegree;
-
-		const degreePerNode = ((360 - absoluteStartDegree) + absoluteEndDegree) / maxNodeCountPerLayer;
-		const nodeIndex = citedByNumber % maxNodeCountPerLayer;
-
-		const nodeDegree = absoluteStartDegree + degreePerNode * nodeIndex;
-		const connectionUnitLength = nodeConnectionsConfig.connectionLength;
-		const nodeConnectionLength = connectionUnitLength + connectionUnitLength * layerIndex;
+		var calculation = calculateCitedByAngleAndLength(rootNode, citedByNumber);
 
 		const isDraggable = true;
-		return createLeafNode(rootNode, nodeDegree, nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
+		return createLeafNode(rootNode, calculation.nodeDegree, calculation.nodeConnectionLength, nodeId, radius, isDraggable, mouseOverCallback, mouseOutCallback, callbackReturnObject, dragstartCallback, dragendCallback, clickedCallback);
 	}
 
 	var getNodeById = function(nodeID) {
@@ -280,7 +351,9 @@ var visualizerModule = (function () {
 		removeVisualObject: removeVisualObject,
 		destroy: destroy,
 		moveObject: moveObject,
-		setPositionOnCamera: setPositionOnCamera
+		setPositionOnCamera: setPositionOnCamera,
 
+		setCitedByPosition: setCitedByPosition,
+		setReferencePosition: setReferencePosition
 	}
 })();

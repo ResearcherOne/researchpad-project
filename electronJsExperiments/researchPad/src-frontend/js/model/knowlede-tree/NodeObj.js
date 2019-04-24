@@ -1,15 +1,8 @@
-function Node(ID, academicDataLibrary, radius){ //Abstract Class
+function Node(ID, academicDataLibrary){ //Abstract Class
 	this.ID = ID;
 	this.academicDataLibrary = academicDataLibrary;
-	this.radius = radius;
 
-	this.visualObject;
-	
 	this.isHidden = false;
-
-	this.getVisualObject = function() {
-		return this.visualObject;
-	}
 
 	this.getID = function() {
 		return this.ID;
@@ -25,11 +18,7 @@ function Node(ID, academicDataLibrary, radius){ //Abstract Class
 		var nodeOnCameraPos = {x: cameraPos.x+nodePos.x, y: cameraPos.y+nodePos.y};
 		return nodeOnCameraPos;
 	}
-
-	this.destroy = function() {
-		visualizerModule.removeVisualObject(this.visualObject);
-	}
-
+	/*
 	this.setPosition = function(x, y) {
 		visualizerModule.setPosition(this.visualObject, x,y);
 	}
@@ -49,7 +38,7 @@ function Node(ID, academicDataLibrary, radius){ //Abstract Class
 		this.visualObject.to({opacity: 0});
 		if(this.visualObject.connection) this.visualObject.connection.to({opacity: 0});
 	}
-
+	*/
 	this.isHiddenNode = function() {
 		return this.isHidden;
 	}

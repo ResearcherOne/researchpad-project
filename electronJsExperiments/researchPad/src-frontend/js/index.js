@@ -53,7 +53,7 @@
 		GOOGLE: "Google Scholar",
 		ARXIV: "Arxiv"
 	};
-	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
+	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
 
 	const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
 		arxivId: "arxivId",
@@ -379,7 +379,6 @@
 			knowledgeTree.createRootNode(rootNodeObjectID, academicMetadataObj, rootNodeRadius, x, y);
 			const fetchMethod = SEMANTIC_SCHOLAR_SEARCH_METHODS.arxivId;
 			const paperArxivId = arxivDataModel.getArxivId();
-			console.log("PAPER ID: "+paperArxivId);
 			fetchPaperDetailsFromSemanticScholar(fetchMethod, paperArxivId, function(err, result){
 				if(result) {
 					const semanticDataModel = new SemanticScholarData(result);

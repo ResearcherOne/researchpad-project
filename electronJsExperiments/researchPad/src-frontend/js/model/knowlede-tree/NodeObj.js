@@ -1,77 +1,30 @@
-function Node(ID, metadata, radius){ //Abstract Class
+function Node(ID, academicDataLibrary){ //Abstract Class
 	this.ID = ID;
-	this.metadata = metadata;
-	this.radius = radius;
+	this.academicDataLibrary = academicDataLibrary;
 
-	this.visualObject;
-	
 	this.isHidden = false;
-
-	this.getVisualObject = function() {
-		return this.visualObject;
-	}
 
 	this.getID = function() {
 		return this.ID;
 	}
 
-	this.getTitle = function() {
-		return this.metadata.title;
+	this.getAbsolutePosition = function(visualObjID) {
+		return {x: visualizerModule.getNodeCenterById(visualObjID).x, y:visualizerModule.getNodeCenterById(visualObjID).y};
 	}
 
-	this.getAuthors = function() {
-		return this.metadata.authors;
-	}
-
-	this.getYear = function() {
-		return this.metadata.year;
-	}
-
-	this.getJournal = function() {
-		return this.metadata.journal;
-	}
-
-	this.getAbstract = function() {
-		return this.metadata.abstract;
-	}
-
-	this.getCitationCount = function() {
-		return this.metadata.citedByCount;
-	}
-
-	this.getLink = function() {
-		return this.metadata.link;
-	}
-
-	this.getCitedByLink = function() {
-		return this.metadata.citedByLink;
-	}
-
-	this.getAbsolutePosition = function() {
-		return {x: visualizerModule.getNodeCenterById(this.ID).x, y:visualizerModule.getNodeCenterById(this.ID).y};
-	}
-
-	this.getPositionOnCamera = function() {
+	this.getPositionOnCamera = function(visualObjID) {
 		var cameraPos = visualizerModule.getCanvasPos();
-		var nodePos = visualizerModule.getNodeCenterById(this.ID);
+		var nodePos = visualizerModule.getNodeCenterById(visualObjID);
 		var nodeOnCameraPos = {x: cameraPos.x+nodePos.x, y: cameraPos.y+nodePos.y};
 		return nodeOnCameraPos;
 	}
-
-	this.destroy = function() {
-		visualizerModule.removeVisualObject(this.visualObject);
-	}
-
+	/*
 	this.setPosition = function(x, y) {
 		visualizerModule.setPosition(this.visualObject, x,y);
 	}
 
 	this.move = function(x, y) {
 		visualizerModule.moveObject(this.visualObject, x, y);
-	}
-
-	this.getMetadata = function() {
-		return this.metadata;
 	}
 
 	this.show = function() {
@@ -85,12 +38,19 @@ function Node(ID, metadata, radius){ //Abstract Class
 		this.visualObject.to({opacity: 0});
 		if(this.visualObject.connection) this.visualObject.connection.to({opacity: 0});
 	}
-
+	*/
 	this.isHiddenNode = function() {
 		return this.isHidden;
 	}
 
-	this.changeStrokeColor = function(color) {
-        visualizerModule.setStrokeColor(this.visualObject, color);
+	this.changeStrokeColor = function(visualObjID, color) {
+        visualizerModule.setStrokeColor(visualObjID, color);
+	}
+
+	this.addAcademicData = function(key, value) {
+		this.academicDataLibrary[key] = value;
+	}
+	this.getAcademicDataLibrary = function() {
+		return this.academicDataLibrary;
 	}
 }

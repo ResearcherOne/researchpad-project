@@ -77,8 +77,9 @@ function initializeBackend() {
 
 	ipcRestModule.listen(backendApi.searchArxiv, function(request, response){
 		const searchText = request.searchText;
-	
-		arxivModule.search(searchText, function(err, result){
+		const trimmedText = searchText.trim();
+
+		arxivModule.search(trimmedText, function(err, result){
 			if(!err) {
 				//dataCleanerModule.cleanGoogleResultList(result);
 				response.send({"resultList": result.items});
@@ -111,6 +112,14 @@ function initializeBackend() {
 
 		if(fetchMethod == "arxivId") {
 			semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(err, result){
+				if(!err) {
+					response.send({"metadata": result});
+				} else {
+					response.error("OOps, unable to fetch data from semantic scholar");
+				}
+			});
+		} else if (fetchMethod == "semanticId") {
+			semanticScholarModule.getSemanticScholarDataViaId(paperId, function(err, result){
 				if(!err) {
 					response.send({"metadata": result});
 				} else {

@@ -1,5 +1,7 @@
-function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
-	Node.call(this, ID, metadata, radius);
+function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
+	Node.call(this, ID, academicDataLibrary);
+
+	this.radius = radius;
 
 	this.references = {};
 	this.referenceCount = 0;
@@ -7,18 +9,19 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 	this.citedByNodes = {};
 	this.citedByCount = 0;
 
+	this.suggestedCitedByNodeList = [];
+	this.suggestedReferenceNodeList = [];
+
 	this.siblingIDs = {};
 	this.siblingCount = 0;
 
-	this.hideLeafNodesTimer = null;
-
 	this.clickedCallback = clickedCallback;
 
-	var mouseOver = function(rootNodeObject) {
-		if(mouseOverCallback) mouseOverCallback(rootNodeObject);
+	var mouseOver = function(rootNodeObject, visualObjID) {
+		if(mouseOverCallback) mouseOverCallback(rootNodeObject, visualObjID);
 	}
-	var mouseOut = function(rootNodeObject) {
-		if(mouseOutCallback) mouseOutCallback(rootNodeObject);
+	var mouseOut = function(rootNodeObject, visualObjID) {
+		if(mouseOutCallback) mouseOutCallback(rootNodeObject, visualObjID);
 	}
 
 	var getSerializedLeafNodesObj = function(leafNodes) {
@@ -32,17 +35,16 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 	const isDraggable = false;
 	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback, this.clickedCallback);
 
-	this.createReference = function(ID, metadata, radius) {
-		const referencePosition = this.referenceCount;
-		this.references[ID] = new ReferenceNode(this.ID, this.visualObject, ID, metadata, radius, referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
-		this.references[ID].hide();
-		this.referenceCount++;
+	this.getVisualObj = function() {
+		return this.visualObject;
 	}
-	this.createCitedBy = function(ID, metadata, radius) {
-		const citedByPosition = this.citedByCount;
-		this.citedByNodes[ID] = new CitedByNode(this.ID, this.visualObject, ID, metadata, radius, citedByPosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
-		this.citedByNodes[ID].hide();
-		this.citedByCount++;
+	this.connectCitedBy = function(refID) {
+		this.citedByNodes[refID] = 1;
+		this.citedByNodes++;
+	}
+	this.connectReference = function(refID) {
+		this.references[refID] = 1;
+		this.referenceCount++;
 	}
 	this.setSibling = function(nodeID, siblingType) {
 		this.siblingIDs[nodeID] = siblingType;
@@ -53,25 +55,30 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		delete this.siblingIDs[nodeID];
 		this.siblingCount--;
 	}
-	this.removeReference = function(ID) {
-		this.references[ID].destroy();
+	this.removeReferenceConnection = function(ID) {
 		this.references[ID] = undefined;
 		delete this.references[ID];
 		this.referenceCount--;
 	}
-	this.removeCitedBy = function(ID) {
-		this.citedByNodes[ID].destroy();
+	this.removeCitedByConnection = function(ID) {
 		this.citedByNodes[ID] = undefined;
 		delete this.citedByNodes[ID];
 		this.citedByCount--;
 	}
+	this.getCitedByCount = function() {
+		return this.citedByCount;
+	}
+	this.getReferenceCount = function() {
+		return this.referenceCount;
+	}
+
 	this.serialize = function() {
 		var serializedNodeObj = {};
 		serializedNodeObj.ID = this.ID;
-		serializedNodeObj.metadata = this.metadata;
+		serializedNodeObj.academicDataLibrary = this.academicDataLibrary;
 		serializedNodeObj.radius = this.radius;
-		serializedNodeObj.x = this.getAbsolutePosition().x;
-		serializedNodeObj.y = this.getAbsolutePosition().y;
+		serializedNodeObj.x = this.getAbsolutePosition(this.ID).x;
+		serializedNodeObj.y = this.getAbsolutePosition(this.ID).y;
 
 		serializedNodeObj.references = getSerializedLeafNodesObj(this.references);
 		serializedNodeObj.referenceCount = this.referenceCount;
@@ -79,16 +86,19 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		serializedNodeObj.citedByNodes = getSerializedLeafNodesObj(this.citedByNodes);
 		serializedNodeObj.citedByCount = this.citedByCount;
 
+		serializedNodeObj.suggestedCitedByNodeList = this.suggestedCitedByNodeList;
+		serializedNodeObj.suggestedReferenceNodeList = this.suggestedReferenceNodeList;
+
 		serializedNodeObj.siblingIDs = this.siblingIDs;
 		serializedNodeObj.siblingCount = this.siblingCount;
 		return JSON.stringify(serializedNodeObj);
 	}
 
-	this.importSerializedReferences = function(serializedReferences, serializedCitedbyNodes, refCount, citedbyCount) {
+	this.importSerializedReferences = function(serializedReferences, serializedCitedbyNodes, refCount, citedbyCount, suggestedCitedByNodeList, suggestedReferenceNodeList) {
 		var reconstructedReferences = {}
 		for (var referenceNodeID in serializedReferences){
 			var leafNodeData = JSON.parse(serializedReferences[referenceNodeID]);
-			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
+			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicDataLibrary, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 			reconstructedReferences[referenceNodeID].hide();
 		}
 		this.referenceCount = refCount;
@@ -97,53 +107,56 @@ function RootNode(ID, metadata, radius, initialX, initialY, dragstartCallback, d
 		var reconstructedCitedbyNodes = {}
 		for (var referenceNodeID in serializedCitedbyNodes){
 			var leafNodeData = JSON.parse(serializedCitedbyNodes[referenceNodeID]);
-			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.metadata, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
+			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicDataLibrary, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
 			reconstructedCitedbyNodes[referenceNodeID].hide();
 		}
 		this.citedByCount = citedbyCount;
 		this.citedByNodes = reconstructedCitedbyNodes;
+
+		this.suggestedCitedByNodeList = suggestedCitedByNodeList;
+		this.suggestedReferenceNodeList = suggestedReferenceNodeList;
 	}
-
-	this.hideLeafNodes = function(durationSec) {
-		/*
-		for (var citationNodeID in this.citedByNodes){
-			this.citedByNodes[citationNodeID].hide();
-		}
-		for (var referenceNodeID in this.references){
-			this.references[referenceNodeID].hide();
-		}
-		*/
-		if(!this.hideLeafNodesTimer) {
-			this.hideLeafNodesTimer = setTimeout(function(rootNodeObj){
-				for (var citationNodeID in rootNodeObj.citedByNodes){
-					rootNodeObj.citedByNodes[citationNodeID].hide();
-				}
-				for (var referenceNodeID in rootNodeObj.references){
-					rootNodeObj.references[referenceNodeID].hide();
-				}
-
-				rootNodeObj.hideLeafNodesTimer = null;
-			}, durationSec * 1000, this);
-		} else {
-			clearTimeout(this.hideLeafNodesTimer);
-			this.hideLeafNodesTimer = setTimeout(function(rootNodeObj){
-				rootNodeObj.hideLeafNodes();
-				rootNodeObj.hideLeafNodesTimer = null;
-			}, durationSec * 1000, this);
-		}
+	this.getSuggestedCitedByCount = function() {
+		return this.suggestedCitedByNodeList.length;
 	}
-
-	this.showLeafNodes = function() {
-		clearTimeout(this.hideLeafNodesTimer);
-		this.hideLeafNodesTimer = null;
-		for (var citationNodeID in this.citedByNodes){
-			this.citedByNodes[citationNodeID].show();
-		}
-		for (var referenceNodeID in this.references){
-			this.references[referenceNodeID].show();
-		}
+	this.getSuggestedReferenceCount = function() {
+		return this.suggestedReferenceNodeList.length;
 	}
-
+	this.isSuggestedNode = function(nodeID) {
+		const isSuggestedCitedBy = (this.suggestedCitedByNodeList.indexOf(nodeID) > -1);
+		if(isSuggestedCitedBy) return true;
+		else return (this.suggestedReferenceNodeList.indexOf(nodeID) > -1);
+	}
+	this.suggestCitedBy = function(citedByID) {
+		this.suggestedCitedByNodeList.push(citedByID);
+	}
+	this.suggestReference = function(referenceID) {
+		this.suggestedReferenceNodeList.push(referenceID);
+	}
+	this.removeCitedBySuggestion = function(citedByID) {
+		const indexOfNode = this.suggestedCitedByNodeList.indexOf(citedByID);
+		this.suggestedCitedByNodeList.splice(indexOfNode, 1); 
+	}
+	this.removeReferenceSuggestion = function(referenceID) {
+		const indexOfNode = this.suggestedReferenceNodeList.indexOf(referenceID);
+		this.suggestedReferenceNodeList.splice(indexOfNode, 1); 
+	}
+	this.getLeafNode = function(leafNodeID) {
+		if(this.references[leafNodeID]) return this.references[leafNodeID];
+		else return this.citedByNodes[leafNodeID];
+	}
+	this.getAllCitedByNodes = function() {
+		return this.citedByNodes;
+	}
+	this.getAllReferenceNodes = function() {
+		return this.references;
+	}
+	this.getSuggestedCitedByList = function() {
+		return this.suggestedCitedByNodeList;
+	}
+	this.getSuggestedReferenceList = function() {
+		return this.suggestedReferenceNodeList;
+	}
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, 'constructor', { 
 	    value: RootNode, 

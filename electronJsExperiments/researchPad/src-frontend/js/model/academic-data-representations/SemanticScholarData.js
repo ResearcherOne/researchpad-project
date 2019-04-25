@@ -15,6 +15,7 @@ function SemanticScholarData(metadata){
     }
     this.getYear = function() {
         if(this.metadata == null) return null;
+        if(this.metadata.year == null) return null;
         return this.metadata.year.toString();
     }
     this.getAuthorList = function() {

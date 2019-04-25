@@ -29,21 +29,25 @@ function LeafNode(ID, academicDataLibrary, isCitationNode) {
 		return rootID;
 	}
 	this.connectRoot = function(rootID, rootVisualObj, radius, referencePosition, dragstartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
-		const rootSpecificVisualObjID = this.ID + rootID;
-		const rootSpecificVisualObj = visualizerModule.createCitedByNode(rootVisualObj, referencePosition, rootSpecificVisualObjID, radius, mouseOverCallback, mouseOutCallback, this, dragstartCallback, dragendCallback, clickedCallback);
-        hideVisualObj(rootSpecificVisualObj);
         this.rootNodes[rootID] = {
             rootVisualObj: rootVisualObj,
-			visualObj: rootSpecificVisualObj,
+			visualObj: null,
 			radius: radius,
             position: referencePosition,
-            isHidden: true
+            isHidden: true,
+            callback: {
+                dragstart: dragstartCallback,
+                dragend: dragendCallback,
+                mouseOver: mouseOverCallback,
+                mouseOut: mouseOutCallback,
+                clicked: clickedCallback
+            }
 		};
 		this.rootNodeCount++;
 	};
 	this.removeRootConnection = function(rootID) {
-		const visualObj = this.rootNodes[rootID].visualObj;
-		visualizerModule.removeVisualObject(visualObj);
+        const visualObj = this.rootNodes[rootID].visualObj;
+        if(visualObj) visualizerModule.removeVisualObject(visualObj);
 		delete this.rootNodes[rootID];
 		this.rootNodeCount--;
 	};
@@ -55,7 +59,24 @@ function LeafNode(ID, academicDataLibrary, isCitationNode) {
         return Object.keys(this.rootNodes)
     }
 
-    this.setPosition = function(rootID, suggestionPosition) {
+    this.setPositionForSuggestion = function(rootID, suggestionPosition) {
+        const visualObj = this.rootNodes[rootID].visualObj;
+        if(!visualObj) {
+            const rootSpecificVisualObjID = this.ID + rootID;
+            const rootNodeData = this.rootNodes[rootID];
+            const rootVisualObj = rootNodeData.rootVisualObj;
+            const radius = rootNodeData.radius;
+            const mouseOverCallback = rootNodeData.callback.mouseOver;
+            const mouseOutCallback = rootNodeData.callback.mouseOut;
+            const dragstartCallback = rootNodeData.callback.dragstart;
+            const dragendCallback = rootNodeData.callback.dragend;
+            const clickedCallback = rootNodeData.callback.clicked;
+            if(this.isCitationNode) {
+                this.rootNodes[rootID].visualObj = visualizerModule.createCitedByNode(rootVisualObj, suggestionPosition, rootSpecificVisualObjID, radius, mouseOverCallback, mouseOutCallback, this, dragstartCallback, dragendCallback, clickedCallback);
+            } else {
+                this.rootNodes[rootID].visualObj = visualizerModule.createReferenceNode(rootVisualObj, suggestionPosition, rootSpecificVisualObjID, radius, mouseOverCallback, mouseOutCallback, this, dragstartCallback, dragendCallback, clickedCallback);
+            }
+        }
         const rootVisualObj = this.rootNodes[rootID].rootVisualObj;
         const leafRadius = this.rootNodes[rootID].radius;
         const leafVisualObj = this.rootNodes[rootID].visualObj;
@@ -63,12 +84,15 @@ function LeafNode(ID, academicDataLibrary, isCitationNode) {
         hideVisualObj(leafVisualObj);
     }
 
+    //this.removeSuggestion
+        //destroy visualObj
+
     this.show = function(rootID) {
-        showVisualObj(this.rootNodes[rootID].visualObj);
+        if(this.rootNodes[rootID].visualObj) showVisualObj(this.rootNodes[rootID].visualObj);
     }
 
     this.hide = function(rootID) {
-        hideVisualObj(this.rootNodes[rootID].visualObj);
+        if(this.rootNodes[rootID].visualObj) hideVisualObj(this.rootNodes[rootID].visualObj);
     }
 
 	this.serialize = function() {

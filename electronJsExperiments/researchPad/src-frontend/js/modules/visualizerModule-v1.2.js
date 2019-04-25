@@ -198,7 +198,7 @@ var visualizerModule = (function () {
 	};
 
 	var setReferencePosition = function (rootVisualObj, leafVisualObj, position, leafRadius) {
-		var calculation = calculateCitedByAngleAndLength(rootVisualObj, position);
+		var calculation = calculateReferenceAngleAndLength(rootVisualObj, position);
 		var newPos = calculateLeafNodeCoordinateAroundRootNode(rootVisualObj, calculation.nodeDegree, calculation.nodeConnectionLength, leafRadius);
 		leafVisualObj.position({
 			x: newPos.x,

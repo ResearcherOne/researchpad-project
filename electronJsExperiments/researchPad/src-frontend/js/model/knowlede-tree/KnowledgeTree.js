@@ -43,6 +43,8 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 
 	var _selectedNode = null;
 
+	const DEFAULT_ROOT_UPDATE_LEAF_NODE_REVEAL_DURATION_SEC = 1;
+
 	var getNodeType = function(nodeObj) {
 		if(nodeObj.constructor.name == "RootNode") {
 			return "root";
@@ -186,17 +188,18 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	var createReferenceObj = function(self, refID, initialAcademicDataLibrary) {
 		var referenceObj = new ReferenceNode(refID, initialAcademicDataLibrary);
 		self.referenceNodes[refID] = referenceObj;
+		console.log(self.referenceNodes);
 		return referenceObj;
 	}
 
 	var suggestCitedBy = function(self, rootID, refID, suggestionPosition) {
 		self.rootNodes[rootID].suggestCitedBy(refID);
-		self.citedByNodes[refID].setPosition(rootID, suggestionPosition);
+		self.citedByNodes[refID].setPositionForSuggestion(rootID, suggestionPosition);
 	}
 
 	var suggestReference = function(self, rootID, refID, suggestionPosition) {
 		self.rootNodes[rootID].suggestReference(refID);
-		self.referenceNodes[refID].setPosition(rootID, suggestionPosition);
+		self.referenceNodes[refID].setPositionForSuggestion(rootID, suggestionPosition);
 	}
 
 	//Initialization
@@ -248,8 +251,9 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 				connectRootNodeToExistingLeafNodes(this, rootID, refID, radius, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
 			} else {
 				const referenceObj = createReferenceObj(this, refID, initialAcademicDataLibrary);
-				referenceObj.connectRoot(rootID, rootVisualObj);
-				rootObj.connectReference(refID);
+				connectRootNodeToExistingLeafNodes(this, rootID, refID, radius, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+				//referenceObj.connectRoot(rootID, rootVisualObj);
+				//rootObj.connectReference(refID);
 
 				const suggestedReferenceCount = this.rootNodes[rootID].getSuggestedReferenceCount();
 				if(suggestedReferenceCount < 10) {
@@ -266,12 +270,21 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		return refID;
 	}
 	this.removeReferenceFromRootNode = function(rootID, refID) {
-		const isSuggested = this.rootNodes[rootID].isSuggestedNode(refID);
+		const rootObj = this.rootNodes[rootID];
+		const referenceObj = this.referenceNodes[refID];
+		const isSuggested = rootObj.isSuggestedNode(refID);
+
 		if(isSuggested) {
-			this.rootNodes[rootID].removeReferenceSuggestion(refID);
+			rootObj.removeReferenceSuggestion(refID);
+			this.showLeafNodes(rootID);
+			this.hideLeafNodes(rootID, DEFAULT_ROOT_UPDATE_LEAF_NODE_REVEAL_DURATION_SEC);
 		}
-		delete this.referenceNodes[refID];
-		this.rootNodes[rootID].removeReference(refID);
+		referenceObj.removeRootConnection(rootID);
+		rootObj.removeCitedByConnection(refID);
+
+		if(referenceObj.getConnectionCount() == 0) {
+			delete this.referenceNodes[refID];
+		}
 	}
 	this.removeCitedbyFromRootNode = function(rootID, citedByID) {
 		const rootObj = this.rootNodes[rootID];
@@ -280,6 +293,8 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 
 		if(isSuggested) {
 			rootObj.removeCitedBySuggestion(citedByID);
+			this.showLeafNodes(rootID);
+			this.hideLeafNodes(rootID, DEFAULT_ROOT_UPDATE_LEAF_NODE_REVEAL_DURATION_SEC);
 		}
 		citedByObj.removeRootConnection(rootID);
 		rootObj.removeCitedByConnection(citedByID);
@@ -378,17 +393,15 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		const rootNode = this.rootNodes[rootNodeID];
 		const citedByList = rootNode.getSuggestedCitedByList();
 		const referenceList = rootNode.getSuggestedReferenceList();
-		//const citedByNodes = this.citedByNodes;
-		//const referenceNodes = this.referenceNodes;
-		console.log(citedByList);
-		console.log(referenceList);
+
 		for(var i=0; i<citedByList.length; i++) {
 			const ID = citedByList[i];
 			this.citedByNodes[ID].show(rootNodeID);
 		}
 		for(var j=0; j<referenceList.length; j++) {
-			const ID = citedByList[j];
+			const ID = referenceList[j];
 			this.referenceNodes[ID].show(rootNodeID);
+			console.log("REF ID: "+ID);
 		}
 		visualizerModule.updateCanvas();
 
@@ -397,8 +410,6 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		const rootNode = this.rootNodes[rootNodeID];
 		const citedByList = rootNode.getSuggestedCitedByList();
 		const referenceList = rootNode.getSuggestedReferenceList();
-		const citedByNodes = this.citedByNodes;
-		const referenceNodes = this.referenceNodes;
 
 		if(this.rootNodeApperanceTimers[rootNodeID]) {
 			clearTimeout(this.rootNodeApperanceTimers[rootNodeID]);
@@ -411,7 +422,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 				self.citedByNodes[ID].hide(rootNodeID);
 			}
 			for(var j=0; j<referenceList.length; j++) {
-				const ID = citedByList[j];
+				const ID = referenceList[j];
 				self.referenceNodes[ID].hide(rootNodeID);
 			}
 			visualizerModule.updateCanvas();

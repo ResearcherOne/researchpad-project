@@ -152,7 +152,6 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	}
 
 	var isLeafNodeExists = function(self, nodeID) {
-		console.log("THIS SIBLING CONN: "+self.siblingConnectionCount);
 		const isCitedByExists = self.citedByNodes[nodeID] != null;
 		const isReferenceExists = self.referenceNodes[nodeID] != null;
 		return (isCitedByExists || isReferenceExists);
@@ -188,7 +187,6 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 	var createReferenceObj = function(self, refID, initialAcademicDataLibrary) {
 		var referenceObj = new ReferenceNode(refID, initialAcademicDataLibrary);
 		self.referenceNodes[refID] = referenceObj;
-		console.log(self.referenceNodes);
 		return referenceObj;
 	}
 
@@ -401,7 +399,6 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		for(var j=0; j<referenceList.length; j++) {
 			const ID = referenceList[j];
 			this.referenceNodes[ID].show(rootNodeID);
-			console.log("REF ID: "+ID);
 		}
 		visualizerModule.updateCanvas();
 

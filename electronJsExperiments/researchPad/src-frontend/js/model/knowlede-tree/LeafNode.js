@@ -84,9 +84,6 @@ function LeafNode(ID, academicDataLibrary, isCitationNode) {
         hideVisualObj(leafVisualObj);
     }
 
-    //this.removeSuggestion
-        //destroy visualObj
-
     this.show = function(rootID) {
         if(this.rootNodes[rootID].visualObj) showVisualObj(this.rootNodes[rootID].visualObj);
     }
@@ -99,7 +96,7 @@ function LeafNode(ID, academicDataLibrary, isCitationNode) {
 		var serializedObj = {};
 		serializedObj.ID = this.ID;
 		serializedObj.academicDataLibrary = this.academicDataLibrary;
-		serializedObj.rootNodes = this.rootNodes; //serializing visualObj as well may not be a good idea.
+		//serializedObj.rootNodes = this.rootNodes; //serializing visualObj as well may not be a good idea.
 		return JSON.stringify(serializedObj);
 	}
 

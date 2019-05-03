@@ -3,11 +3,8 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 
 	this.radius = radius;
 
-	this.references = {};
-	this.referenceCount = 0;
-
-	this.citedByNodes = {};
-	this.citedByCount = 0;
+	this.referenceList = [];
+	this.citedByNodeList = [];
 
 	this.suggestedCitedByNodeList = [];
 	this.suggestedReferenceNodeList = [];
@@ -24,14 +21,6 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		if(mouseOutCallback) mouseOutCallback(rootNodeObject, visualObjID);
 	}
 
-	var getSerializedLeafNodesObj = function(leafNodes) {
-		var serializedLeafNodes = {};
-		for (var leafNodeID in leafNodes){
-			serializedLeafNodes[leafNodeID] = leafNodes[leafNodeID].serialize();
-		}
-		return serializedLeafNodes;
-	}
-
 	const isDraggable = false;
 	this.visualObject = visualizerModule.createRootNode(this.radius, initialX, initialY, this.ID, isDraggable, mouseOver, mouseOut, this, dragstartCallback, dragendCallback, this.clickedCallback);
 
@@ -39,12 +28,10 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		return this.visualObject;
 	}
 	this.connectCitedBy = function(refID) {
-		this.citedByNodes[refID] = 1;
-		this.citedByNodes++;
+		this.citedByNodeList.push(refID);
 	}
 	this.connectReference = function(refID) {
-		this.references[refID] = 1;
-		this.referenceCount++;
+		this.referenceList.push(refID);
 	}
 	this.setSibling = function(nodeID, siblingType) {
 		this.siblingIDs[nodeID] = siblingType;
@@ -56,20 +43,16 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		this.siblingCount--;
 	}
 	this.removeReferenceConnection = function(ID) {
-		this.references[ID] = undefined;
-		delete this.references[ID];
-		this.referenceCount--;
+		this.referenceList = this.referenceList.remove(ID);
 	}
 	this.removeCitedByConnection = function(ID) {
-		this.citedByNodes[ID] = undefined;
-		delete this.citedByNodes[ID];
-		this.citedByCount--;
+		this.citedByNodeList = this.citedByNodeList.remove(ID);
 	}
 	this.getCitedByCount = function() {
-		return this.citedByCount;
+		return this.citedByNodeList.length;
 	}
 	this.getReferenceCount = function() {
-		return this.referenceCount;
+		return this.referenceList.length;
 	}
 
 	this.serialize = function() {
@@ -80,11 +63,8 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		serializedNodeObj.x = this.getAbsolutePosition(this.ID).x;
 		serializedNodeObj.y = this.getAbsolutePosition(this.ID).y;
 
-		serializedNodeObj.references = getSerializedLeafNodesObj(this.references);
-		serializedNodeObj.referenceCount = this.referenceCount;
-
-		serializedNodeObj.citedByNodes = getSerializedLeafNodesObj(this.citedByNodes);
-		serializedNodeObj.citedByCount = this.citedByCount;
+		serializedNodeObj.referenceList = this.referenceList;
+		serializedNodeObj.citedByNodeList = this.citedByNodeList;
 
 		serializedNodeObj.suggestedCitedByNodeList = this.suggestedCitedByNodeList;
 		serializedNodeObj.suggestedReferenceNodeList = this.suggestedReferenceNodeList;
@@ -93,28 +73,15 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		serializedNodeObj.siblingCount = this.siblingCount;
 		return JSON.stringify(serializedNodeObj);
 	}
+	this.importSerializedData = function(serializedData) {
+		this.referenceList = serializedData.referenceList;
+		this.citedByNodeList = serializedData.citedByNodeList;
 
-	this.importSerializedReferences = function(serializedReferences, serializedCitedbyNodes, refCount, citedbyCount, suggestedCitedByNodeList, suggestedReferenceNodeList) {
-		var reconstructedReferences = {}
-		for (var referenceNodeID in serializedReferences){
-			var leafNodeData = JSON.parse(serializedReferences[referenceNodeID]);
-			reconstructedReferences[referenceNodeID] = new ReferenceNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicDataLibrary, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
-			reconstructedReferences[referenceNodeID].hide();
-		}
-		this.referenceCount = refCount;
-		this.references = reconstructedReferences;
+		this.suggestedCitedByNodeList =  serializedData.suggestedCitedByNodeList;
+		this.suggestedReferenceNodeList = serializedData.suggestedReferenceNodeList;
 
-		var reconstructedCitedbyNodes = {}
-		for (var referenceNodeID in serializedCitedbyNodes){
-			var leafNodeData = JSON.parse(serializedCitedbyNodes[referenceNodeID]);
-			reconstructedCitedbyNodes[referenceNodeID] = new CitedByNode(this.ID, this.visualObject, leafNodeData.ID, leafNodeData.academicDataLibrary, leafNodeData.radius, leafNodeData.referencePosition, dragstartCallback, dragendCallback, mouseOver, mouseOut, this.clickedCallback);
-			reconstructedCitedbyNodes[referenceNodeID].hide();
-		}
-		this.citedByCount = citedbyCount;
-		this.citedByNodes = reconstructedCitedbyNodes;
-
-		this.suggestedCitedByNodeList = suggestedCitedByNodeList;
-		this.suggestedReferenceNodeList = suggestedReferenceNodeList;
+		this.siblingIDs = serializedData.siblingIDs;
+		this.siblingCount = serializedData.siblingCount;
 	}
 	this.getSuggestedCitedByCount = function() {
 		return this.suggestedCitedByNodeList.length;
@@ -141,15 +108,11 @@ function RootNode(ID, academicDataLibrary, radius, initialX, initialY, dragstart
 		const indexOfNode = this.suggestedReferenceNodeList.indexOf(referenceID);
 		this.suggestedReferenceNodeList.splice(indexOfNode, 1); 
 	}
-	this.getLeafNode = function(leafNodeID) {
-		if(this.references[leafNodeID]) return this.references[leafNodeID];
-		else return this.citedByNodes[leafNodeID];
+	this.getCitationNodeList = function() {
+		return this.citedByNodeList;
 	}
-	this.getAllCitedByNodes = function() {
-		return this.citedByNodes;
-	}
-	this.getAllReferenceNodes = function() {
-		return this.references;
+	this.getReferenceNodeList = function() {
+		return this.referenceList;
 	}
 	this.getSuggestedCitedByList = function() {
 		return this.suggestedCitedByNodeList;

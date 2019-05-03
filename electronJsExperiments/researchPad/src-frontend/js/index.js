@@ -323,17 +323,6 @@
 	}
 
 //User Action Helper Functions
-	String.prototype.hashCode = function() {
-		var hash = 0, i, chr;
-		if (this.length === 0) return hash;
-		for (i = 0; i < this.length; i++) {
-		chr   = this.charCodeAt(i);
-		hash  = ((hash << 5) - hash) + chr;
-		hash |= 0; // Convert to 32bit integer
-		}
-		return ""+hash;
-	};
-  
 	function createRootNodeWithScholarData(metadata, x, y, rootNodeRadius) {
 		return nodeID;
 	}
@@ -753,7 +742,7 @@
 	var nodeDetailsStaticOverlayer = null;
 
 	function initializeKnowledeTree() {
-		knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200, NODE_CONNECTIONS_CONFIG, mapClickedCallback);
+		knowledgeTree = new KnowledgeTree(konvaDivID, 1600, 1200, NODE_CONNECTIONS_CONFIG, mapClickedCallback, DEFAULT_LEAF_NODE_RADIUS);
 	
 		knowledgeTree.setNodeDragStartCallback(nodeDragStartCallback);
 		knowledgeTree.setNodeDragEndCallback(nodeDragEndCallback);

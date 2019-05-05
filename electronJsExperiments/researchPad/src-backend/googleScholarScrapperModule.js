@@ -58,7 +58,7 @@ let scrapGoogleScholarPageCodeToRunOnChromium = () => {
     let headerTagForTitle = containerDiv.querySelectorAll('.gs_rt')[0];
     const title = headerTagForTitle.innerText;
     var paperLink = null;
-    if(headerTagForTitle.childNodes[0].hasOwnProperty("href")) {
+    if(headerTagForTitle.childNodes[0].hasAttribute("href")) {
       paperLink = headerTagForTitle.childNodes[0].getAttribute("href");
     }
 

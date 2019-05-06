@@ -1028,11 +1028,7 @@ function initializeKnowledeTree() {
 function initializeScript() {
 	mixpanel.initialize("188da479052e0f47136df656355ebdc4");
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
-	overlayerModule.initializeModule(
-		overlayDivID,
-		upperPanelDivID,
-		abstractDivID
-	);
+	overlayerModule.initialize(overlayDivID, upperPanelDivID, abstractDivID);
 
 	initializeKnowledeTree();
 

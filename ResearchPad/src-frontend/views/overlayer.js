@@ -24,11 +24,7 @@ var overlayerModule = (function() {
 		}
 	}
 
-	var initializeModule = function(
-		overlayDivId,
-		upperPanelDivId,
-		abstractDivIdInput
-	) {
+	var initialize = function(overlayDivId, upperPanelDivId, abstractDivIdInput) {
 		divId = overlayDivId;
 		titleId = divId + "-text";
 
@@ -154,7 +150,7 @@ var overlayerModule = (function() {
 	};
 
 	return {
-		initializeModule: initializeModule,
+		initialize: initialize,
 		drawTitleOverlay: drawTitleOverlay,
 		drawAbstractOverlay: drawAbstractOverlay,
 		clearTitleOverlay: clearTitleOverlay,

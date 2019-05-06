@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Research Pad</title>
+
+		<!-- Third Party Libraries -->
+		<script src="https://unpkg.com/konva@2.4.2/konva.min.js"></script>
+
+		<!-- Views -->
+		<script src="./view/mix-panel.js"></script>
+		<script src="./view/overlayer.js"></script>
+		<script src="./view/node-details-static-overlayer.js"></script>
+		<script src="./view/search-panel.js"></script>
+		<script src="./view/trash-bin.js"></script>
+
+		<!-- Modules -->
+		<script src="./modules/visualizer.js"></script>
+		<script src="./modules/ipc-rest-renderer.js"></script>
+		<script src="./modules/logger.js"></script>
+
+		<!-- Models -->
+		<script src="./model/academic-data-representations/AcademicData.js"></script>
+		<script src="./model/academic-data-representations/ArxivData.js"></script>
+		<script src="./model/academic-data-representations/GoogleScholarData.js"></script>
+		<script src="./model/academic-data-representations/SemanticScholarData.js"></script>
+		<script src="./model/field-specific-aggregated-data-models/ComputerScienceAggregateModel.js"></script>
+		<script src="./model/field-specific-aggregated-data-models/PhysicsAggregateModel.js"></script>
+		<script src="./model/knowlede-tree/NodeObj.js"></script>
+		<script src="./model/knowlede-tree/LeafNode.js"></script>
+		<script src="./model/knowlede-tree/RootNode.js"></script>
+		<script src="./model/knowlede-tree/ReferenceNode.js"></script>
+		<script src="./model/knowlede-tree/CitedByNode.js"></script>
+		<script src="./model/knowlede-tree/KnowledgeTree.js"></script>
+
+		<!-- Main Script and Stylesheet -->
+		<script src="./index.js"></script>
+		<link rel="stylesheet" type="text/css" href="index.css" />
+	</head>
+	<body id="body">
+		<div id="knowledge-tree-div">
+			<!-- Hover on Search Panel Overlay -->
+			<div id="overlay-abstract-div" class="unselectable">
+				<div class="unselectable" id="overlay-abstract-div-text"></div>
+			</div>
+
+			<!-- Header Bar Overlay -->
+			<div id="overlay-controlset-upper-panel" class="unselectable">
+				<button id="save-button" type="button">SAVE</button>
+				<button id="reset-button" type="button">RESET</button>
+			</div>
+
+			<!-- Search Item Overlay -->
+			<div id="overlay-div" class="unselectable">
+				<div class="unselectable" id="overlay-div-text"></div>
+			</div>
+
+			<!-- Trashbin Overlay -->
+			<div id="overlay-trashbin-mouse-area" class="unselectable">
+				<div id="trash-panel-slide">
+					<img src="img/trashfull.png" alt="trash bin icon" />
+					<span>&#8250;</span>
+				</div>
+			</div>
+
+			<!-- Search Panel Overlay -->
+			<div id="overlay-search-panel">
+				<div class="unselectable" id="search-box-div">
+					<p></p>
+					<input
+						id="google-scholar-searchbox"
+						type="text"
+						placeholder="Search on Google Scholar"
+					/>
+					<button id="search-button" type="button">SEARCH</button>
+				</div>
+				<div id="search-results-div" class="unselectable"></div>
+				<div id="overlay-search-panel-shadow" class="unselectable">
+					<div class="loader"></div>
+				</div>
+			</div>
+
+			<!-- Knowledge Tree Container -->
+			<div id="konva-div"></div>
+		</div>
+	</body>
+</html>

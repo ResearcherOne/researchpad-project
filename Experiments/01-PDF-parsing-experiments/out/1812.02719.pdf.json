@@ -1,0 +1,558 @@
+[
+ {
+  "name": "Times",
+  "rowTexts": [
+   "arXiv:1812.02719v1  [hep-ph]  6 Dec 2018"
+  ]
+ },
+ {
+  "name": "g_d6_f17",
+  "rowTexts": [
+   "Light hidden photon production in high energy collisions"
+  ]
+ },
+ {
+  "name": "g_d6_f18",
+  "rowTexts": [
+   "S. Demidov"
+  ]
+ },
+ {
+  "name": "g_d6_f19",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d6_f20",
+  "rowTexts": [
+   ","
+  ]
+ },
+ {
+  "name": "g_d6_f19",
+  "rowTexts": [
+   "2"
+  ]
+ },
+ {
+  "name": "g_d6_f18",
+  "rowTexts": [
+   ", S. Gninenko"
+  ]
+ },
+ {
+  "name": "g_d6_f19",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d6_f18",
+  "rowTexts": [
+   "and D. Gorbunov"
+  ]
+ },
+ {
+  "name": "g_d6_f19",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d6_f20",
+  "rowTexts": [
+   ","
+  ]
+ },
+ {
+  "name": "g_d6_f19",
+  "rowTexts": [
+   "2",
+   "1"
+  ]
+ },
+ {
+  "name": "g_d6_f18",
+  "rowTexts": [
+   "Institute for Nuclear Research of the Russian Academy of Science",
+   "s, Moscow 117312, Russia"
+  ]
+ },
+ {
+  "name": "g_d6_f19",
+  "rowTexts": [
+   "2"
+  ]
+ },
+ {
+  "name": "g_d6_f18",
+  "rowTexts": [
+   "Moscow Institute of Physics and Technology, Dolgoprudny 141700",
+   ", Russia",
+   "E-mails:"
+  ]
+ },
+ {
+  "name": "g_d6_f21",
+  "rowTexts": [
+   "demidov@ms2.inr.ac.ru"
+  ]
+ },
+ {
+  "name": "g_d6_f18",
+  "rowTexts": [
+   ","
+  ]
+ },
+ {
+  "name": "g_d6_f21",
+  "rowTexts": [
+   "Sergei.Gninenko@cern.ch"
+  ]
+ },
+ {
+  "name": "g_d6_f18",
+  "rowTexts": [
+   ","
+  ]
+ },
+ {
+  "name": "g_d6_f21",
+  "rowTexts": [
+   "gorby@ms2.inr.ac.ru"
+  ]
+ },
+ {
+  "name": "g_d6_f22",
+  "rowTexts": [
+   "Abstract"
+  ]
+ },
+ {
+  "name": "g_d6_f23",
+  "rowTexts": [
+   "The visible and dark sectors of particle physics can be conne",
+   "cted via kinetic mixing between ordinary and hidden",
+   "photons. If the latter is light its production in high energy",
+   "collisions of ordinary particles proceeds via oscillation",
+   "s with",
+   "ordinary photons similarly to the neutrino processes. Gene",
+   "rically, the experiments are insensitive to mass of the hidd",
+   "en",
+   "vector, if it is lighter than 1 MeV, and it does not decay into"
+  ]
+ },
+ {
+  "name": "g_d6_f24",
+  "rowTexts": [
+   "e"
+  ]
+ },
+ {
+  "name": "g_d6_f25",
+  "rowTexts": [
+   "+"
+  ]
+ },
+ {
+  "name": "g_d6_f24",
+  "rowTexts": [
+   "e"
+  ]
+ },
+ {
+  "name": "g_d6_f26",
+  "rowTexts": [
+   "−"
+  ]
+ },
+ {
+  "name": "g_d6_f23",
+  "rowTexts": [
+   "-pair. Still, one can use the missing energy and",
+   "scattering off the detector material as signatures to search",
+   "for the light vectors. Presence of media suppresses product",
+   "ion",
+   "of the light vectors making the experiments insensitive to t",
+   "he entire model. We present analytic formulas for the light",
+   "hidden photon production, propagation and detection valid",
+   "for searches at colliders and beam-target experiments and",
+   "apply them to estimate the impact on the sensitivities of a se",
+   "t of experiments — NA64, FASER, MATHUSLA, SHiP,",
+   "T2K, DUNE, NA62 — in a zero-background case."
+  ]
+ },
+ {
+  "name": "g_d6_f27",
+  "rowTexts": [
+   "1  Introduction"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "New physics can involve GeV-scale and even lighter particles, the pat",
+   "tern argued to be preferable when the gauge hierarchy",
+   "problem is addressed [1, 2].  These new particles can be directly searc",
+   "hed for in high-intensity collision experiments",
+   "operating at collider or fixed-target facilities. They include universa",
+   "l experiments like those running at the LHC, long-",
+   "baseline neutrinos oscillation experiments exploiting proton beams inc",
+   "ident on target (DUNE, T2K) and specially designed",
+   "projects with high-intensity beams dedicated to new physics huntin",
+   "g (NA64, SHiP, MATHUSLA). Generically, whenever",
+   "very light particles are concerned, astrophysical processes exh",
+   "ibit a higher sensitivity than the direct searches, but the",
+   "latter naturally earn a higher confidence, and we concentrate on t",
+   "hem.",
+   "The new particles, if light, must be singlet with respect to the gauge g",
+   "roup of the Standard Model of particle physics",
+   "(SM). Otherwise, absence of their traces in numerous experiment",
+   "s performed so far would be difficult to explain. If the",
+   "new singlet is a Lorenzian vector,"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   ", its most natural effective interaction with the SM fields is via so-calle",
+   "d vector portal",
+   "— renormalizable mixing between the gauge-invariant kinetic terms of"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "and photon"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "A"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   ". Below the electroweak scale",
+   "around 100 GeV the corresponding lagrangian reads"
+  ]
+ },
+ {
+  "name": "g_d6_f31",
+  "rowTexts": [
+   "L"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "="
+  ]
+ },
+ {
+  "name": "g_d6_f31",
+  "rowTexts": [
+   "−"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "1",
+   "4"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "F"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μν"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "F"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μν"
+  ]
+ },
+ {
+  "name": "g_d6_f31",
+  "rowTexts": [
+   "−"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "1",
+   "4"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μν"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μν"
+  ]
+ },
+ {
+  "name": "g_d6_f31",
+  "rowTexts": [
+   "−"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "ǫ"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "2"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "F"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μν"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μν"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "+",
+   "1",
+   "2"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "m"
+  ]
+ },
+ {
+  "name": "g_d6_f32",
+  "rowTexts": [
+   "2"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "+"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "A"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "j"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   ","
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "(1)",
+   "where"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "m"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "is the hidden photon mass emerged presumably due to the Higgs mech",
+   "anism operating in the hidden sector.",
+   "The kinetic mixing with the ordinary photon in (1) solely defines the hidd",
+   "en photon phenomenology associated with the",
+   "SM particles:"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "can be produced by a virtual photon and can decay into the SM part",
+   "icles via a virtual photon wherever",
+   "kinematically allowed. The hidden photon can also effectively scatter o",
+   "ff the electrically charged SM particles because of",
+   "this mixing. Besides, in the hidden sector"
+  ]
+ },
+ {
+  "name": "g_d6_f29",
+  "rowTexts": [
+   "X"
+  ]
+ },
+ {
+  "name": "g_d6_f30",
+  "rowTexts": [
+   "μ"
+  ]
+ },
+ {
+  "name": "g_d6_f28",
+  "rowTexts": [
+   "can couple to dark matter particles [3] hence forming a gate betwee",
+   "n the",
+   "1"
+  ]
+ }
+]

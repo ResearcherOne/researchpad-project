@@ -1,0 +1,365 @@
+[
+ {
+  "name": "g_d5_f56",
+  "rowTexts": [
+   "Nikhef-2018-059"
+  ]
+ },
+ {
+  "name": "g_d5_f57",
+  "rowTexts": [
+   "Probing New Physics in"
+  ]
+ },
+ {
+  "name": "g_d5_f58",
+  "rowTexts": [
+   "B"
+  ]
+ },
+ {
+  "name": "g_d5_f59",
+  "rowTexts": [
+   "→"
+  ]
+ },
+ {
+  "name": "g_d5_f58",
+  "rowTexts": [
+   "πK"
+  ]
+ },
+ {
+  "name": "g_d5_f57",
+  "rowTexts": [
+   "Decays"
+  ]
+ },
+ {
+  "name": "g_d5_f56",
+  "rowTexts": [
+   "Robert Fleischer"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "a,b"
+  ]
+ },
+ {
+  "name": "g_d5_f56",
+  "rowTexts": [
+   ", Ruben Jaarsma"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "a"
+  ]
+ },
+ {
+  "name": "g_d5_f61",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d5_f56",
+  "rowTexts": [
+   ", Eleftheria Malami"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "a"
+  ]
+ },
+ {
+  "name": "g_d5_f56",
+  "rowTexts": [
+   "and K. Keri Vos"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "c",
+   "a"
+  ]
+ },
+ {
+  "name": "g_d5_f62",
+  "rowTexts": [
+   "Nikhef, Science Park 105, NL-1098 XG Amsterdam, Netherlands"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "b"
+  ]
+ },
+ {
+  "name": "g_d5_f62",
+  "rowTexts": [
+   "Department of Physics and Astronomy, Faculty of Science,",
+   "Vrije Universiteit Amsterdam, NL-1081 HV Amsterdam, Netherlands"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "c"
+  ]
+ },
+ {
+  "name": "g_d5_f62",
+  "rowTexts": [
+   "Theoretische Physik 1, Naturwissenschaftlich-Technische Fakult ̈at,",
+   "Universit ̈at Siegen, D-57068 Siegen, Germany"
+  ]
+ },
+ {
+  "name": "g_d5_f57",
+  "rowTexts": [
+   "Abstract"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   "Over the last two decades,"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "B"
+  ]
+ },
+ {
+  "name": "g_d5_f65",
+  "rowTexts": [
+   "→"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "πK"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   "modes have received a lot of attention.  They are par-",
+   "ticularly  interesting  since  the  main  contribution  to  these  decays  comes  from  QCD  penguin",
+   "topologies.  Furthermore, electroweak penguin amplitudes enter at a level comparable to the",
+   "tree topologies.  In the past, a discrepancy was found in the correlation between the CP asym-",
+   "metries of"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "B"
+  ]
+ },
+ {
+  "name": "g_d5_f61",
+  "rowTexts": [
+   "0"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "d"
+  ]
+ },
+ {
+  "name": "g_d5_f65",
+  "rowTexts": [
+   "→"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "π"
+  ]
+ },
+ {
+  "name": "g_d5_f61",
+  "rowTexts": [
+   "0"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "K"
+  ]
+ },
+ {
+  "name": "g_d5_f61",
+  "rowTexts": [
+   "S"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   ".  We provide the state-of-the-art picture of this situation and consider",
+   "new constraints, finding that the effect has become larger.  An attractive explanation is offered",
+   "by a modified electroweak penguin sector.  We propose a new method to determine the relevant",
+   "parameters.  It employs an isospin relation between the amplitudes of the"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "B"
+  ]
+ },
+ {
+  "name": "g_d5_f65",
+  "rowTexts": [
+   "→"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "πK"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   "decays, and",
+   "makes only minimal use of the"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "SU"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   "(3) flavour symmetry.  Using current data as well as future",
+   "scenarios, we demonstrate how the mixing-induced CP asymmetry of"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "B"
+  ]
+ },
+ {
+  "name": "g_d5_f61",
+  "rowTexts": [
+   "0"
+  ]
+ },
+ {
+  "name": "g_d5_f60",
+  "rowTexts": [
+   "d"
+  ]
+ },
+ {
+  "name": "g_d5_f65",
+  "rowTexts": [
+   "→"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "π"
+  ]
+ },
+ {
+  "name": "g_d5_f61",
+  "rowTexts": [
+   "0"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "K"
+  ]
+ },
+ {
+  "name": "g_d5_f61",
+  "rowTexts": [
+   "S"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   "plays a key",
+   "role in this analysis.  The application of our strategy at the next generation of"
+  ]
+ },
+ {
+  "name": "g_d5_f64",
+  "rowTexts": [
+   "B"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   "-physics exper-",
+   "iments may establish New Physics and reveal new sources of CP violation in the electroweak",
+   "penguin sector."
+  ]
+ },
+ {
+  "name": "g_d5_f62",
+  "rowTexts": [
+   "Invited talks at",
+   "The Sixth Annual Conference on Large Hadron Collider Physics (LHCP 2018)",
+   "Bologna, Italy, 4–9 June 2018",
+   "and",
+   "The Tenth International Workshop on the CKM Unitarity Triangle (CKM 2018)",
+   "Heidelberg, Germany, 17–21 September 2018",
+   "To appear in the Proceedings"
+  ]
+ },
+ {
+  "name": "g_d5_f56",
+  "rowTexts": [
+   "December 2018"
+  ]
+ },
+ {
+  "name": "g_d5_f66",
+  "rowTexts": [
+   "1"
+  ]
+ },
+ {
+  "name": "g_d5_f63",
+  "rowTexts": [
+   "Speaker"
+  ]
+ },
+ {
+  "name": "Times",
+  "rowTexts": [
+   "arXiv:1812.02672v1  [hep-ph]  6 Dec 2018"
+  ]
+ }
+]

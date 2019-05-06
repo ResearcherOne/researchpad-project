@@ -68,9 +68,9 @@ var overlayerModule = (function() {
 	 * an item in the search content
 	 */
 	var drawAbstractOverlay = function(x, y, abstract, journal, authors) {
-		const overlayMargin = 1; // In vw/vh
 		const yBottomMax = window.innerHeight;
 		const yTopMax = 0;
+		const overlayMargin = 1; // In vw/vh
 
 		var overlay = document.getElementById(abstractDivId);
 		var overlayText = document.getElementById(abstractTextId);

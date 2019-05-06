@@ -1,56 +1,56 @@
-function ArxivData(metadata){
-	AcademicData.call(this, metadata);
-	
-	this.getTitle = function() {
-		if(this.metadata == null) return null;
-		return this.metadata.title;
-	}
+function ArxivData(metadata) {
+  AcademicData.call(this, metadata);
 
-	this.getYear = function() {
-		if(this.metadata == null) return null;
-		const extractedYear = new Date(this.metadata.published).getFullYear();
-		return extractedYear;
-	}
+  this.getTitle = function() {
+    if (this.metadata == null) return null;
+    return this.metadata.title;
+  };
 
-	this.getAbstract = function() {
-		if(this.metadata == null) return null;
-		return this.metadata.summary;
-	}
+  this.getYear = function() {
+    if (this.metadata == null) return null;
+    const extractedYear = new Date(this.metadata.published).getFullYear();
+    return extractedYear;
+  };
 
-	this.getAuthorList = function() {
-		if(this.metadata == null) return null;
-		var authorList = [];
-		this.metadata.authors.forEach(function(authorObj){
-			if(authorObj.name) {
-				authorList.push(authorObj.name);
-			}
-		});
-		return authorList;
-	}
-	
-	this.getArxivId = function() {
-    if(this.metadata == null) return null;
- 		const splittedArxivUrl = this.metadata.id.split("/");
-		const arxivId = splittedArxivUrl[splittedArxivUrl.length-1];
+  this.getAbstract = function() {
+    if (this.metadata == null) return null;
+    return this.metadata.summary;
+  };
 
-		const vSplittedId = arxivId.split("v");
-		const versionCleanizedId = vSplittedId[0];
+  this.getAuthorList = function() {
+    if (this.metadata == null) return null;
+    var authorList = [];
+    this.metadata.authors.forEach(function(authorObj) {
+      if (authorObj.name) {
+        authorList.push(authorObj.name);
+      }
+    });
+    return authorList;
+  };
 
-		return versionCleanizedId;
-	}
-	/*
-		this.getArxivUrl = function() {
-			return this.metadata.id;
-		}
+  this.getArxivId = function() {
+    if (this.metadata == null) return null;
+    const splittedArxivUrl = this.metadata.id.split("/");
+    const arxivId = splittedArxivUrl[splittedArxivUrl.length - 1];
 
-	*/
-    
-    ArxivData.prototype = Object.create(AcademicData.prototype);
-	Object.defineProperty(ArxivData.prototype, 'constructor', { 
-	    value: ArxivData, 
-	    enumerable: false, // so that it does not appear in 'for in' loop
-	    writable: true
-	});
+    const vSplittedId = arxivId.split("v");
+    const versionCleanizedId = vSplittedId[0];
+
+    return versionCleanizedId;
+  };
+  /*
+    this.getArxivUrl = function() {
+      return this.metadata.id;
+    }
+
+  */
+
+  ArxivData.prototype = Object.create(AcademicData.prototype);
+  Object.defineProperty(ArxivData.prototype, "constructor", {
+    value: ArxivData,
+    enumerable: false, // so that it does not appear in 'for in' loop
+    writable: true
+  });
 }
 /* Unused Metadata Parts
 {

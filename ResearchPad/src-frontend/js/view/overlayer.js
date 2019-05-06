@@ -34,7 +34,6 @@ var overlayerModule = (function() {
 
 		abstractDivId = abstractDivIdInput;
 		abstractTextId = abstractDivId + "-text";
-		console.log("abstractDivId: " + abstractDivId);
 
 		upperPanelId = upperPanelDivId;
 		infoDivId = upperPanelId + "-info-div";

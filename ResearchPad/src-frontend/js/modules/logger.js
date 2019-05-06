@@ -1,38 +1,37 @@
-var loggerModule = (function () {
+var loggerModule = (function() {
 	var errorArray = [];
 	var pushErrorTimeout = null;
 	var pushErrorTimeoutSec = 5;
 
 	var error = function(type, msg) {
-		msg = msg.replace(/\s+/g, '-').toLowerCase();
-		errorArray.push(type+"-"+msg);
-		if(pushErrorTimeout) {
+		msg = msg.replace(/\s+/g, "-").toLowerCase();
+		errorArray.push(type + "-" + msg);
+		if (pushErrorTimeout) {
 			clearTimeout(pushErrorTimeout);
 		}
-		pushErrorTimeout = setTimeout(function(){
-			console.log("error-bulk: "+JSON.stringify(errorArray));
-			mixpanel.track("error-bulk", {"errors":errorArray});
+		pushErrorTimeout = setTimeout(function() {
+			console.log("error-bulk: " + JSON.stringify(errorArray));
+			mixpanel.track("error-bulk", { errors: errorArray });
 			errorArray = [];
-		}, pushErrorTimeoutSec*1000);
-		
-	}
+		}, pushErrorTimeoutSec * 1000);
+	};
 
 	var log = function(type, msg, extraData) {
-		msg = msg.replace(/\s+/g, '-').toLowerCase();
-		console.log("system-log-"+type+": "+msg);
-		if(extraData) {
+		msg = msg.replace(/\s+/g, "-").toLowerCase();
+		console.log("system-log-" + type + ": " + msg);
+		if (extraData) {
 			extraData.systemMessage = msg;
-			mixpanel.track(type+"-"+msg, extraData);
+			mixpanel.track(type + "-" + msg, extraData);
 		} else {
-			mixpanel.track(type+"-"+msg);
+			mixpanel.track(type + "-" + msg);
 		}
-	}
+	};
 
 	var initialize = function(hostname) {
 		mixpanel.identify(hostname);
 		mixpanel.people.set({
-			"$hostname": hostname,    // only special properties need the $
-			"$last_login": new Date(),         // properties can be dates...
+			$hostname: hostname, // only special properties need the $
+			$last_login: new Date() // properties can be dates...
 		});
 
 		/*
@@ -47,11 +46,11 @@ var loggerModule = (function () {
 			"gender": "Male"                    // feel free to define your own properties
 		});
 		*/
-	}
+	};
 
 	return {
-		initialize:  initialize,
+		initialize: initialize,
 		log: log,
 		error: error
-	}
+	};
 })();

@@ -1,51 +1,31 @@
 {
-  "name": "ResearchPad",
-  "productName": "ResearchPad",
-  "version": "1.0.0",
-  "description": "My Electron application description",
+  "name": "research-pad",
+  "productName": "Research Pad",
+  "version": "0.0.1",
+  "description": "Research Pad description",
   "main": "main.js",
-  "repository": "https://github.com/ResearcherOne/researchpad-project",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ResearcherOne/researchpad-project"
+  },
   "scripts": {
-    "start": "electron main.js",
-    "build": "electron-packager . researchPad --overwrite --platform=win32",
-    "build-mac": "electron-packager . researchPad-mac --overwrite --platform=darwin",
-    "package": "asar pack build/researchPad-win32-x64/resources/app out/app.asar"
+    "start": "NODE_ENV=development electron main.js",
+    "publish-all": "electron-builder --mac --win --linux --publish always",
+    "publish-mac": "electron-builder --mac --publish always",
+    "publish-win": "electron-builder --win --publish always",
+    "publish-linux": "electron-builder --linux --publish always",
+    "build-all": "electron-builder --mac --win --linux",
+    "build-mac": "electron-builder --mac",
+    "build-win": "electron-builder --win",
+    "build-linux": "electron-builder --linux"
   },
   "keywords": [],
   "author": "researcher1",
   "license": "MIT",
-  "config": {
-    "forge": {
-      "packagerConfig": {},
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "my_new_app"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
-      ]
-    }
-  },
   "dependencies": {
+    "electron-updater": "^4.0.6",
     "crossref": "^1.2.1",
     "download": "^7.1.0",
-    "electron-reload": "^1.4.0",
-    "electron-squirrel-startup": "^1.0.0",
     "file-saver": "^2.0.1",
     "node-fetch": "^2.3.0",
     "puppeteer": "^1.13.0",
@@ -53,13 +33,48 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.30",
-    "@electron-forge/maker-deb": "^6.0.0-beta.34",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.34",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.34",
-    "@electron-forge/maker-zip": "^6.0.0-beta.34",
-    "asar": "^0.14.6",
-    "electron": "4.0.1",
-    "electron-packager": "^13.0.1"
+    "electron": "^5.0.1",
+    "electron-builder": "^20.39.0",
+    "electron-reload": "^1.4.0"
+  },
+  "build": {
+    "appId": "com.researchpad.researchpad",
+    "asar": true,
+    "files": [
+      "main.js",
+      "src-backend/**/*",
+      "src-frontend/**/*",
+      "node_module/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "build"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "ResearcherOne",
+      "repo": "researchpad-project",
+      "vPrefixedTagName": true,
+      "private": true,
+      "token": "be019221cc52a98455ba509912fdfc0158dc32a0",
+      "releaseType": "release",
+      "publishAutoUpdate": true
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "rpm"
+      ]
+    }
   }
 }

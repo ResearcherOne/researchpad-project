@@ -65,6 +65,7 @@ const upperPanelDivID = "overlay-controlset-upper-panel";
 const searchPanelDivID = "overlay-search-panel";
 const searchDivID = "search-results-div";
 const baseDivId = "knowledge-tree-div";
+const trashBinDivID = "overlay-trashbin-mouse-area";
 
 /* HTML Class Names */
 const nodeEssentialClassName = "node-essential-div";

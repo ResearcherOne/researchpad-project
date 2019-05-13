@@ -1,9 +1,8 @@
 const { app, BrowserWindow } = require("electron");
 const { autoUpdater } = require("electron-updater");
-
 const backend = require("./src-backend/app.js");
-const env = process.env.NODE_ENV || "production";
 
+const env = process.env.NODE_ENV || "production";
 let mainWindow;
 
 /* Application event emitters */

@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require("electron");
 const { autoUpdater } = require("electron-updater");
+const electronReload = require("electron-reload");
 const backend = require("./src-backend/app.js");
 
 const env = process.env.NODE_ENV || "production";
@@ -22,15 +23,15 @@ app.on("activate", () => {
   }
 });
 
-/* Initialize backend application */
+/* Initialize application */
+electronReload(__dirname);
 backend.initializeBackend();
 
 //-----------------------------------------------------
 // Function Definitions
 //-----------------------------------------------------
 
-/**
- * Create main window function for
+/* Create main window function for
  * electron application
  */
 function createWindow() {
@@ -49,7 +50,6 @@ function createWindow() {
 
   // Some development options
   if (env === "development") {
-    require("electron-reload")(__dirname);
     mainWindow.webContents.openDevTools();
   }
 

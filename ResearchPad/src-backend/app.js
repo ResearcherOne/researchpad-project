@@ -26,7 +26,7 @@ const isDevtools = false;
 var isChromiumReady = false;
 
 function initializeBackend() {
-	console.log("Dirname: " + __dirname);
+	// console.log("Dirname: " + __dirname);
 	console.log("Backend initialized");
 
 	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(

@@ -1,13 +1,17 @@
-//Index.js Sections
-//Configurations
-//Backend Communication
-//UI Helper Functions
-//Handle UI Actions
-//User Action Helper Functions
-//Handle User Actions (Aggregated from UI Actions)
-//Initialization
+/**
+ * Index.js Sections:
+ * 		Configurations
+ * 		Backend Communication
+ * 		UI Helper Functions
+ * 		Handle UI Actions
+ * 		User Action Helper Functions
+ * 		Handle User Actions (Aggregated from UI Actions)
+ * 		Initialization
+ */
 
-//Configurations
+//-----------------------------------------------------
+// Configuration Constants
+//-----------------------------------------------------
 const BACKEND_API = {
 	//getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 	getHostname: "/get-hostname",
@@ -17,26 +21,6 @@ const BACKEND_API = {
 	getSemanticScholarData: "/get-semantic-scholar",
 	isChromiumReady: "/get-chromium-status"
 };
-
-const sendRequestsTopic = "listen-renderer";
-const listenResponsesTopic = "response-to-renderer";
-
-const konvaDivID = "konva-div";
-const overlayDivID = "overlay-div";
-const abstractDivID = "overlay-abstract-div";
-
-const upperPanelDivID = "overlay-controlset-upper-panel";
-
-const trashBinDivID = "overlay-trashbin-mouse-area";
-
-const searchPanelDivID = "overlay-search-panel";
-const searchDivID = "search-results-div";
-
-const baseDivId = "knowledge-tree-div";
-const nodeEssentialClassName = "node-essential-div";
-const nodeExtraUpperClassName = "node-extra-upper-div";
-const nodeExtraLowerClassName = "node-extra-lower-div";
-
 const NODE_CONNECTIONS_CONFIG = {
 	citedByAbsoluteStartDegree: 285,
 	citedByAbsoluteEndDegree: 85,
@@ -45,37 +29,51 @@ const NODE_CONNECTIONS_CONFIG = {
 	connectionLength: 50,
 	maxConnectionPerLayer: 10
 };
-
-const DEFAULT_ROOT_NODE_RADIUS = 30;
-const DEFAULT_LEAF_NODE_RADIUS = 15;
-
-const LEAF_NODE_HIDE_DURATION_SEC = 1.5;
-
 const AVAILABLE_SEARCH_PLATFORMS = {
 	//This will turn into fields such as Physics, Computer Science, etc.
 	GOOGLE: "Google Scholar",
 	ARXIV: "Arxiv"
 };
-var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
-
-const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
-	arxivId: "arxivId",
-	semananticId: "semanticId"
-};
-
 const ACADEMIC_DATA_KEY_NAMES = {
 	ARXIV: "arxiv",
 	GOOGLE: "googleScholar",
 	SEMANTIC_SCHOLAR: "semanticScholar"
 };
-
+const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
+	arxivId: "arxivId",
+	semananticId: "semanticId"
+};
 const NODE_TYPES = {
 	ROOT: "root",
 	CITATION: "citedby",
 	REFERENCE: "root"
 };
+const CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
+const DEFAULT_ROOT_NODE_RADIUS = 30;
+const DEFAULT_LEAF_NODE_RADIUS = 15;
+const LEAF_NODE_HIDE_DURATION_SEC = 1.5;
 
-//Backend Communication
+/* Topics */
+const sendRequestsTopic = "listen-renderer";
+const listenResponsesTopic = "response-to-renderer";
+
+/* HTML ID tags */
+const konvaDivID = "konva-div";
+const overlayDivID = "overlay-div";
+const abstractDivID = "overlay-abstract-div";
+const upperPanelDivID = "overlay-controlset-upper-panel";
+const searchPanelDivID = "overlay-search-panel";
+const searchDivID = "search-results-div";
+const baseDivId = "knowledge-tree-div";
+
+/* HTML Class Names */
+const nodeEssentialClassName = "node-essential-div";
+const nodeExtraUpperClassName = "node-extra-upper-div";
+const nodeExtraLowerClassName = "node-extra-lower-div";
+
+//-----------------------------------------------------
+// Backend Communication
+//-----------------------------------------------------
 function request(apiUrl, requestObj, callback) {
 	ipcRestRenderer.request(apiUrl, requestObj, callback);
 }
@@ -95,6 +93,7 @@ function request(apiUrl, requestObj, callback) {
 	*/
 function getHostname(callback) {
 	const requestObj = {};
+
 	request(BACKEND_API.getHostname, requestObj, function(err, responseObj) {
 		if (!err) {
 			var hostname = responseObj.hostname;
@@ -108,7 +107,8 @@ function getHostname(callback) {
 }
 function performSearch(searchPlatform, searchText, callback) {
 	const requestObj = { searchText: searchText };
-	var api;
+	let api;
+
 	if (searchPlatform == AVAILABLE_SEARCH_PLATFORMS.GOOGLE) {
 		api = BACKEND_API.searchGoogleScholar;
 	} else if (searchPlatform == AVAILABLE_SEARCH_PLATFORMS.ARXIV) {
@@ -119,7 +119,7 @@ function performSearch(searchPlatform, searchText, callback) {
 
 	request(api, requestObj, function(err, responseObj) {
 		if (!err) {
-			var resultList = responseObj.resultList;
+			let resultList = responseObj.resultList;
 			callback(null, resultList);
 		} else {
 			loggerModule.error("error", "unable to get data from google scholar.");
@@ -158,7 +158,9 @@ function getCitedByOfArticle(citedByLink, callback) {
 	});
 }
 
-//UI Helper Functions
+//-----------------------------------------------------
+// UI Helper Functions
+//-----------------------------------------------------
 function offset(el) {
 	var rect = el.getBoundingClientRect(),
 		scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
@@ -189,7 +191,9 @@ function isIdExistInParentElements(elem, idToSearch) {
 	}
 }
 
-//Handle UI Actions
+//-----------------------------------------------------
+// Handle UI Actions
+//-----------------------------------------------------
 function nodeDragStartCallback(nodeType, nodeObj, visualObjID) {
 	if (nodeType == "root") {
 		rootNodeDragStart(nodeObj, visualObjID);
@@ -333,7 +337,9 @@ function viewWebButtonClicked(link) {
 	window.open(link);
 }
 
-//User Action Helper Functions
+//-----------------------------------------------------
+// User Action Helper Functions
+//-----------------------------------------------------
 String.prototype.hashCode = function() {
 	var hash = 0,
 		i,
@@ -677,7 +683,9 @@ function transformLeafToRootNodeForArxiv(
 	});
 }
 
-//Handle User Actions (Aggregated from UI Actions)
+//-----------------------------------------------------
+// Handle User Actions (Aggregated from UI Actions)
+//-----------------------------------------------------
 function selectRootNode(nodeObj, visualObjID) {
 	if (knowledgeTree.isSelectedNodeExists()) {
 		knowledgeTree.clearSelectedNode();
@@ -1003,11 +1011,13 @@ function transformReferenceNodeToRootNode(
 	}
 }
 
-//Initialization
-var knowledgeTree = null;
-var searchPanel = null;
-var trashBin = null;
-var nodeDetailsStaticOverlayer = null;
+//-----------------------------------------------------
+// Initialization
+//-----------------------------------------------------
+let knowledgeTree = null;
+let searchPanel = null;
+let trashBin = null;
+let nodeDetailsStaticOverlayer = null;
 
 function initializeKnowledeTree() {
 	knowledgeTree = new KnowledgeTree(
@@ -1024,8 +1034,7 @@ function initializeKnowledeTree() {
 	knowledgeTree.setNodeMouseOutCallback(nodeMouseOutCallback);
 	knowledgeTree.setNodeClickedCallback(nodeClickedCallback);
 }
-
-function initializeScript() {
+function initializeFrontend() {
 	mixpanel.initialize("188da479052e0f47136df656355ebdc4");
 	ipcRestRenderer.initialize(sendRequestsTopic, listenResponsesTopic);
 	overlayerModule.initialize(overlayDivID, upperPanelDivID, abstractDivID);
@@ -1123,7 +1132,10 @@ function initializeScript() {
 	//implement built-in exit button (disable default one as well) to also log exit event.
 }
 
+/* Once html document resources have loaded run
+ * frontend initialization
+ */
 document.addEventListener("DOMContentLoaded", function(event) {
-	initializeScript();
-	console.log("DOM fully loaded and parsed");
+	console.log("DOM fully loaded");
+	initializeFrontend();
 });

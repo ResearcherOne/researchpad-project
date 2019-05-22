@@ -53,7 +53,7 @@
 		GOOGLE: "Google Scholar",
 		ARXIV: "Arxiv"
 	};
-	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.ARXIV;
+	var CURRENT_SEARCH_PLATFORM = AVAILABLE_SEARCH_PLATFORMS.GOOGLE;
 
 	const SEMANTIC_SCHOLAR_SEARCH_METHODS = {
 		arxivId: "arxivId",
@@ -771,7 +771,7 @@
 		
 		const loadedKnowledgeTreeData = localStorage.getItem("knowledgeTree");
 		if(loadedKnowledgeTreeData) {
-			knowledgeTree.importSerializedData(loadedKnowledgeTreeData);
+			//knowledgeTree.importSerializedData(loadedKnowledgeTreeData);
 			loggerModule.log("log", "knowledge tree loaded");
 		} else {
 			loggerModule.log("log", "no saved knowledge tree found");
@@ -813,7 +813,8 @@
 
 		document.getElementById("save-button").addEventListener("click", function(event){
 			event.preventDefault();
-			localStorage.setItem("knowledgeTree", knowledgeTree.serialize());
+			const serializedKnowledgeTree = knowledgeTree.serialize();
+			localStorage.setItem("knowledgeTree", serializedKnowledgeTree);
 			overlayerModule.informUser("Your Knowledge Tree is saved.");
 			loggerModule.log("action", "save button clicked");
 		});

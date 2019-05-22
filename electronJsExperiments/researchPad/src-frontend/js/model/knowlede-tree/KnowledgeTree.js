@@ -144,33 +144,6 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		return reconstructedSiblingConnections;	
 	}
 
-	var performRootNodeCitedByNodeConnections = function(self) {
-		for (var rootNodeID in self.rootNodes){
-			const rootNode = self.rootNodes[rootNodeID];
-			const citationNodeList = rootNode.getCitationNodeList();
-
-			for(var i = 0; i<citationNodeList.length; i++) {
-				const citationID = citationNodeList[i];
-				const academicLibrary = self.citedByNodes[citationID].getAcademicDataLibrary();
-				self.addCitedbyToRootNode(rootNodeID, citationID, academicLibrary, self.defaultLeafRadius);
-			}
-		}
-	}
-
-	var performRootNodeReferenceConnections = function(self) {
-	/*
-		for (var rootNodeID in self.rootNodes){
-			const rootNode = self.rootNodes[rootNodeID];
-			const referenceNodeList = rootNode.getReferenceNodeList();
-
-			for(var i = 0; i<referenceNodeList.length; i++) {
-				const refID = referenceNodeList[i];
-				const academicLibrary = self.referenceNodes[refID].getAcademicDataLibrary();
-				self.addReferenceToRootNode(rootNodeID, refID, academicLibrary, self.defaultLeafRadius);
-			}
-		}
-	*/
-	}
 	
 	var mapClickedCallback = function(clickedObjName) {
 		if(clickedObjName == "Circle") {
@@ -195,34 +168,102 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		const isReferenceExists = self.referenceNodes[nodeID] != null;
 		return (isCitedByExists || isReferenceExists);
 	}
+	
+	var connectRootToCitedBy = function(self, rootNodeID, leafNodeID, citedByPosition,  radius, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
+		const rootObj = self.rootNodes[rootNodeID];
+		const rootVisualObj = rootObj.getVisualObj();
+		
+		const citedByObj = self.citedByNodes[leafNodeID];
+		citedByObj.connectRoot(rootNodeID, rootVisualObj, radius, citedByPosition, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback);
+		rootObj.connectCitedBy(leafNodeID);
+	}
+	
+	var connectRootToReference = function(self, rootNodeID, leafNodeID, referencePosition,  radius, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
+		const rootObj = self.rootNodes[rootNodeID];
+		const rootVisualObj = rootObj.getVisualObj();
+		
+		const referenceObj = self.referenceNodes[leafNodeID];
+		referenceObj.connectRoot(rootNodeID, rootVisualObj, radius, referencePosition, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback);
+		rootObj.connectReference(leafNodeID);
+	}
 
 	var connectRootNodeToExistingLeafNodes = function(self, rootNodeID, leafNodeID,  radius, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback) {
 		const rootObj = self.rootNodes[rootNodeID];
-		const rootVisualObj = rootObj.getVisualObj();
-		const rootNodeCitedByCount = rootObj.getCitedByCount();
-		const rootNodeReferenceCount = rootObj.getReferenceCount();
-
+		
 		if(self.citedByNodes[leafNodeID]) {
-			const citedByObj = self.citedByNodes[leafNodeID];
-			const citedByPosition = rootNodeCitedByCount + 1;
-			citedByObj.connectRoot(rootNodeID, rootVisualObj, radius, citedByPosition, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback);
-			rootObj.connectCitedBy(leafNodeID);
+			const rootNodeCitedByCount = rootObj.getCitedByCount();
+			const citedByPosition = rootNodeCitedByCount+1;
+			connectRootToCitedBy(self, rootNodeID, leafNodeID, citedByPosition,  radius, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback);
 		}
-
+		
 		if(self.referenceNodes[leafNodeID]) {
-			const referenceObj = self.referenceNodes[leafNodeID];
+			const rootNodeReferenceCount = rootObj.getReferenceCount();
 			const referencePosition = rootNodeReferenceCount + 1;
-			referenceObj.connectRoot(rootNodeID, rootVisualObj, radius, referencePosition, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback);
-			rootObj.connectReference(leafNodeID);
+			connectRootToReference(self, rootNodeID, leafNodeID, referencePosition,  radius, dragStartCallback, dragendCallback, mouseOverCallback, mouseOutCallback, clickedCallback);
 		}
 	}
+	
+	var performRootNodeCitedByNodeConnections = function(self) {
+		for (var rootNodeID in self.rootNodes){
+			const rootNode = self.rootNodes[rootNodeID];
+			const citationNodeList = rootNode.getCitationNodeList();
 
+			for(var i = 0; i<citationNodeList.length; i++) {
+				const citationID = citationNodeList[i];
+				const dummyPos = i;
+
+				const rootVisualObj = rootNode.getVisualObj();
+				self.citedByNodes[citationID].connectRoot(rootNodeID, rootVisualObj, self.defaultLeafRadius, dummyPos, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+			}
+		}
+	}
+	var performRootNodeReferenceConnections = function(self) {
+		for (var rootNodeID in self.rootNodes){
+			const rootNode = self.rootNodes[rootNodeID];
+			const referenceNodeList = rootNode.getReferenceNodeList();
+			
+			for(var i = 0; i<referenceNodeList.length; i++) {
+				const refID = referenceNodeList[i];
+				const dummyPos = i;
+
+				const rootVisualObj = rootNode.getVisualObj();
+				console.log(self.referenceNodes);
+				console.log(refID);
+				self.referenceNodes[refID].connectRoot(rootNodeID, rootVisualObj, self.defaultLeafRadius, dummyPos, nodeDragStartCallback, nodeDragEndCallback, nodeMouseOverCallback, nodeMouseOutCallback, nodeClickedCallback);
+			}
+		}
+	}
+	var performRootNodeSuggestions = function(self) {
+		for (var rootNodeID in self.rootNodes){
+			const rootNode = self.rootNodes[rootNodeID];
+			const suggestedLeafNodeList = rootNode.getSuggestedCitedByList();
+			
+			for(var i = 0; i<suggestedLeafNodeList.length; i++) {
+				const refID = suggestedLeafNodeList[i];
+
+				const suggestionPos = i;
+				self.citedByNodes[refID].setPositionForSuggestion(rootNodeID, suggestionPos);
+			}
+		}
+
+		for (var rootNodeID in self.rootNodes){
+			const rootNode = self.rootNodes[rootNodeID];
+			const suggestedLeafNodeList = rootNode.getSuggestedReferenceList();
+			
+			for(var i = 0; i<suggestedLeafNodeList.length; i++) {
+				const refID = suggestedLeafNodeList[i];
+
+				const suggestionPos = i;
+				self.referenceNodes[refID].setPositionForSuggestion(rootNodeID, suggestionPos);
+			}
+		}
+	}
 	var createCitedByObj = function(self, refID, initialAcademicDataLibrary) {
 		var citedByObj = new CitedByNode(refID, initialAcademicDataLibrary);
 		self.citedByNodes[refID] = citedByObj;
 		return citedByObj;
 	}
-
+	
 	var createReferenceObj = function(self, refID, initialAcademicDataLibrary) {
 		var referenceObj = new ReferenceNode(refID, initialAcademicDataLibrary);
 		self.referenceNodes[refID] = referenceObj;
@@ -233,7 +274,7 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		self.rootNodes[rootID].suggestCitedBy(refID);
 		self.citedByNodes[refID].setPositionForSuggestion(rootID, suggestionPosition);
 	}
-
+	
 	var suggestReference = function(self, rootID, refID, suggestionPosition) {
 		self.rootNodes[rootID].suggestReference(refID);
 		self.referenceNodes[refID].setPositionForSuggestion(rootID, suggestionPosition);
@@ -406,15 +447,18 @@ function KnowledgeTree(konvaDivID, width, height, nodeConnectionsConfig, mapClic
 		var knowledgeTreeData = JSON.parse(serializedKnowledgeTree);
 		this.rootNodes = reconstructRootNodes(knowledgeTreeData.rootNodes);
 		this.rootNodeCount = knowledgeTreeData.rootNodeCount;
-
+		
 		this.siblingConnections = reconstructSiblingConnections(knowledgeTreeData.siblingConnections);
 		this.siblingConnectionCount = knowledgeTreeData.siblingConnectionCount;
-
+		
 		this.citedByNodes = reconstructCitedByNodes(knowledgeTreeData.citedByNodes);
 		this.referenceNodes = reconstructReferenceNodes(knowledgeTreeData.referenceNodes);
-
+		console.log(this.referenceNodes);
+		
 		performRootNodeCitedByNodeConnections(this);
 		performRootNodeReferenceConnections(this);
+
+		performRootNodeSuggestions(this);
 	}
 	this.destroy = function() {
 		visualizerModule.destroy();

@@ -10,6 +10,7 @@
   },
   "scripts": {
     "start": "NODE_ENV=development electron main.js",
+    "start-win": "electron main.js",
     "publish-all": "electron-builder --mac --win --linux --publish always",
     "publish-mac": "electron-builder --mac --publish always",
     "publish-win": "electron-builder --win --publish always",

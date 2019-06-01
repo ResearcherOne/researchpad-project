@@ -18,18 +18,18 @@
 		<script src="./modules/logger.js"></script>
 
 		<!-- Models -->
-		<script src="./models/academic-data-representations/AcademicData.js"></script>
-		<script src="./models/academic-data-representations/ArxivData.js"></script>
-		<script src="./models/academic-data-representations/GoogleScholarData.js"></script>
-		<script src="./models/academic-data-representations/SemanticScholarData.js"></script>
-		<script src="./models/field-specific-aggregated-data-models/ComputerScienceAggregateModel.js"></script>
-		<script src="./models/field-specific-aggregated-data-models/PhysicsAggregateModel.js"></script>
-		<script src="./models/knowlede-tree/NodeObj.js"></script>
-		<script src="./models/knowlede-tree/LeafNode.js"></script>
-		<script src="./models/knowlede-tree/RootNode.js"></script>
-		<script src="./models/knowlede-tree/ReferenceNode.js"></script>
-		<script src="./models/knowlede-tree/CitedByNode.js"></script>
-		<script src="./models/knowlede-tree/KnowledgeTree.js"></script>
+		<script src="./models/data-representations/academic.js"></script>
+		<script src="./models/data-representations/arxiv.js"></script>
+		<script src="./models/data-representations/google-scholar.js"></script>
+		<script src="./models/data-representations/semantic-scholar.js"></script>
+		<script src="./models/field-specific-aggregated-data-models/computer-science.js"></script>
+		<script src="./models/field-specific-aggregated-data-models/physics.js"></script>
+		<script src="./models/knowlede-tree/knowledge-tree.js"></script>
+		<script src="./models/knowlede-tree/node.js"></script>
+		<script src="./models/knowlede-tree/leaf-node.js"></script>
+		<script src="./models/knowlede-tree/root-node.js"></script>
+		<script src="./models/knowlede-tree/reference-node.js"></script>
+		<script src="./models/knowlede-tree/cited-by-node.js"></script>
 
 		<!-- Main Script and Stylesheet -->
 		<script src="./index.js"></script>
@@ -57,11 +57,7 @@
 			<div id="overlay-search-panel">
 				<div class="unselectable" id="search-box-div">
 					<p></p>
-					<input
-						id="google-scholar-searchbox"
-						type="text"
-						placeholder="Search on Google Scholar"
-					/>
+					<input id="google-scholar-searchbox" type="text" placeholder="Search on Google Scholar" />
 					<button id="search-button" type="button">SEARCH</button>
 				</div>
 				<div id="search-results-div" class="unselectable"></div>

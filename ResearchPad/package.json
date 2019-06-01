@@ -1,80 +1,81 @@
 {
-  "name": "research-pad",
-  "productName": "Research Pad",
-  "version": "0.0.1",
-  "description": "Research Pad description",
-  "main": "main.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ResearcherOne/researchpad-project"
-  },
-  "scripts": {
-    "start": "NODE_ENV=development electron main.js",
-    "publish-all": "electron-builder --mac --win --linux --publish always",
-    "publish-mac": "electron-builder --mac --publish always",
-    "publish-win": "electron-builder --win --publish always",
-    "publish-linux": "electron-builder --linux --publish always",
-    "build-all": "electron-builder --mac --win --linux",
-    "build-mac": "electron-builder --mac",
-    "build-win": "electron-builder --win",
-    "build-linux": "electron-builder --linux"
-  },
-  "keywords": [],
-  "author": "researcher1",
-  "license": "MIT",
-  "dependencies": {
-    "electron-reload": "^1.4.0",
-    "electron-updater": "^4.0.6",
-    "crossref": "^1.2.1",
-    "download": "^7.1.0",
-    "file-saver": "^2.0.1",
-    "node-fetch": "^2.3.0",
-    "puppeteer": "^1.13.0",
-    "request": "^2.88.0",
-    "xml2js": "^0.4.19"
-  },
-  "devDependencies": {
-    "electron": "^5.0.1",
-    "electron-builder": "^20.39.0"
-  },
-  "build": {
-    "appId": "com.researchpad.researchpad",
-    "asar": true,
-    "files": [
-      "main.js",
-      "src-backend/**/*",
-      "src-frontend/**/*",
-      "node_module/**/*",
-      "package.json"
-    ],
-    "directories": {
-      "output": "build"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "ResearcherOne",
-      "repo": "researchpad-project",
-      "vPrefixedTagName": true,
-      "private": true,
-      "token": "be019221cc52a98455ba509912fdfc0158dc32a0",
-      "releaseType": "release",
-      "publishAutoUpdate": true
-    },
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ]
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ]
-    },
-    "linux": {
-      "target": [
-        "rpm"
-      ]
-    }
-  }
+	"name": "research-pad",
+	"productName": "Research Pad",
+	"version": "0.0.1",
+	"description": "Research Pad description",
+	"main": "main.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ResearcherOne/researchpad-project"
+	},
+	"scripts": {
+		"start": "NODE_ENV=development electron main.js",
+		"publish-all": "electron-builder --mac --win --linux --publish always",
+		"publish-mac": "electron-builder --mac --publish always",
+		"publish-win": "electron-builder --win --publish always",
+		"publish-linux": "electron-builder --linux --publish always",
+		"build-all": "electron-builder --mac --win --linux",
+		"build-mac": "electron-builder --mac",
+		"build-win": "electron-builder --win",
+		"build-linux": "electron-builder --linux"
+	},
+	"keywords": [],
+	"author": "researcher1",
+	"license": "MIT",
+	"dependencies": {
+		"electron-reload": "^1.4.0",
+		"electron-updater": "^4.0.6",
+		"crossref": "^1.2.1",
+		"download": "^7.1.0",
+		"file-saver": "^2.0.1",
+		"node-fetch": "^2.3.0",
+		"puppeteer": "^1.13.0",
+		"request": "^2.88.0",
+		"xml2js": "^0.4.19"
+	},
+	"devDependencies": {
+		"electron": "^5.0.2",
+		"electron-builder": "^20.42.0"
+	},
+	"build": {
+		"appId": "com.researchpad.researchpad",
+		"asar": true,
+		"files": [
+			"main.js",
+			"src-backend/**/*",
+			"src-frontend/**/*",
+			"node_module/**/*",
+			"package.json"
+		],
+		"directories": {
+			"output": "build"
+		},
+		"publish": {
+			"provider": "github",
+			"owner": "ResearcherOne",
+			"repo": "researchpad-project",
+			"vPrefixedTagName": true,
+			"private": true,
+			"token": "be019221cc52a98455ba509912fdfc0158dc32a0",
+			"releaseType": "release",
+			"publishAutoUpdate": true
+		},
+		"mac": {
+			"identity": null,
+			"target": [
+				"dmg",
+				"zip"
+			]
+		},
+		"win": {
+			"target": [
+				"nsis"
+			]
+		},
+		"linux": {
+			"target": [
+				"rpm"
+			]
+		}
+	}
 }

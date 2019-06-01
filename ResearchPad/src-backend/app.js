@@ -1,11 +1,11 @@
 var os = require("os");
 
-var ipcRestModule = require(__dirname + "/ipcRestModule");
-var crossrefModule = require(__dirname + "/crossrefModule");
-var googleScholarModule = require(__dirname + "/googleScholarScrapperModule");
-var semanticScholarModule = require(__dirname + "/semanticScholarModule");
-var dataCleanerModule = require(__dirname + "/dataCleanerModule");
-var arxivModule = require(__dirname + "/arxivModule");
+var ipcRestModule = require("./ipc-rest");
+var crossrefModule = require("./cross-reference");
+var googleScholarModule = require("./google-scholar-scrapper");
+var semanticScholarModule = require("./semantic-scholar");
+var dataCleanerModule = require("./data-cleaner");
+var arxivModule = require("./arxiv");
 
 const backendApi = {
 	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
@@ -29,10 +29,7 @@ function initializeBackend() {
 	// console.log("Dirname: " + __dirname);
 	console.log("Backend initialized");
 
-	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(
-		err,
-		res
-	) {
+	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(err, res) {
 		if (res) {
 			isChromiumReady = true;
 			console.log("Scrapper Ready");
@@ -43,10 +40,7 @@ function initializeBackend() {
 	});
 	ipcRestModule.initialize(listenRenderer, responseRenderer);
 
-	ipcRestModule.listen(backendApi.getCrossrefMetaDataByDoi, function(
-		request,
-		response
-	) {
+	ipcRestModule.listen(backendApi.getCrossrefMetaDataByDoi, function(request, response) {
 		const doi = request.doi;
 
 		crossrefModule.fetchMetadataByDoi(doi, function(err, res) {
@@ -64,17 +58,11 @@ function initializeBackend() {
 		response.send({ hostname: computerName });
 	});
 
-	ipcRestModule.listen(backendApi.searchGoogleScholar, function(
-		request,
-		response
-	) {
+	ipcRestModule.listen(backendApi.searchGoogleScholar, function(request, response) {
 		const searchText = request.searchText;
 
 		if (isChromiumReady) {
-			googleScholarModule.searchGoogleScholar(searchText, function(
-				err,
-				result
-			) {
+			googleScholarModule.searchGoogleScholar(searchText, function(err, result) {
 				if (!err) {
 					dataCleanerModule.cleanGoogleResultList(result);
 					response.send({ resultList: result });
@@ -101,17 +89,11 @@ function initializeBackend() {
 		});
 	});
 
-	ipcRestModule.listen(backendApi.getCitedByFromGoogleScholar, function(
-		request,
-		response
-	) {
+	ipcRestModule.listen(backendApi.getCitedByFromGoogleScholar, function(request, response) {
 		const citedByLink = request.citedByLink;
 
 		if (isChromiumReady) {
-			googleScholarModule.getCitedbyOfArticle(citedByLink, function(
-				err,
-				result
-			) {
+			googleScholarModule.getCitedbyOfArticle(citedByLink, function(err, result) {
 				if (!err) {
 					response.send({ resultList: result });
 				} else {
@@ -123,18 +105,12 @@ function initializeBackend() {
 		}
 	});
 
-	ipcRestModule.listen(backendApi.getSemanticScholarData, function(
-		request,
-		response
-	) {
+	ipcRestModule.listen(backendApi.getSemanticScholarData, function(request, response) {
 		const fetchMethod = request.fetchMethod;
 		const paperId = request.paperId;
 
 		if (fetchMethod == "arxivId") {
-			semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(
-				err,
-				result
-			) {
+			semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(err, result) {
 				if (!err) {
 					response.send({ metadata: result });
 				} else {
@@ -142,10 +118,7 @@ function initializeBackend() {
 				}
 			});
 		} else if (fetchMethod == "semanticId") {
-			semanticScholarModule.getSemanticScholarDataViaId(paperId, function(
-				err,
-				result
-			) {
+			semanticScholarModule.getSemanticScholarDataViaId(paperId, function(err, result) {
 				if (!err) {
 					response.send({ metadata: result });
 				} else {

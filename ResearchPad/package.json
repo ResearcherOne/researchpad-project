@@ -1,7 +1,7 @@
 {
 	"name": "research-pad",
 	"productName": "Research Pad",
-	"version": "0.0.8",
+	"version": "0.0.7",
 	"description": "Research Pad description",
 	"main": "main.js",
 	"repository": {
@@ -9,7 +9,7 @@
 		"url": "https://github.com/ResearcherOne/researchpad-project"
 	},
 	"scripts": {
-		"start": "export NODE_ENV=development && electron main.js",
+		"start": "set NODE_ENV=development && electron main.js",
 		"publish-all": "electron-builder --mac --win --publish always",
 		"publish-mac": "electron-builder --mac --publish always",
 		"publish-win": "electron-builder --win --publish always",

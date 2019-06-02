@@ -7,8 +7,7 @@ let openBrowser = async (isHeadless, isDevtools) => {
 	browser = await puppeteer.launch({
 		executablePath: exePath,
 		headless: isHeadless,
-		devtools: isDevtools,
-		dumpio: true
+		devtools: isDevtools
 	});
 };
 

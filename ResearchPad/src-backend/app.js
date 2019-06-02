@@ -7,8 +7,13 @@ var semanticScholarModule = require(__dirname + "/semanticScholarModule");
 var dataCleanerModule = require(__dirname + "/dataCleanerModule");
 var arxivModule = require(__dirname + "/arxivModule");
 
+if (typeof localStorage === "undefined" || localStorage === null) {
+	var LocalStorage = require('node-localstorage').LocalStorage;
+	localStorage = new LocalStorage(__dirname+'/out/researchpad-storage-test-v1');
+  }
+
 const backendApi = {
-	getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
+	//getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
 	getHostname: "/get-hostname",
 	searchGoogleScholar: "/search-google-scholar",
 	searchArxiv: "/search-arxiv",
@@ -43,6 +48,7 @@ function initializeBackend() {
 	});
 	ipcRestModule.initialize(listenRenderer, responseRenderer);
 
+	/*
 	ipcRestModule.listen(backendApi.getCrossrefMetaDataByDoi, function(
 		request,
 		response
@@ -57,6 +63,7 @@ function initializeBackend() {
 			}
 		});
 	});
+	*/
 
 	ipcRestModule.listen(backendApi.getHostname, function(request, response) {
 		const computerName = os.hostname();
@@ -106,18 +113,27 @@ function initializeBackend() {
 		response
 	) {
 		const citedByLink = request.citedByLink;
-
+		
 		if (isChromiumReady) {
-			googleScholarModule.getCitedbyOfArticle(citedByLink, function(
-				err,
-				result
-			) {
-				if (!err) {
-					response.send({ resultList: result });
-				} else {
-					response.error("OOps, unable to fetch data from google scholar.");
-				}
-			});
+			var cachedResult;
+			if(citedByLink) cachedResult = JSON.parse(localStorage.getItem(citedByLink));
+
+			if(!cachedResult) {
+				googleScholarModule.getCitedbyOfArticle(citedByLink, function(
+					err,
+					result
+				) {
+					if (!err) {
+						localStorage.setItem(citedByLink, JSON.stringify(result));
+						response.send({ resultList: result });
+					} else {
+						response.error("OOps, unable to fetch data from google scholar.");
+					}
+				});
+			} else {
+				console.log("Cached response sent.");
+				response.send({ resultList: cachedResult });
+			}
 		} else {
 			response.error("Connection with Google Scholar is not ready yet.");
 		}
@@ -130,31 +146,42 @@ function initializeBackend() {
 		const fetchMethod = request.fetchMethod;
 		const paperId = request.paperId;
 
-		if (fetchMethod == "arxivId") {
-			semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(
-				err,
-				result
-			) {
-				if (!err) {
-					response.send({ metadata: result });
-				} else {
-					response.error("OOps, unable to fetch data from semantic scholar");
-				}
-			});
-		} else if (fetchMethod == "semanticId") {
-			semanticScholarModule.getSemanticScholarDataViaId(paperId, function(
-				err,
-				result
-			) {
-				if (!err) {
-					response.send({ metadata: result });
-				} else {
-					response.error("OOps, unable to fetch data from semantic scholar");
-				}
-			});
+		var cachedResult;
+		if(paperId) cachedResult = JSON.parse(localStorage.getItem(paperId));
+
+		if(!cachedResult) {
+			if (fetchMethod == "arxivId") {
+				semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(
+					err,
+					result
+				) {
+					if (!err) {
+						localStorage.setItem(paperId, JSON.stringify(result));
+						response.send({ metadata: result });
+					} else {
+						response.error("OOps, unable to fetch data from semantic scholar");
+					}
+				});
+			} else if (fetchMethod == "semanticId") {
+				semanticScholarModule.getSemanticScholarDataViaId(paperId, function(
+					err,
+					result
+				) {
+					if (!err) {
+						localStorage.setItem(paperId, JSON.stringify(result));
+						response.send({ metadata: result });
+					} else {
+						response.error("OOps, unable to fetch data from semantic scholar");
+					}
+				});
+			} else {
+				response.error("Unknown fetch method.");
+			}
 		} else {
-			response.error("Unknown fetch method.");
+			console.log("Cached semantic scholar data sent.");
+			response.send({ metadata: cachedResult });
 		}
+
 	});
 
 	ipcRestModule.listen(backendApi.isChromiumReady, function(request, response) {

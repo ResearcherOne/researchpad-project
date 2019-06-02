@@ -3,7 +3,8 @@ const { autoUpdater } = require("electron-updater");
 const electronReload = require("electron-reload");
 const backend = require("./src-backend/app.js");
 
-const env = process.env.NODE_ENV || "production";
+//const env = process.env.NODE_ENV || "production";
+const env = "development";
 let mainWindow;
 
 /* Application event emitters */

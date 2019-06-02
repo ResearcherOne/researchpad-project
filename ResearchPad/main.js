@@ -3,25 +3,24 @@ const { autoUpdater } = require("electron-updater");
 const electronReload = require("electron-reload");
 const backend = require("./src-backend/app.js");
 
-//const env = process.env.NODE_ENV || "production";
-const env = "development";
+const env = process.env.NODE_ENV || "production";
 let mainWindow;
 
 /* Application event emitters */
 app.on("ready", () => {
-  createWindow();
-  autoUpdater.checkForUpdatesAndNotify();
+	createWindow();
+	autoUpdater.checkForUpdatesAndNotify();
 });
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+	if (process.platform !== "darwin") {
+		app.quit();
+	}
 });
 app.on("activate", () => {
-  if (mainWindow === null) {
-    createWindow();
-    autoUpdater.checkForUpdatesAndNotify();
-  }
+	if (mainWindow === null) {
+		createWindow();
+		autoUpdater.checkForUpdatesAndNotify();
+	}
 });
 
 /* Initialize application */
@@ -36,26 +35,26 @@ backend.initializeBackend();
  * electron application
  */
 function createWindow() {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
-    resizable: false,
-    webPreferences: {
-      nodeIntegration: true
-    }
-  });
+	// Create the browser window.
+	mainWindow = new BrowserWindow({
+		width: 1280,
+		height: 720,
+		resizable: false,
+		webPreferences: {
+			nodeIntegration: true
+		}
+	});
 
-  // Show main html page
-  mainWindow.loadURL(`file://${__dirname}/src-frontend/index.html`);
+	// Show main html page
+	mainWindow.loadURL(`file://${__dirname}/src-frontend/index.html`);
 
-  // Some development options
-  if (env === "development") {
-    mainWindow.webContents.openDevTools();
-  }
+	// Some development options
+	if (env === "development") {
+		mainWindow.webContents.openDevTools();
+	}
 
-  // On close event
-  mainWindow.on("closed", () => {
-    mainWindow = null;
-  });
+	// On close event
+	mainWindow.on("closed", () => {
+		mainWindow = null;
+	});
 }

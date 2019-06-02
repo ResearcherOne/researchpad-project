@@ -1,7 +1,7 @@
 {
 	"name": "research-pad",
 	"productName": "Research Pad",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"description": "Research Pad description",
 	"main": "main.js",
 	"repository": {

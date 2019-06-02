@@ -8,9 +8,9 @@ var dataCleanerModule = require(__dirname + "/dataCleanerModule");
 var arxivModule = require(__dirname + "/arxivModule");
 
 if (typeof localStorage === "undefined" || localStorage === null) {
-	var LocalStorage = require('node-localstorage').LocalStorage;
-	localStorage = new LocalStorage(__dirname+'/out/researchpad-storage-test-v1');
-  }
+	var LocalStorage = require("node-localstorage").LocalStorage;
+	localStorage = new LocalStorage(__dirname);
+}
 
 const backendApi = {
 	//getCrossrefMetaDataByDoi: "/get-crossref-metadata-by-doi",
@@ -34,10 +34,7 @@ function initializeBackend() {
 	// console.log("Dirname: " + __dirname);
 	console.log("Backend initialized");
 
-	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(
-		err,
-		res
-	) {
+	googleScholarModule.initializeModule(isHeadlessChrome, isDevtools, function(err, res) {
 		if (res) {
 			isChromiumReady = true;
 			console.log("Scrapper Ready");
@@ -71,17 +68,11 @@ function initializeBackend() {
 		response.send({ hostname: computerName });
 	});
 
-	ipcRestModule.listen(backendApi.searchGoogleScholar, function(
-		request,
-		response
-	) {
+	ipcRestModule.listen(backendApi.searchGoogleScholar, function(request, response) {
 		const searchText = request.searchText;
 
 		if (isChromiumReady) {
-			googleScholarModule.searchGoogleScholar(searchText, function(
-				err,
-				result
-			) {
+			googleScholarModule.searchGoogleScholar(searchText, function(err, result) {
 				if (!err) {
 					dataCleanerModule.cleanGoogleResultList(result);
 					response.send({ resultList: result });
@@ -108,21 +99,15 @@ function initializeBackend() {
 		});
 	});
 
-	ipcRestModule.listen(backendApi.getCitedByFromGoogleScholar, function(
-		request,
-		response
-	) {
+	ipcRestModule.listen(backendApi.getCitedByFromGoogleScholar, function(request, response) {
 		const citedByLink = request.citedByLink;
-		
+
 		if (isChromiumReady) {
 			var cachedResult;
-			if(citedByLink) cachedResult = JSON.parse(localStorage.getItem(citedByLink));
+			if (citedByLink) cachedResult = JSON.parse(localStorage.getItem(citedByLink));
 
-			if(!cachedResult) {
-				googleScholarModule.getCitedbyOfArticle(citedByLink, function(
-					err,
-					result
-				) {
+			if (!cachedResult) {
+				googleScholarModule.getCitedbyOfArticle(citedByLink, function(err, result) {
 					if (!err) {
 						localStorage.setItem(citedByLink, JSON.stringify(result));
 						response.send({ resultList: result });
@@ -139,22 +124,16 @@ function initializeBackend() {
 		}
 	});
 
-	ipcRestModule.listen(backendApi.getSemanticScholarData, function(
-		request,
-		response
-	) {
+	ipcRestModule.listen(backendApi.getSemanticScholarData, function(request, response) {
 		const fetchMethod = request.fetchMethod;
 		const paperId = request.paperId;
 
 		var cachedResult;
-		if(paperId) cachedResult = JSON.parse(localStorage.getItem(paperId));
+		if (paperId) cachedResult = JSON.parse(localStorage.getItem(paperId));
 
-		if(!cachedResult) {
+		if (!cachedResult) {
 			if (fetchMethod == "arxivId") {
-				semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(
-					err,
-					result
-				) {
+				semanticScholarModule.getSemanticScholarDataViaArxivId(paperId, function(err, result) {
 					if (!err) {
 						localStorage.setItem(paperId, JSON.stringify(result));
 						response.send({ metadata: result });
@@ -163,10 +142,7 @@ function initializeBackend() {
 					}
 				});
 			} else if (fetchMethod == "semanticId") {
-				semanticScholarModule.getSemanticScholarDataViaId(paperId, function(
-					err,
-					result
-				) {
+				semanticScholarModule.getSemanticScholarDataViaId(paperId, function(err, result) {
 					if (!err) {
 						localStorage.setItem(paperId, JSON.stringify(result));
 						response.send({ metadata: result });
@@ -181,7 +157,6 @@ function initializeBackend() {
 			console.log("Cached semantic scholar data sent.");
 			response.send({ metadata: cachedResult });
 		}
-
 	});
 
 	ipcRestModule.listen(backendApi.isChromiumReady, function(request, response) {

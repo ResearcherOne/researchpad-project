@@ -756,4 +756,10 @@ this.referenceNodes = reconstructReferenceNodes(this.referenceNodes);
 	this.isRootNodeExists = function(nodeID) {
 		return this.rootNodes[nodeID] != null;
 	};
+	this.isCitedByExists = function(nodeID) {
+		return this.citedByNodes[nodeID] != null;
+	};
+	this.isReferenceExists = function(nodeID) {
+		return this.referenceNodes[nodeID] != null;
+	};
 }

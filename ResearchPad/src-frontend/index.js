@@ -65,6 +65,7 @@ const upperPanelDivID = "overlay-controlset-upper-panel";
 const searchPanelDivID = "overlay-search-panel";
 const searchDivID = "search-results-div";
 const baseDivId = "knowledge-tree-div";
+const trashBinDivID = "overlay-trashbin-mouse-area";
 
 /* HTML Class Names */
 const nodeEssentialClassName = "node-essential-div";
@@ -1165,6 +1166,7 @@ function executeCallbackOnceChorimumReady(callback)
 let knowledgeTree = null;
 let searchPanel = null;
 let nodeDetailsStaticOverlayer = null;
+var g_trashBin = null;
 
 function initializeKnowledeTree() {
 	knowledgeTree = new KnowledgeTree(
@@ -1187,6 +1189,8 @@ function initializeFrontend() {
 	overlayerModule.initialize(overlayDivID, upperPanelDivID, abstractDivID);
 
 	initializeKnowledeTree();
+
+	g_trashBin = new TrashBin(trashBinDivID);
 
 	searchPanel = new SearchPanel(searchPanelDivID);
 	searchPanel.setSearchRequestReceivedCallback(searchRequestReceivedCallback);

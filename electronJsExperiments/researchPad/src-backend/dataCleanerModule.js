@@ -1,12 +1,9 @@
 function cleanGoogleResultList(googleResultList){
-    var thingsToRemove = ["[HTML]","[BOOK]","[PDF]"];
+    var bracket_regex = /\[(.*?)]/g ;
+
     googleResultList.forEach(function(resultObj){
-        thingsToRemove.forEach(function(keyword){
-            const lowerCaseKeyword = keyword.toLowerCase();
-            var result = resultObj.title.replace(keyword,'');
-            result = result.replace(lowerCaseKeyword,'');
+            var result = resultObj.title.replace(bracket_regex,'');
             resultObj.title = result;
-        });
     });
 }
 

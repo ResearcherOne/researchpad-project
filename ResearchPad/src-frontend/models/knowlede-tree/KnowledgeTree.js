@@ -187,7 +187,7 @@ function KnowledgeTree(
 		firstNodeType,
 		secondNodeType
 	) {
-		const connectionID = "conn-" + rootID + siblingReferenceRootID;
+		const connectionID = "conn-" + rootID + "" +siblingReferenceRootID;
 		var connectionObj = new SiblingConnection(
 			connectionID,
 			rootID,
@@ -762,4 +762,7 @@ this.referenceNodes = reconstructReferenceNodes(this.referenceNodes);
 	this.isReferenceExists = function(nodeID) {
 		return this.referenceNodes[nodeID] != null;
 	};
+	this.isConnectionExists = function(rootNodeID, leafNodeID) {
+		return this.rootNodes[rootNodeID].isConnectedToLeafNode(leafNodeID);
+	}
 }

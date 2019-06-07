@@ -63,7 +63,7 @@ function RootNode(
 	};
 	this.connectCitedBy = function(refID) {
 		this.citedByNodes[refID] = 1;
-		this.citedByNodes++;
+		this.citedByCount++;
 	};
 	this.connectReference = function(refID) {
 		this.references[refID] = 1;
@@ -127,6 +127,7 @@ function RootNode(
 		suggestedCitedByNodeList,
 		suggestedReferenceNodeList
 	) {
+		console.log("IMPORT WOWOWOWOWO")
 		var reconstructedReferences = {};
 		for (var referenceNodeID in serializedReferences) {
 			var leafNodeData = JSON.parse(serializedReferences[referenceNodeID]);
@@ -214,6 +215,15 @@ function RootNode(
 	this.getSuggestedReferenceList = function() {
 		return this.suggestedReferenceNodeList;
 	};
+	this.isConnectedToLeafNode = function(leafID){
+		console.log("---"+this.ID+"---")
+		console.log(leafID);
+		console.log(this.radius);
+		console.log(this.citedByNodes);
+		console.log(this.references);
+		if(this.references[leafID] || this.citedByNodes[leafID]) return true;
+		else return false;
+	}
 	RootNode.prototype = Object.create(Node.prototype);
 	Object.defineProperty(RootNode.prototype, "constructor", {
 		value: RootNode,

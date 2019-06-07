@@ -894,27 +894,35 @@ function citationNodeDragStart(nodeObj, visualObjID) {}
 function referenceNodeDragStart(nodeObj, visualObjID) {}
 function rootNodeDragEnd(nodeObj, visualObjID) {}
 function citationNodeDragEnd(nodeObj, visualObjID) {
-	const x = nodeObj.getAbsolutePosition(visualObjID).x;
-	const y = nodeObj.getAbsolutePosition(visualObjID).y;
-	const ID = nodeObj.getID();
-	const rootNodeIdOfLeafNode = nodeObj.getRootNodeID(visualObjID);
-	const academicDataLibrary = nodeObj.getAcademicDataLibrary();
+	if(g_trashBin.isMouseInTrashZone()){
+		const ID = nodeObj.getID();
+		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID(visualObjID);
+		knowledgeTree.removeCitedbyFromRootNode(rootNodeIdOfLeafNode, ID);
 
-	saveTransformedCitationRoot(CURRENT_SEARCH_PLATFORM,
-		x,
-		y,
-		ID,
-		rootNodeIdOfLeafNode,
-		academicDataLibrary
-	);
-	transformCitationNodeToRootNode(
-		CURRENT_SEARCH_PLATFORM,
-		x,
-		y,
-		ID,
-		rootNodeIdOfLeafNode,
-		academicDataLibrary
-	);
+		pushRemoveLeafEventToSavedRecords(CURRENT_SEARCH_PLATFORM, NODE_TYPES.CITATION, rootNodeIdOfLeafNode, ID);
+	} else {
+		const x = nodeObj.getAbsolutePosition(visualObjID).x;
+		const y = nodeObj.getAbsolutePosition(visualObjID).y;
+		const ID = nodeObj.getID();
+		const rootNodeIdOfLeafNode = nodeObj.getRootNodeID(visualObjID);
+		const academicDataLibrary = nodeObj.getAcademicDataLibrary();
+	
+		saveTransformedCitationRoot(CURRENT_SEARCH_PLATFORM,
+			x,
+			y,
+			ID,
+			rootNodeIdOfLeafNode,
+			academicDataLibrary
+		);
+		transformCitationNodeToRootNode(
+			CURRENT_SEARCH_PLATFORM,
+			x,
+			y,
+			ID,
+			rootNodeIdOfLeafNode,
+			academicDataLibrary
+		);
+	}
 }
 function referenceNodeDragEnd(nodeObj, visualObjID) {
 	const x = nodeObj.getAbsolutePosition(visualObjID).x;
@@ -1138,6 +1146,25 @@ function spawnRootNodeRecursively(startIndex, rows) {
 		} else {
 			setTimeout(function(){ spawnRootNodeRecursively(startIndex, rows); }, 100);
 		}
+	} else if (savedElement.saveType == "pushRemoveLeafEventToSavedRecords") {
+		const rootID = savedElement.rootID;
+		const leafID = savedElement.leafID;
+		const leafType = savedElement.leafType;
+		if(knowledgeTree.isConnectionExists(rootID, leafID)) {
+			console.log("YO");
+			if(leafType == NODE_TYPES.CITATION) {
+				console.log("NM");
+				knowledgeTree.removeCitedbyFromRootNode(rootID, leafID);
+			} else if (leafType == NODE_TYPES.REFERENCE) {
+				console.log("HEY HEY HEY");
+				knowledgeTree.removeReferenceFromRootNode(rootID, leafID);
+			} else {
+				console.log("TROLO");
+				loggerModule.error("error", "Unknown leaf type: "+leafType);
+			}
+		} else {
+			setTimeout(function(){ spawnRootNodeRecursively(startIndex, rows); }, 100);
+		}
 	} else {
 		loggerModule.error("error", "Unknown save type: "+savedElement.saveType);
 	}
@@ -1145,6 +1172,7 @@ function spawnRootNodeRecursively(startIndex, rows) {
 function loadSavedData()
 {
 	db.allDocs({include_docs: true, descending: false}, function(err, doc) {
+		console.log(doc.rows);
 		const startIndex = 0;
 		spawnRootNodeRecursively(startIndex, doc.rows);
 	})
@@ -1158,6 +1186,21 @@ function executeCallbackOnceChorimumReady(callback)
 			setTimeout(function(){executeCallbackOnceChorimumReady(callback)}, 1000);
 		}
 	});
+}
+function pushRemoveLeafEventToSavedRecords(platform, leafType, rootID, leafID) {
+	var savedData = {
+		_id: new Date().toISOString(),
+		saveType: "pushRemoveLeafEventToSavedRecords",
+		platform: platform,
+		leafType: leafType,
+		rootID: rootID,
+		leafID: leafID
+	  };
+	  db.put(savedData, function callback(err, result) {
+		if (!err) {
+		  console.log('Successfully saved the data!');
+		}
+	  });
 }
 
 //-----------------------------------------------------

@@ -21,17 +21,14 @@
 
 ![alt text](https://github.com/ResearcherOne/researchpad-project/blob/develop/images/04-go-deeper.png)
 
+# Project Team:
+- Andrew Camps: Our 10x software engineer guy.
+- Ogulcan Cingiler: Take cares of backend, data fetching, data parsing and whatever else needed to make ResearchPad project come reality.
+- Emre Ay: Anything that is non technical is handled by Emre. Talking with researchers, data analysis, etc.
+- Birkan Kolcu: Mostly creating new features needed, software architecture (sorry for messing up with front-end), prioritization of features and coding hard.
+
 # Credits
 - This project is initiated by Birkan Kolcu as a frustration stem from the fact that none of the commercial research management softwares out there didn't provide visualization/mind mapping capability integrated with academic web content.
 
-- Project Team:
- - Andrew Camps
-  - Our 10x software engineer guy.
- - Ogulcan Cingiler
-  - Take cares of backend, data fetching, data parsing and whatever else needed to make ResearchPad project come reality.
- - Emre Ay
-  - Anything that is non technical is handled by Emre. Talking with researchers, data analysis, etc.
- - Birkan Kolcu
-  - Mostly creating new features needed, software architecture (sorry for messing up with front-end), prioritization of features and coding hard.
- 
+# This project is not maintained anymore.
 - Unfortunately we do not maintain the project anymore. Hope this project will be useful for some folks out there to create cool projects.

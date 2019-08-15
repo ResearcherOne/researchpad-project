@@ -32,3 +32,4 @@
 
 # This project is not maintained anymore.
 - Unfortunately we do not maintain the project anymore. Hope this project will be useful for some folks out there to create cool projects.
+- If you are sad, and really wanted to actually use a research mind-mapping tool you should probably check out Docear project that would be probably useful for your PhD.
